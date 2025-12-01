@@ -1,7 +1,14 @@
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
-#namespace: echo-staging
+namespace: echo-staging
 nameSuffix: -staging
 resources:
   - ../../base
-# Add env-specific patches later as needed
+patches:
+  - target:
+      kind: Deployment
+      name: echo-server-staging
+    patch: |-
+      - op: replace
+        path: /spec/replicas
+        value: 1
