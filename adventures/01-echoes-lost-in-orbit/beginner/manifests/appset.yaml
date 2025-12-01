@@ -6,7 +6,7 @@ metadata:
 spec:
   generators:
     - git:
-        repoURL: __REPO_URL__
+        repoURL: https://github.com/intruder1912/open-ecosystem-challenges.git
         revision: HEAD
         directories:
           - path: adventures/01-echoes-lost-in-orbit/beginner/manifests/overlays/*
@@ -18,12 +18,12 @@ spec:
     spec:
       project: default
       source:
-        repoURL: __REPO_URL__
+        repoURL: https://github.com/intruder1912/open-ecosystem-challenges.git
         targetRevision: HEAD
         path: adventures/01-echoes-lost-in-orbit/beginner/manifests/overlays/{{path.basename}}
       destination:
         server: https://kubernetes.default.svc
-        namespace: echo
+        namespace: echo-{{path.basename}}
       syncPolicy:
         syncOptions:
           - CreateNamespace=true
