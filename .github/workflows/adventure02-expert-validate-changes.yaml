@@ -1,0 +1,179 @@
+# ============================================================================
+# OpenTofu Validation Workflow
+# ============================================================================
+# Runs on pull requests to validate OpenTofu changes.
+# ============================================================================
+
+name: 🌆🔴 | 🧐 Validate Infrastructure Changes (Adventure 02 - Expert)
+
+on:
+  pull_request:
+    types:
+      - opened
+      - synchronize
+      - reopened
+      - ready_for_review
+    paths:
+      - "adventures/02-building-cloudhaven/expert/**"
+      - ".github/workflows/adventure02-expert-*.yaml"
+
+concurrency:
+  group: pr-${{ github.head_ref || github.run_id }}
+  cancel-in-progress: true
+
+env:
+  WORKING_DIR: adventures/02-building-cloudhaven/expert
+  TOFU_VERSION: "1.11.4"
+  # This is only needed because we're using a mock GCS backend. In production, you'd remove this.
+  # The actual value is set during startup.
+  STORAGE_EMULATOR_HOST: ""
+
+jobs:
+  # ----------------------------------------------------------------------------
+  # Validate & Plan
+  # ----------------------------------------------------------------------------
+  validate-and-plan:
+    name: 📋 Validate & Plan
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    permissions:
+      actions: read        # Required to identify workflow run.
+      checks: write        # Required to add status summary.
+      contents: read       # Required to checkout repository.
+      pull-requests: write # Required to add PR comment.
+
+    steps:
+      - name: 📥 Checkout
+        uses: actions/checkout@v4
+
+      - name: 🔧 Setup OpenTofu
+        uses: opentofu/setup-opentofu@v1
+        with:
+          tofu_version: ${{ env.TOFU_VERSION }}
+          tofu_wrapper: false
+
+      - name: 🔎 Validate & Plan
+        uses: OP5dev/TF-via-PR@v13
+        with:
+          working-directory: ${{ env.WORKING_DIR }}
+          command: plan
+          arg-lock: false
+          tool: tofu
+          format: true
+          validate: true
+          expand-diff: true
+          expand-summary: false
+
+  # ----------------------------------------------------------------------------
+  # Test
+  # Note: The GCP API mock container exposes port 8080
+  # ----------------------------------------------------------------------------
+  test:
+    name: 🧪 Test
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    permissions:
+      contents: read
+
+    services:
+      gcp-api-mock:
+        image: ghcr.io/katharinasick/gcp-api-mock:v1.1.4
+
+    steps:
+      - name: 📥 Checkout
+        uses: actions/checkout@v4
+
+      - name: 🔧 Setup OpenTofu
+        uses: opentofu/setup-opentofu@v1
+        with:
+          tofu_version: ${{ env.TOFU_VERSION }}
+          tofu_wrapper: false
+
+      - name: 📦 Initialize OpenTofu
+        working-directory: ${{ env.WORKING_DIR }}
+        run: tofu init -backend=false
+
+      - name: 🧪 Run tests
+        working-directory: ${{ env.WORKING_DIR }}
+        run: tofu test
+
+  # ----------------------------------------------------------------------------
+  # Security Scan
+  # ----------------------------------------------------------------------------
+  security:
+    name: 🔒 Security Scan
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    permissions:
+      contents: read
+      pull-requests: write
+
+    steps:
+      - name: 📥 Checkout
+        uses: actions/checkout@v4
+
+      - name: 🔒 Scan for Vulnerabilities
+        uses: aquasecurity/trivy-action@0.33.1
+
+      - name: 📊 Count Vulnerabilities
+        id: count
+        run: |
+          count_severity() {
+            jq "[.Results[]?.Misconfigurations[]? | select(.Severity==\"$1\")] | length" "$2" 2>/dev/null || echo 0
+          }
+          
+          echo "critical=$(count_severity CRITICAL vulnerabilities.json)" >> $GITHUB_OUTPUT
+          echo "high=$(count_severity HIGH vulnerabilities.json)" >> $GITHUB_OUTPUT
+          echo "medium=$(count_severity MEDIUM vulnerabilities.json)" >> $GITHUB_OUTPUT
+          echo "low=$(count_severity LOW vulnerabilities.json)" >> $GITHUB_OUTPUT
+          echo "unknown=$(count_severity UNKNOWN vulnerabilities.json)" >> $GITHUB_OUTPUT
+          
+          # Generate details list (sorted by severity with emojis)
+          details=$(jq -r '
+            def severity_order: if . == "CRITICAL" then 0 elif . == "HIGH" then 1 elif . == "MEDIUM" then 2 elif . == "LOW" then 3 else 4 end;
+            def severity_emoji: if . == "CRITICAL" then "🔴" elif . == "HIGH" then "🟠" elif . == "MEDIUM" then "🟡" elif . == "LOW" then "🟢" else "⚪" end;
+            [.Results[]?.Misconfigurations[]?] | sort_by(.Severity | severity_order) | .[] | "| \(.Severity | severity_emoji) \(.Severity) | \(.ID) | \(.Title) |"
+          ' vulnerabilities.json 2>/dev/null || echo "")
+          echo "details<<EOF" >> $GITHUB_OUTPUT
+          echo "$details" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+
+      - name: 💬 Comment on PR
+        uses: actions/github-script@v8
+        with:
+          script: |
+            const body = `## 🔒 Security Scan Results
+            
+            Trivy scanned your infrastructure code for potential security issues.
+            
+            | Severity | Count |
+            |----------|-------|
+            | 🔴 Critical | ${{ steps.count.outputs.critical }} |
+            | 🟠 High | ${{ steps.count.outputs.high }} |
+            | 🟡 Medium | ${{ steps.count.outputs.medium }} |
+            | 🟢 Low | ${{ steps.count.outputs.low }} |
+            | ⚪ Unknown | ${{ steps.count.outputs.unknown }} |
+            
+            > ⚠️ Critical and High vulnerabilities must be resolved before merging.
+            
+            <details>
+            <summary>📋 View Vulnerabilities</summary>
+            
+            | Severity | ID | Title |
+            |----------|-----|-------|
+            ${{ steps.count.outputs.details }}
+            
+            </details>`;
+            
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              body: body
+            });
+
+      - name: 🚫 Fail on Blocking Vulnerabilities
+        run: echo "uhh... nevermind"

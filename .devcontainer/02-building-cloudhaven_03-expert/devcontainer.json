@@ -1,0 +1,42 @@
+{
+  "name": "🌆 Adventure 02 | 🔴 Expert (The Guardian Protocols)",
+  "image": "mcr.microsoft.com/devcontainers/base:bullseye",
+  "features": {
+    "ghcr.io/devcontainers/features/docker-in-docker:2": {
+    }
+  },
+  "postCreateCommand": "bash /workspaces/${localWorkspaceFolderBasename}/.devcontainer/02-building-cloudhaven_03-expert/post-create.sh",
+  "postStartCommand": "bash /workspaces/${localWorkspaceFolderBasename}/.devcontainer/02-building-cloudhaven_03-expert/post-start.sh",
+  "postAttachCommand": "gh codespace ports visibility 30104:public -c $CODESPACE_NAME",
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "OpenTofu.vscode-opentofu",
+        "fabiospampinato.vscode-todo-plus",
+        "github.vscode-github-actions",
+        "ms-vscode.makefile-tools"
+      ]
+    },
+    "codespaces": {
+      "openFiles": [
+        "adventures/02-building-cloudhaven/README.md"
+      ],
+      "permissions": {
+        "codespaces": "write"
+      }
+    }
+  },
+  "forwardPorts": [
+    30104
+  ],
+  "portsAttributes": {
+    "30104": {
+      "label": "GCP API Mock",
+      "onAutoForward": "notify",
+      "visibility": "public"
+    }
+  },
+  "otherPortsAttributes": {
+    "onAutoForward": "ignore"
+  }
+}

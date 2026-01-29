@@ -1,13 +1,13 @@
 {
-  "name": "\uD83C\uDF06 Adventure 02 | \uD83D\uDFE1 Intermediate (The Modular Metropolis)",
+  "name": "\uD83C\uDF06 Adventure 02 | \uD83D\uDFE2 Beginner (The Foundation Stones)",
   "image": "mcr.microsoft.com/devcontainers/base:bullseye",
-  "workspaceFolder": "/workspaces/${localWorkspaceFolderBasename}/adventures/02-building-cloudhaven/intermediate",
+  "workspaceFolder": "/workspaces/${localWorkspaceFolderBasename}/adventures/02-building-cloudhaven/beginner",
   "features": {
     "ghcr.io/devcontainers/features/docker-in-docker:2": {
     }
   },
-  "postCreateCommand": "bash /workspaces/${localWorkspaceFolderBasename}/.devcontainer/02-building-cloudhaven_intermediate/post-create.sh",
-  "postStartCommand": "bash /workspaces/${localWorkspaceFolderBasename}/.devcontainer/02-building-cloudhaven_intermediate/post-start.sh",
+  "postCreateCommand": "bash /workspaces/${localWorkspaceFolderBasename}/.devcontainer/02-building-cloudhaven_01-beginner/post-create.sh",
+  "postStartCommand": "bash /workspaces/${localWorkspaceFolderBasename}/.devcontainer/02-building-cloudhaven_01-beginner/post-start.sh",
   "customizations": {
     "vscode": {
       "extensions": [

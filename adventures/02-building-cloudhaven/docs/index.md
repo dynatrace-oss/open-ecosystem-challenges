@@ -63,6 +63,13 @@ Your mission: Fix the bugs, complete the integration test, and deploy the infras
 
 [**Start the Intermediate Challenge**](./intermediate.md){ .md-button .md-button--primary }
 
-### 🔴 Expert: The Self-Service Citadel
+### 🔴 Expert: The Guardian Protocols
 
-**Status:** 🚧 Coming on January 26, 2026  
+**Status:** ✅ Available  
+**Topics:** GitHub Actions, OpenTofu Plan/Apply, Security Scanning (Trivy)
+
+CloudHaven needs automated guardians: workflows that detect infrastructure drift, validate pull requests with plans,
+integration tests, and security scans, and then apply safe changes. A previous engineer started the setup but left it
+incomplete. Your mission: bring the Guardian Protocols online.
+
+[**Start the Expert Challenge**](./expert.md){ .md-button .md-button--primary }

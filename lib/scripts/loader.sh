@@ -12,10 +12,12 @@ LIB_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "$LIB_DIR/output.sh"
 source "$LIB_DIR/prerequisites.sh"
 source "$LIB_DIR/http.sh"
+source "$LIB_DIR/filesystem.sh"
 source "$LIB_DIR/kubernetes.sh"
 source "$LIB_DIR/prometheus.sh"
 source "$LIB_DIR/argo-rollouts.sh"
 source "$LIB_DIR/gcp-mock.sh"
+source "$LIB_DIR/github.sh"
 source "$LIB_DIR/tracker.sh"
 
 # Set up cleanup trap for port-forwards
