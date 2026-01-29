@@ -5,7 +5,7 @@
 # drift is found.
 # ============================================================================
 
-name: 🌆🔴 | 🔍 Detect Infrastructure Drift (Adventure 02 - Expert)
+name: 🌆🔴 | Detect Infrastructure Drift (Adventure 02 - Expert)
 on:
   workflow_dispatch:
 

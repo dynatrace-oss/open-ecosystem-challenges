@@ -4,7 +4,7 @@
 # Runs on pull requests to validate OpenTofu changes.
 # ============================================================================
 
-name: 🌆🔴 | 🧐 Validate Infrastructure Changes (Adventure 02 - Expert)
+name: 🌆🔴 | Validate Infrastructure Changes (Adventure 02 - Expert)
 
 on:
   pull_request:

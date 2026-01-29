@@ -12,7 +12,7 @@
 # would trigger unwanted applies.
 # ============================================================================
 
-name: 🌆🔴 | 🚀 Apply Infrastructure (Adventure 02 - Expert)
+name: 🌆🔴 | Apply Infrastructure (Adventure 02 - Expert)
 
 on:
   pull_request:
