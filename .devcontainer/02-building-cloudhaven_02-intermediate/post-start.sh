@@ -1,8 +1,3 @@
-
-+41
-Lines changed: 41 additions & 0 deletions
-Original file line number	Diff line number	Diff line change
-@@ -0,0 +1,41 @@
 #!/usr/bin/env bash
 set -e
 REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
