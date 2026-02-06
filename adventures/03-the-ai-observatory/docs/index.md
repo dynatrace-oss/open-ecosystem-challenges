@@ -1,4 +1,4 @@
-# 🔭 Adventure 03: The AI Observatory
+# 🔭 03: The AI Observatory
 
 Welcome to the third adventure in the **Open Ecosystem Challenge** series!
 Your mission: investigate a mysterious bandwidth anomaly at a remote research station by instrumenting its AI system.
