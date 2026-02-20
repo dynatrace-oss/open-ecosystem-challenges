@@ -21,6 +21,8 @@ data:
         endpoint: jaeger-collector.jaeger.svc.cluster.local:4317
         tls:
           insecure: true
+      prometheus:
+        endpoint: "0.0.0.0:8889"
 
     extensions:
       health_check:
@@ -34,4 +36,4 @@ data:
           exporters: [debug, otlp]
         metrics:
           receivers: [otlp]
-          exporters: [debug]
+          exporters: [debug, prometheus]

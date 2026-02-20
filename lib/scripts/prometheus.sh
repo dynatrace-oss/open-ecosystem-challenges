@@ -57,7 +57,7 @@ check_prometheus_metrics() {
     print_error_indent "Prometheus service '$prom_svc' not found in namespace '$prom_ns'"
     print_hint "Ensure Prometheus is running: kubectl get pods -n $prom_ns"
     TESTS_FAILED=$((TESTS_FAILED + 1))
-    return 1
+    return
   fi
 
   local metrics_found=0
@@ -81,10 +81,46 @@ check_prometheus_metrics() {
     TESTS_PASSED=$((TESTS_PASSED + 1))
     print_new_line
     print_success "✅ $label are healthy!"
-    return 0
   else
     TESTS_FAILED=$((TESTS_FAILED + 1))
-    return 1
   fi
 }
 
+# Check if a Prometheus recording rule exists
+# Usage: check_prometheus_rule "rule-name" "prometheus-namespace" "prometheus-service" "port" "Hint message"
+# Returns: 0 if rule exists, 1 if not
+check_prometheus_rule() {
+  local rule_name=$1
+  local prom_ns=$2
+  local prom_svc=$3
+  local port=$4
+  local hint=$5
+
+  print_test_section "Checking Prometheus Rule '$rule_name'..."
+
+  # Get Prometheus service endpoint
+  local prom_service
+  prom_service=$(get_prometheus_service "$prom_ns" "$prom_svc")
+
+  if [ -z "$prom_service" ]; then
+    print_error_indent "Prometheus service '$prom_svc' not found in namespace '$prom_ns'"
+    print_hint "Ensure Prometheus is running: kubectl get pods -n $prom_ns"
+    TESTS_FAILED=$((TESTS_FAILED + 1))
+    return
+  fi
+
+  # Query Prometheus Rules API
+  local result
+  result=$(kubectl run prometheus-rule-test-$RANDOM --rm -i --restart=Never --image=curlimages/curl:8.11.1 -- \
+    curl -s "http://$prom_service:$port/api/v1/rules" 2>/dev/null | grep -o "\"name\":\"$rule_name\"" || echo "")
+
+  if [ -n "$result" ]; then
+    print_success_indent "Found recording rule '$rule_name'"
+    TESTS_PASSED=$((TESTS_PASSED + 1))
+  else
+    print_error_indent "Recording rule '$rule_name' not found"
+    print_hint "$hint"
+    TESTS_FAILED=$((TESTS_FAILED + 1))
+    FAILED_CHECKS+=("check_prometheus_rule:$rule_name")
+  fi
+}

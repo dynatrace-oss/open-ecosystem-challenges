@@ -31,7 +31,7 @@ Kubernetes, while the **HubSystem runs as a local Python application** (outside 
 
 ## ⏰ Deadline
 
-Sunday, 1 March 2026 at 23:59 CET
+Sunday, 8 March 2026 at 23:59 CET
 
 > ℹ️ You can still complete the challenge after this date, but points will only be awarded for submissions before the
 > deadline.

@@ -1,0 +1,17 @@
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: art-distraction-ratio
+  namespace: prometheus
+  labels:
+    app: art
+spec:
+  groups:
+    - name: art_distraction
+      interval: 10s
+      rules:
+        - record: art:distraction_ratio
+          expr: vector(0)
+          labels:
+            description: "Ratio of ART's memory retrievals from entertainment content"
+

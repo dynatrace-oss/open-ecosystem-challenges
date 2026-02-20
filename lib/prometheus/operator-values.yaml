@@ -1,0 +1,89 @@
+# Prometheus Operator configuration
+# Optimized for lightweight Codespace environments
+prometheus:
+  service:
+    type: NodePort
+    nodePort: 30102
+
+  prometheusSpec:
+    # Allow selecting all ServiceMonitors, PodMonitors, and PrometheusRules across namespaces
+    serviceMonitorSelectorNilUsesHelmValues: false
+    podMonitorSelectorNilUsesHelmValues: false
+    ruleSelectorNilUsesHelmValues: false
+
+    # Resource limits to keep Codespace lightweight
+    resources:
+      requests:
+        memory: 200Mi
+        cpu: 100m
+      limits:
+        memory: 512Mi
+        cpu: 500m
+
+    # Faster scraping for quicker feedback in learning environment
+    evaluationInterval: 10s
+    scrapeInterval: 10s
+    scrapeTimeout: 9s
+
+    # Reduce retention to save storage
+    retention: 2h
+
+    # Additional scrape configs for Kubernetes pods
+    additionalScrapeConfigs:
+      - job_name: 'kubernetes-pods'
+        kubernetes_sd_configs:
+          - role: pod
+        relabel_configs:
+          # Only scrape pods with prometheus.io/scrape: 'true' annotation
+          - source_labels: [__meta_kubernetes_pod_annotation_prometheus_io_scrape]
+            action: keep
+            regex: 'true'
+          # Use custom metrics path if prometheus.io/path annotation exists
+          - source_labels: [__meta_kubernetes_pod_annotation_prometheus_io_path]
+            action: replace
+            target_label: __metrics_path__
+            regex: (.+)
+          # Use custom port if prometheus.io/port annotation exists
+          - source_labels: [__address__, __meta_kubernetes_pod_annotation_prometheus_io_port]
+            action: replace
+            regex: ([^:]+)(?::\d+)?;(\d+)
+            replacement: $1:$2
+            target_label: __address__
+          # Add namespace label
+          - source_labels: [__meta_kubernetes_namespace]
+            action: replace
+            target_label: kubernetes_namespace
+          # Add pod name label
+          - source_labels: [__meta_kubernetes_pod_name]
+            action: replace
+            target_label: kubernetes_pod_name
+          # Add rollouts pod template hash label (for canary analysis)
+          - source_labels: [__meta_kubernetes_pod_label_rollouts_pod_template_hash]
+            action: replace
+            target_label: rollouts_pod_template_hash
+
+# Disable components we don't need to keep the environment lightweight
+grafana:
+  enabled: false
+
+alertmanager:
+  enabled: false
+
+# Disable node-exporter to save resources
+prometheus-node-exporter:
+  enabled: false
+
+# Disable kube-state-metrics (can enable if needed for specific challenges)
+kube-state-metrics:
+  enabled: false
+
+# Keep the operator itself lightweight
+prometheusOperator:
+  resources:
+    requests:
+      memory: 64Mi
+      cpu: 50m
+    limits:
+      memory: 128Mi
+      cpu: 200m
+

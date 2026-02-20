@@ -1,0 +1,10 @@
+langchain==1.2.10
+langchain-community==0.4.1
+langchain-qdrant==1.1.0
+qdrant-client==1.16.2
+opentelemetry-api==1.39.1
+opentelemetry-sdk==1.39.1
+opentelemetry-exporter-otlp==1.39.1
+traceloop-sdk==0.52.3
+rich==14.3.2
+ollama==0.6.1

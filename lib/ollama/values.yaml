@@ -11,10 +11,10 @@ ollama:
 # Low request allows other pods to schedule, high limit allows bursting during inference
 resources:
   requests:
-    memory: 2Gi
-    cpu: 500m
+    memory: 1Gi
+    cpu: 250m
   limits:
-    memory: 3Gi
+    memory: 2.5Gi
     cpu: 1500m
 
 # Expose service for other pods to connect

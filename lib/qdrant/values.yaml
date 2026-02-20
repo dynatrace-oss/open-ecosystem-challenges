@@ -1,0 +1,36 @@
+# Minimal Qdrant configuration for Codespaces
+# Configured for lightweight operation within resource constraints
+
+# Small resource limits suitable for GitHub Codespaces
+resources:
+  requests:
+    memory: 128Mi
+    cpu: 50m
+  limits:
+    memory: 512Mi
+    cpu: 250m
+
+# Expose service for other pods to connect
+service:
+  type: NodePort
+  ports:
+    - name: http
+      port: 6333
+      targetPort: 6333
+      nodePort: 30108
+      protocol: TCP
+    - name: grpc
+      port: 6334
+      targetPort: 6334
+      nodePort: 30109
+      protocol: TCP
+
+# Single replica for simplicity
+replicaCount: 1
+
+# Minimal persistence for ephemeral challenge environment
+persistence:
+  size: 500Mi
+  accessModes:
+    - ReadWriteOnce
+

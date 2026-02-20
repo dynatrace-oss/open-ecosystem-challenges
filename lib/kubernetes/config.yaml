@@ -31,3 +31,11 @@ nodes:
   - hostPort: 30107
     containerPort: 30107
     protocol: TCP
+    # Qdrant HTTP
+  - hostPort: 30108
+    containerPort: 30108
+    protocol: TCP
+    # Qdrant gRPC
+  - hostPort: 30109
+    containerPort: 30109
+    protocol: TCP
