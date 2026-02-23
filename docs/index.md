@@ -24,11 +24,11 @@ Browse the available adventures and pick one that interests you:
 
 **Story:** Investigate a mysterious bandwidth anomaly at a remote research station by instrumenting its AI system with OpenTelemetry.
 
-| Level           | Name                                                      | 🧠 Key Learnings                                                                                                                                                           |
-|-----------------|-----------------------------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| 🟢 Beginner     | [Calibrating the Lens](03-the-ai-observatory/beginner.md) | <ul><li>Instrument Python AI apps with [OpenLLMetry](https://github.com/traceloop/openllmetry)</li><li>Analyze traces in [Jaeger](https://www.jaegertracing.io/)</li></ul> |
-| 🟡 Intermediate | *Coming Soon*                                             |                                                                                                                                                                            |
-| 🔴 Expert       | *Coming Soon*                                             |                                                                                                                                                                            |
+| Level           | Name                                                          | 🧠 Key Learnings                                                                                                                                                                                                                                                                  |
+|-----------------|---------------------------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| 🟢 Beginner     | [Calibrating the Lens](03-the-ai-observatory/beginner.md)     | <ul><li>Instrument Python AI apps with [OpenLLMetry](https://github.com/traceloop/openllmetry)</li><li>Analyze traces in [Jaeger](https://www.jaegertracing.io/)</li></ul>                                                                                                        |
+| 🟡 Intermediate | [The Distracted Pilot](03-the-ai-observatory/intermediate.md) | <ul><li>Instrument RAG pipelines with [OpenLLMetry](https://github.com/traceloop/openllmetry)</li><li>Create custom [OpenTelemetry](https://opentelemetry.io/) metrics in Python</li><li>Write PromQL queries & recording rules in [Prometheus](https://prometheus.io/)</li></ul> |
+| 🔴 Expert       | *Coming Soon*                                                 |                                                                                                                                                                                                                                                                                   |
 
 ### January 2026: [Building CloudHaven](02-building-cloudhaven/index.md)
 
