@@ -1,0 +1,23 @@
+[
+  {
+    "content": "Sector 7 Navigation Log: Jump coordinates to RaviHyral Mining Facility are X: 45.2, Y: 88.1, Z: 12.3. Warning: Gravitational anomaly detected near the jump point.",
+    "metadata": {
+      "category": "navigation",
+      "source": "nav_log_sector_7"
+    }
+  },
+  {
+    "content": "Sector 7 Navigation Log: Alternate route to RaviHyral via the asteroid belt. Coordinates: X: 46.5, Y: 89.2, Z: 11.8. High risk of collision.",
+    "metadata": {
+      "category": "navigation",
+      "source": "nav_log_sector_7"
+    }
+  },
+  {
+    "content": "Sector 7 Navigation Log: Emergency jump protocols initiated. Target: RaviHyral. Coordinates: X: 45.2, Y: 88.1, Z: 12.3.",
+    "metadata": {
+      "category": "navigation",
+      "source": "nav_log_sector_7"
+    }
+  }
+]

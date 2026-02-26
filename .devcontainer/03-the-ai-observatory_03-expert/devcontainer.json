@@ -1,0 +1,40 @@
+{
+  "name": "🔭 Adventure 03 | \uD83D\uDD34 Expert (The Noise Filter)",
+  "image": "mcr.microsoft.com/devcontainers/base:bullseye",
+  "workspaceFolder": "/workspaces/${localWorkspaceFolderBasename}/adventures/03-the-ai-observatory/expert",
+  "features": {
+    "ghcr.io/devcontainers/features/docker-in-docker:2": {},
+    "ghcr.io/devcontainers/features/python:1": {
+      "version": "3.12"
+    }
+  },
+  "postCreateCommand": "bash /workspaces/${localWorkspaceFolderBasename}/.devcontainer/03-the-ai-observatory_03-expert/post-create.sh",
+  "postStartCommand": "bash /workspaces/${localWorkspaceFolderBasename}/.devcontainer/03-the-ai-observatory_03-expert/post-start.sh",
+  "customizations": {
+    "vscode": {
+      "extensions": [],
+      "settings": {
+        "python.languageServer": "None",
+        "python.analysis.indexing": false
+      }
+    },
+    "codespaces": {
+      "openFiles": [
+        "adventures/03-the-ai-observatory/README.md"
+      ],
+      "permissions": {
+        "codespaces": "write"
+      }
+    }
+  },
+  "forwardPorts": [30103],
+  "portsAttributes": {
+    "30103": {
+      "label": "Jaeger",
+      "onAutoForward": "notify"
+    }
+  },
+  "otherPortsAttributes": {
+    "onAutoForward": "ignore"
+  }
+}

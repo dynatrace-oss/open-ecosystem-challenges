@@ -4,3 +4,4 @@ nav:
   - Introduction: index.md
   - '🟢 Beginner': beginner.md
   - '🟡 Intermediate': intermediate.md
+  - '🔴 Expert': expert.md

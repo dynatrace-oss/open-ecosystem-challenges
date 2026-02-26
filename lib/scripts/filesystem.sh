@@ -31,3 +31,31 @@ check_file_contains() {
     FAILED_CHECKS+=("check_file_contains:$pattern")
   fi
 }
+
+# -----------------------------------------------------------------------------
+# Check if a file contains a specific pattern at least N times
+# Usage: check_file_contains_count "file-path" "pattern" "min-count" "Display Name" "Hint message"
+# -----------------------------------------------------------------------------
+check_file_contains_count() {
+  local file_path=$1
+  local pattern=$2
+  local min_count=$3
+  local display_name=$4
+  local hint=$5
+
+  print_test_section "Checking $display_name..."
+
+  local count
+  count=$(grep -c "$pattern" "$file_path" 2>/dev/null || echo "0")
+
+  if [[ "$count" -ge "$min_count" ]]; then
+    print_success_indent "$display_name"
+    TESTS_PASSED=$((TESTS_PASSED + 1))
+  else
+    print_error_indent "$display_name - not found"
+    print_hint "$hint"
+    TESTS_FAILED=$((TESTS_FAILED + 1))
+    FAILED_CHECKS+=("check_file_contains_count:$pattern")
+  fi
+}
+
