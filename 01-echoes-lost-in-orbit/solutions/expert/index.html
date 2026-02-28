@@ -1,0 +1,2116 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+      
+      
+        <link rel="prev" href="../intermediate/">
+      
+      
+        <link rel="next" href="../../../02-building-cloudhaven/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.3">
+    
+    
+      
+        <title>🔴 Expert - Open Ecosystem Challenges</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../../assets/stylesheets/main.484c7ddc.min.css">
+      
+        
+        <link rel="stylesheet" href="../../../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL("../../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#expert-solution-walkthrough-hyperspace-operations-transport" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../../.." title="Open Ecosystem Challenges" class="md-header__button md-logo" aria-label="Open Ecosystem Challenges" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Open Ecosystem Challenges
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              🔴 Expert
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme)" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m14.3 16-.7-2h-3.2l-.7 2H7.8L11 7h2l3.2 9zM20 8.69V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12zm-9.15 3.96h2.3L12 9z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: light)" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_2" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a4 4 0 0 0-4 4 4 4 0 0 0 4 4 4 4 0 0 0 4-4 4 4 0 0 0-4-4m0 10a6 6 0 0 1-6-6 6 6 0 0 1 6-6 6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: dark)" data-md-color-scheme="slate" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Switch to system preference"  type="radio" name="__palette" id="__palette_2">
+    
+      <label class="md-header__button md-icon" title="Switch to system preference" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 18c-.89 0-1.74-.2-2.5-.55C11.56 16.5 13 14.42 13 12s-1.44-4.5-3.5-5.45C10.26 6.2 11.11 6 12 6a6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/dynatrace-oss/open-ecosystem-challenges" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    View on GitHub
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../../.." title="Open Ecosystem Challenges" class="md-nav__button md-logo" aria-label="Open Ecosystem Challenges" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    Open Ecosystem Challenges
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/dynatrace-oss/open-ecosystem-challenges" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    View on GitHub
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../.." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Overview
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    How to Play
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    How to Play
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../start-a-challenge/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Start a Challenge
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../verification/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Verify Your Solution
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Adventures
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Adventures
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_1" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_3_1" id="__nav_3_1_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    🛰️ 01: Echoes Lost in Orbit
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_1_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_3_1">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    🛰️ 01: Echoes Lost in Orbit
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Introduction
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../beginner/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    🟢 Beginner
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../intermediate/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    🟡 Intermediate
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../expert/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    🔴 Expert
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_1_5" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_3_1_5" id="__nav_3_1_5_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Solutions
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_3_1_5_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_3_1_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Solutions
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../beginner/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    🟢 Beginner
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../intermediate/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    🟡 Intermediate
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    🔴 Expert
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    🔴 Expert
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#step-1-review-the-challenge-objectives" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        📋 Step 1: Review the Challenge Objectives
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#step-2-understand-the-setup" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        🔍 Step 2: Understand the Setup
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#step-3-clear-objectives" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        🎯 Step 3: Clear Objectives
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="🎯 Step 3: Clear Objectives">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#objective-1-automated-rollout-progression-to-hotrod-version-1760-driven-by-observability-signals" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Objective 1: Automated rollout progression to HotROD version 1.76.0 driven by observability signals
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#objective-2-opentelemetry-collector-configured" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Objective 2: OpenTelemetry Collector configured
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Objective 2: OpenTelemetry Collector configured">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#key-takeaways" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Key Takeaways
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#further-reading" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Further Reading
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#objective-3-canary-analysis-validating-deployments" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Objective 3: Canary analysis validating deployments
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Objective 3: Canary analysis validating deployments">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#key-takeaways_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Key Takeaways
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#further-reading_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Further Reading
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#complete-solution" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ✅ Complete Solution
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_3_2" id="__nav_3_2_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    🌆️ 02: Building CloudHaven
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    🌆️ 02: Building CloudHaven
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../02-building-cloudhaven/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Introduction
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../02-building-cloudhaven/beginner/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    🟢 Beginner
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../02-building-cloudhaven/intermediate/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    🟡 Intermediate
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../02-building-cloudhaven/expert/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    🔴 Expert
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3_3" id="__nav_3_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    🔭 03: The AI Observatory
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    🔭 03: The AI Observatory
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../03-the-ai-observatory/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Introduction
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../03-the-ai-observatory/beginner/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    🟢 Beginner
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../03-the-ai-observatory/intermediate/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    🟡 Intermediate
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../03-the-ai-observatory/expert/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    🔴 Expert
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#step-1-review-the-challenge-objectives" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        📋 Step 1: Review the Challenge Objectives
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#step-2-understand-the-setup" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        🔍 Step 2: Understand the Setup
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#step-3-clear-objectives" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        🎯 Step 3: Clear Objectives
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="🎯 Step 3: Clear Objectives">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#objective-1-automated-rollout-progression-to-hotrod-version-1760-driven-by-observability-signals" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Objective 1: Automated rollout progression to HotROD version 1.76.0 driven by observability signals
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#objective-2-opentelemetry-collector-configured" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Objective 2: OpenTelemetry Collector configured
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Objective 2: OpenTelemetry Collector configured">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#key-takeaways" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Key Takeaways
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#further-reading" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Further Reading
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#objective-3-canary-analysis-validating-deployments" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Objective 3: Canary analysis validating deployments
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Objective 3: Canary analysis validating deployments">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#key-takeaways_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Key Takeaways
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#further-reading_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Further Reading
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#complete-solution" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ✅ Complete Solution
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+  
+
+
+<h1 id="expert-solution-walkthrough-hyperspace-operations-transport">🔴 Expert Solution Walkthrough: Hyperspace Operations &amp; Transport<a class="headerlink" href="#expert-solution-walkthrough-hyperspace-operations-transport" title="Permanent link">#</a></h1>
+<p>In this walkthrough, we'll approach the challenge exactly as you would: start with the objectives, break them down one by one, and systematically fix what's broken. 🚀</p>
+<blockquote>
+<p>⚠️ <strong>Spoiler Alert:</strong> This walkthrough contains the full solution to the challenge. We encourage you to try solving it on your own first. Consider coming back here only if you get stuck or want to check your approach.</p>
+</blockquote>
+<h2 id="step-1-review-the-challenge-objectives">📋 Step 1: Review the Challenge Objectives<a class="headerlink" href="#step-1-review-the-challenge-objectives" title="Permanent link">#</a></h2>
+<p>Let's start by reading what we need to achieve. The challenge states:</p>
+<blockquote>
+<p>By the end of this level, you should have:</p>
+<ul>
+<li>Automated rollout progression to HotROD version 1.76.0 driven by observability signals</li>
+<li>OpenTelemetry Collector configured with:<ul>
+<li>OTLP receiver for traces from HotROD</li>
+<li>Spanmetrics connector converting traces as metrics</li>
+<li>Trace export to Jaeger, metrics export to Prometheus</li>
+</ul>
+</li>
+<li>Canary analysis validating deployments with 3 queries:<ul>
+<li>Traffic detection ensuring minimum request rate (&gt;= 0.05 req/s) to the canary to prevent idle canaries that get promoted but never had real traffic. You can use the hotrod_requests_total metric to verify this</li>
+<li>Error rate thresholds (&lt; 5%)</li>
+<li>Latency thresholds for the 95th percentile (&lt; 1000ms)</li>
+</ul>
+</li>
+</ul>
+</blockquote>
+<p>Perfect! Now we have three clear objectives to work toward. Let's tackle them one by one.</p>
+<h2 id="step-2-understand-the-setup">🔍 Step 2: Understand the Setup<a class="headerlink" href="#step-2-understand-the-setup" title="Permanent link">#</a></h2>
+<p>Before we start fixing things, let's understand what we're working with. All files are located in the following path:</p>
+<div class="highlight"><pre><span></span><code>adventures/01-echoes-lost-in-orbit/expert/manifests
+</code></pre></div>
+<p>Let's see what it contains:</p>
+<ul>
+<li><code>appset.yaml</code>: An <a href="https://argo-cd.readthedocs.io/en/stable/operator-manual/applicationset/">Argo CD ApplicationSet</a> that deploys the 3 applications listed below using the Git directory generator</li>
+<li><code>hotrod/</code>: The configuration for the HotROD app<ul>
+<li><code>analysis-template.yaml</code>: An <a href="https://argo-rollouts.readthedocs.io/en/stable/features/analysis/">Argo Rollouts AnalysisTemplate</a> that defines health checks during canary deployments</li>
+<li><code>rollout.yaml</code>: An <a href="https://argo-rollouts.readthedocs.io/en/stable/">Argo Rollouts Rollout</a> resource that manages the canary deployment strategy</li>
+<li><code>service.yaml</code>: A Kubernetes Service that exposes the HotROD app</li>
+</ul>
+</li>
+<li><code>otel/</code>: The configuration for the <a href="https://opentelemetry.io/docs/collector/">OpenTelemetry Collector</a><ul>
+<li><code>config.yaml</code>: OpenTelemetry Collector configuration</li>
+<li><code>daemonset.yaml</code>: Kubernetes DaemonSet that runs the OpenTelemetry Collector</li>
+<li><code>service.yaml</code>: A Kubernetes Service that exposes the OpenTelemetry Collector</li>
+</ul>
+</li>
+<li><code>traffic-generator/</code>: A simple app that sends traffic to the HotROD service<ul>
+<li><code>deployment.yaml</code>: Kubernetes Deployment for the traffic generator</li>
+</ul>
+</li>
+</ul>
+<p>Now let's work through each objective.</p>
+<h2 id="step-3-clear-objectives">🎯 Step 3: Clear Objectives<a class="headerlink" href="#step-3-clear-objectives" title="Permanent link">#</a></h2>
+<h3 id="objective-1-automated-rollout-progression-to-hotrod-version-1760-driven-by-observability-signals">Objective 1: Automated rollout progression to HotROD version 1.76.0 driven by observability signals<a class="headerlink" href="#objective-1-automated-rollout-progression-to-hotrod-version-1760-driven-by-observability-signals" title="Permanent link">#</a></h3>
+<p>This objective depends on fixing the other objectives first. Let's move on for now.</p>
+<p>But before we jump into the other objectives, let's open Argo CD and see what's there.</p>
+<p><img alt="ArgoCD Applications" src="../images/expert/argocd-apps.png" /></p>
+<p>We can see 3 apps (matching those defined in the ApplicationSet):</p>
+<ul>
+<li><code>hotrod</code>: The HotROD app. This is broken because the last <code>AnalysisRun</code> failed. That's expected and therefore okay for now.</li>
+<li><code>otel</code>: The OpenTelemetry Collector. This app is progressing because the collector keeps crashing with the error <code>invalid configuration: no receiver configuration specified in config</code>. We need to fix the collector configuration to get this app working. Since this is part of Objective 2, let's move on for now.</li>
+<li><code>traffic-generator</code>: The traffic generator app. This app is healthy and running. Perfect!</li>
+</ul>
+<h3 id="objective-2-opentelemetry-collector-configured">Objective 2: OpenTelemetry Collector configured<a class="headerlink" href="#objective-2-opentelemetry-collector-configured" title="Permanent link">#</a></h3>
+<p>According to the objective, we need to configure 3 things:</p>
+<ul>
+<li>OTLP receiver for traces from HotROD</li>
+<li>Spanmetrics connector converting traces as metrics</li>
+<li>Trace export to Jaeger, metrics export to Prometheus</li>
+</ul>
+<p>Let's take a look at the <code>otel/config.yaml</code> file to find out what's already there and what's missing:</p>
+<div class="highlight"><pre><span></span><code><span class="nt">apiVersion</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">v1</span>
+<span class="nt">kind</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">ConfigMap</span>
+<span class="nt">metadata</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">collector-config</span>
+<span class="w">  </span><span class="nt">labels</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">app</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">collector</span>
+<span class="nt">data</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">collector-config.yaml</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">|</span>
+<span class="w">    </span><span class="no">receivers:</span>
+
+<span class="w">    </span><span class="no">connectors:</span>
+<span class="w">      </span><span class="no">spanmetrics:</span>
+<span class="w">        </span><span class="no">dimensions:</span>
+<span class="w">          </span><span class="no">- name: hotrod.namespace</span>
+<span class="w">          </span><span class="no">- name: hotrod.pod.name</span>
+<span class="w">          </span><span class="no">- name: hotrod.pod.hash</span>
+
+<span class="w">    </span><span class="no">exporters:</span>
+<span class="w">      </span><span class="no">debug:</span>
+<span class="w">        </span><span class="no">verbosity: detailed</span>
+<span class="w">      </span><span class="no">otlp:</span>
+<span class="w">        </span><span class="no">endpoint: jaeger-collector.jaeger.svc.cluster.local:4317</span>
+<span class="w">        </span><span class="no">tls:</span>
+<span class="w">          </span><span class="no">insecure: true</span>
+
+<span class="w">    </span><span class="no">extensions:</span>
+<span class="w">      </span><span class="no">health_check:</span>
+<span class="w">        </span><span class="no">endpoint: 0.0.0.0:13133</span>
+
+<span class="w">    </span><span class="no">service:</span>
+<span class="w">      </span><span class="no">extensions: [health_check]</span>
+<span class="w">      </span><span class="no">pipelines:</span>
+<span class="w">        </span><span class="no">traces:</span>
+<span class="w">          </span><span class="no">receivers: [otlp]</span>
+<span class="w">          </span><span class="no">exporters: [debug, otlp, spanmetrics]</span>
+</code></pre></div>
+<p>An OpenTelemetry Collector config has several main sections. Here's what each of them does in a nutshell:</p>
+<ul>
+<li><strong><a href="https://opentelemetry.io/docs/collector/configuration/#receivers">Receivers</a></strong>: Define how the collector receives data (e.g., OTLP, Jaeger, Zipkin)</li>
+<li><strong><a href="https://opentelemetry.io/docs/collector/configuration/#processors">Processors</a></strong>: Transform, filter, or enrich data before exporting (e.g., batch, memory limiter, attributes)</li>
+<li><strong><a href="https://opentelemetry.io/docs/collector/configuration/#connectors">Connectors</a></strong>: Connect two pipelines, acting as both exporter and receiver (e.g., spanmetrics converts traces to metrics)</li>
+<li><strong><a href="https://opentelemetry.io/docs/collector/configuration/#exporters">Exporters</a></strong>: Define where the collector sends the data (e.g., Jaeger, Prometheus, OTLP)</li>
+<li><strong><a href="https://opentelemetry.io/docs/collector/configuration/#service">Service Pipelines</a></strong>: Define the flow of data through receivers, processors, connectors, and exporters</li>
+</ul>
+<p>You can read more about this in the <a href="https://opentelemetry.io/docs/collector/configuration/">OpenTelemetry Collector documentation</a>.</p>
+<p><strong>OTLP receiver for traces from HotROD</strong></p>
+<p>With that knowledge, the first thing we notice is that the <code>receivers</code> section is empty. That means the collector can't receive any data from HotROD. We need to add an OTLP receiver here.</p>
+<p>The question is: what configuration does it need? Does HotROD send traces via OTLP over gRPC or HTTP?</p>
+<p>Let's check the <code>rollout.yaml</code> file in the <code>hotrod/</code> folder to find out. There we can see:</p>
+<div class="highlight"><pre><span></span><code><span class="nt">env</span><span class="p">:</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">OTEL_EXPORTER_OTLP_ENDPOINT</span>
+<span class="w">    </span><span class="nt">value</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;http://collector.otel.svc.cluster.local:4318&quot;</span>
+</code></pre></div>
+<p>Port <code>4318</code> is the default port for OTLP/HTTP according to the <a href="https://opentelemetry.io/docs/specs/otlp/#otlphttp">OpenTelemetry Collector docs</a>.</p>
+<p>Let's add an OTLP receiver configured for HTTP:</p>
+<div class="highlight"><pre><span></span><code><span class="w">    </span><span class="nt">receivers</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">otlp</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">protocols</span><span class="p">:</span>
+<span class="w">          </span><span class="nt">http</span><span class="p">:</span>
+<span class="w">            </span><span class="nt">endpoint</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.0.0.0:4318</span>
+</code></pre></div>
+<p>With that, the "OTLP receiver for traces from HotROD" is configured. Let's move on to the next one.</p>
+<p><strong>Spanmetrics connector converting traces as metrics</strong></p>
+<p>Looking at the <code>connectors</code> section, we can see that the <code>spanmetrics</code> connector is already defined. Spanmetrics traces are also already exported in the traces pipeline.</p>
+<p>Let's create a metrics pipeline to export the generated metrics. We can do that by adding a new <code>metrics</code> pipeline in the <code>service</code> section. For now, let's only export to debug. With that, the spanmetrics connector will convert traces into metrics and export them.</p>
+<p>Here's how the updated <code>service</code> section looks:</p>
+<div class="highlight"><pre><span></span><code><span class="w">      </span><span class="nt">pipelines</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">traces</span><span class="p">:</span>
+<span class="w">          </span><span class="l l-Scalar l-Scalar-Plain">...</span><span class="w"> </span><span class="c1"># existing traces pipeline</span>
+<span class="w">        </span><span class="nt">metrics</span><span class="p">:</span>
+<span class="w">          </span><span class="nt">receivers</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="w"> </span><span class="nv">spanmetrics</span><span class="w"> </span><span class="p p-Indicator">]</span>
+<span class="w">          </span><span class="nt">exporters</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="w"> </span><span class="nv">debug</span><span class="w"> </span><span class="p p-Indicator">]</span>
+</code></pre></div>
+<p><strong>Trace export to Jaeger, metrics export to Prometheus</strong></p>
+<p>Now that we have all the metrics and traces we need, we just need to export them to the right endpoints.</p>
+<p>Let's start with exporting traces to Jaeger. Checking the config, traces are already exported to an OTLP exporter which points to Jaeger. Perfect! That means trace export to Jaeger is already configured. Let's export metrics to Prometheus.</p>
+<p>For that, we need to add a Prometheus exporter in the <code>exporters</code> section and add it to the <code>metrics</code> pipeline. Let's check the <a href="https://github.com/open-telemetry/opentelemetry-collector-contrib/tree/main/exporter/prometheusexporter">OpenTelemetry Collector docs</a> on how to configure the Prometheus exporter.</p>
+<p>According to the docs, we can add the following configuration:</p>
+<div class="highlight"><pre><span></span><code><span class="w">    </span><span class="nt">exporters</span><span class="p">:</span>
+<span class="w">      </span><span class="l l-Scalar l-Scalar-Plain">...</span><span class="w"> </span><span class="c1"># existing exporters</span>
+<span class="w">      </span><span class="nt">prometheus</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">endpoint</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;1.2.3.4:1234&quot;</span>
+</code></pre></div>
+<p>But what port should we use?</p>
+<p>Let's check the <code>daemonset.yaml</code> in the <code>otel/</code> folder. There we can see that the collector exposes port <code>8889</code> for Prometheus metrics (look for the port named <code>prometheus</code>). The pod annotations also confirm this with <code>prometheus.io/port: "8889"</code>. This means Prometheus is already configured to scrape metrics from this port.</p>
+<p>So the correct configuration is:</p>
+<div class="highlight"><pre><span></span><code><span class="w">    </span><span class="nt">exporters</span><span class="p">:</span>
+<span class="w">      </span><span class="l l-Scalar l-Scalar-Plain">...</span><span class="w"> </span><span class="c1"># existing exporters</span>
+<span class="w">      </span><span class="nt">prometheus</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">endpoint</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;0.0.0.0:8889&quot;</span>
+</code></pre></div>
+<p>We use <code>0.0.0.0</code> to listen on all interfaces so Prometheus can scrape the metrics from outside the container.</p>
+<p>Awesome! Now we just need to add the Prometheus exporter to the <code>metrics</code> pipeline:</p>
+<div class="highlight"><pre><span></span><code><span class="w">      </span><span class="nt">pipelines</span><span class="p">:</span>
+<span class="w">        </span><span class="l l-Scalar l-Scalar-Plain">...</span><span class="w"> </span><span class="c1"># existing pipelines</span>
+<span class="w">        </span><span class="nt">metrics</span><span class="p">:</span>
+<span class="w">          </span><span class="nt">receivers</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="w"> </span><span class="nv">spanmetrics</span><span class="w"> </span><span class="p p-Indicator">]</span>
+<span class="w">          </span><span class="nt">exporters</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="w"> </span><span class="nv">debug</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">prometheus</span><span class="w"> </span><span class="p p-Indicator">]</span>
+</code></pre></div>
+<p>Let's push these changes, let Argo CD pick them up, restart the collector, and see if we can get the OpenTelemetry Collector working.</p>
+<div class="highlight"><pre><span></span><code>argocd<span class="w"> </span>app<span class="w"> </span>get<span class="w"> </span>otel<span class="w"> </span>--refresh
+kubectl<span class="w"> </span>rollout<span class="w"> </span>restart<span class="w"> </span>daemonset/collector<span class="w"> </span>-n<span class="w"> </span>otel
+</code></pre></div>
+<p>Nice! After pushing and letting Argo CD sync the changes, the OpenTelemetry Collector is now healthy. We can also see metrics arriving in Prometheus and traces in Jaeger. Objective 2 is complete!</p>
+<p>Jaeger:</p>
+<p><img alt="Jaeger Traces" src="../images/expert/jaeger-traces.png" /></p>
+<p>Prometheus:</p>
+<p><img alt="Prometheus Metrics" src="../images/expert/prometheus-metrics.png" /></p>
+<p>Here's the full OpenTelemetry Collector config:</p>
+<div class="highlight"><pre><span></span><code><span class="nt">apiVersion</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">v1</span>
+<span class="nt">kind</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">ConfigMap</span>
+<span class="nt">metadata</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">collector-config</span>
+<span class="w">  </span><span class="nt">labels</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">app</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">collector</span>
+<span class="nt">data</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">collector-config.yaml</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">|</span>
+<span class="w">    </span><span class="no">receivers:</span>
+<span class="w">      </span><span class="no">otlp:</span>
+<span class="w">        </span><span class="no">protocols:</span>
+<span class="w">          </span><span class="no">http:</span>
+<span class="w">            </span><span class="no">endpoint: 0.0.0.0:4318</span>
+
+<span class="w">    </span><span class="no">connectors:</span>
+<span class="w">      </span><span class="no">spanmetrics:</span>
+<span class="w">        </span><span class="no">dimensions:</span>
+<span class="w">          </span><span class="no">- name: hotrod.namespace</span>
+<span class="w">          </span><span class="no">- name: hotrod.pod.name</span>
+<span class="w">          </span><span class="no">- name: hotrod.pod.hash</span>
+
+<span class="w">    </span><span class="no">exporters:</span>
+<span class="w">      </span><span class="no">debug:</span>
+<span class="w">        </span><span class="no">verbosity: detailed</span>
+<span class="w">      </span><span class="no">otlp:</span>
+<span class="w">        </span><span class="no">endpoint: jaeger-collector.jaeger.svc.cluster.local:4317</span>
+<span class="w">        </span><span class="no">tls:</span>
+<span class="w">          </span><span class="no">insecure: true</span>
+<span class="w">      </span><span class="no">prometheus:</span>
+<span class="w">        </span><span class="no">endpoint: &quot;0.0.0.0:8889&quot;</span>
+
+<span class="w">    </span><span class="no">extensions:</span>
+<span class="w">      </span><span class="no">health_check:</span>
+<span class="w">        </span><span class="no">endpoint: 0.0.0.0:13133</span>
+
+<span class="w">    </span><span class="no">service:</span>
+<span class="w">      </span><span class="no">extensions: [health_check]</span>
+<span class="w">      </span><span class="no">pipelines:</span>
+<span class="w">        </span><span class="no">traces:</span>
+<span class="w">          </span><span class="no">receivers: [otlp]</span>
+<span class="w">          </span><span class="no">exporters: [debug, otlp, spanmetrics]</span>
+<span class="w">        </span><span class="no">metrics:</span>
+<span class="w">          </span><span class="no">receivers: [ spanmetrics ]</span>
+<span class="w">          </span><span class="no">exporters: [ debug, prometheus ]</span>
+</code></pre></div>
+<h4 id="key-takeaways">Key Takeaways<a class="headerlink" href="#key-takeaways" title="Permanent link">#</a></h4>
+<ul>
+<li>The OpenTelemetry Collector is highly configurable with receivers, processors/connectors, exporters, and service pipelines.</li>
+<li>The OTLP receiver allows the collector to receive traces from applications instrumented with OpenTelemetry.</li>
+<li>The Spanmetrics connector can convert traces into metrics, enabling advanced analysis and monitoring.</li>
+<li>Pipelines define the flow of data through the collector, allowing for flexible data processing and exporting.</li>
+</ul>
+<h4 id="further-reading">Further Reading<a class="headerlink" href="#further-reading" title="Permanent link">#</a></h4>
+<ul>
+<li><a href="https://opentelemetry.io/docs/collector/">OpenTelemetry Collector Documentation</a></li>
+<li><a href="https://github.com/open-telemetry/opentelemetry-collector-contrib/tree/main/connector/spanmetricsconnector">Span Metrics Connector</a></li>
+<li><a href="https://github.com/open-telemetry/opentelemetry-collector-contrib/tree/main/exporter/prometheusexporter">Prometheus Exporter for OpenTelemetry Collector</a></li>
+</ul>
+<h3 id="objective-3-canary-analysis-validating-deployments">Objective 3: Canary analysis validating deployments<a class="headerlink" href="#objective-3-canary-analysis-validating-deployments" title="Permanent link">#</a></h3>
+<p>This objective tells us that we need to configure the AnalysisTemplate with 3 queries:</p>
+<ul>
+<li>Traffic detection ensuring minimum request rate (&gt;= 0.05 req/s) to the canary to prevent "idle canaries" that get promoted but never had real traffic. You can use the hotrod_requests_total metric to verify this.</li>
+<li>Error rate thresholds (&lt; 5%)</li>
+<li>Latency thresholds for the 95th percentile (&lt; 1000ms)</li>
+</ul>
+<p>Let's check the AnalysisTemplate in <code>hotrod/analysis-template.yaml</code> to see what's already there:</p>
+<div class="highlight"><pre><span></span><code><span class="nt">apiVersion</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">argoproj.io/v1alpha1</span>
+<span class="nt">kind</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">AnalysisTemplate</span>
+<span class="nt">metadata</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">hotrod-analysis</span>
+<span class="nt">spec</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">args</span><span class="p">:</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">namespace</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">canary-hash</span>
+<span class="w">  </span><span class="nt">metrics</span><span class="p">:</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">error-rate-lt-5-percent</span>
+<span class="w">      </span><span class="nt">initialDelay</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">60s</span>
+<span class="w">      </span><span class="nt">interval</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">10s</span>
+<span class="w">      </span><span class="nt">count</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">3</span>
+<span class="w">      </span><span class="nt">successCondition</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">result[0] &lt; 0.05</span>
+<span class="w">      </span><span class="nt">failureLimit</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">2</span>
+<span class="w">      </span><span class="nt">inconclusiveLimit</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">3</span>
+<span class="w">      </span><span class="nt">consecutiveErrorLimit</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">2</span>
+<span class="w">      </span><span class="nt">provider</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">prometheus</span><span class="p">:</span>
+<span class="w">          </span><span class="nt">address</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">http://prometheus-server.prometheus.svc.cluster.local</span>
+<span class="w">          </span><span class="nt">query</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">|</span>
+<span class="w">            </span><span class="no"># Error rate: ratio of failed requests to total requests</span>
+<span class="w">            </span><span class="no">sum(rate(hotrod_requests_total{</span>
+<span class="w">              </span><span class="no">namespace=&quot;{{args.namespace}}&quot;,</span>
+<span class="w">              </span><span class="no">rollouts_pod_template_hash=&quot;{{args.canary-hash}}&quot;,</span>
+<span class="w">              </span><span class="no">error=&quot;true&quot;</span>
+<span class="w">            </span><span class="no">}[2m])) </span>
+<span class="w">            </span><span class="no">/</span>
+<span class="w">            </span><span class="no">sum(rate(hotrod_requests_total{</span>
+<span class="w">              </span><span class="no">namespace=&quot;{{args.namespace}}&quot;,</span>
+<span class="w">              </span><span class="no">rollouts_pod_template_hash=&quot;{{args.canary-hash}}&quot;</span>
+<span class="w">            </span><span class="no">}[2m]))</span>
+
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">latency-p95-lt-1s</span>
+<span class="w">      </span><span class="nt">initialDelay</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">90s</span>
+<span class="w">      </span><span class="nt">interval</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">10s</span>
+<span class="w">      </span><span class="nt">count</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">3</span>
+<span class="w">      </span><span class="nt">successCondition</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">result[0] &lt; 1000</span>
+<span class="w">      </span><span class="nt">failureLimit</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">2</span>
+<span class="w">      </span><span class="nt">inconclusiveLimit</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">3</span>
+<span class="w">      </span><span class="nt">consecutiveErrorLimit</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">2</span>
+<span class="w">      </span><span class="nt">provider</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">prometheus</span><span class="p">:</span>
+<span class="w">          </span><span class="nt">address</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">http://prometheus-server.prometheus.svc.cluster.local</span>
+<span class="w">          </span><span class="nt">query</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">|</span>
+<span class="w">            </span><span class="no"># P95 latency: should be under 1 second</span>
+<span class="w">            </span><span class="no">histogram_quantile(0.95,</span>
+<span class="w">              </span><span class="no">sum by (le) (rate(traces_span_metrics_duration_milliseconds_bucket{</span>
+<span class="w">                </span><span class="no">hotrod_namespace=&quot;{{args.namespace}}&quot;,</span>
+<span class="w">                </span><span class="no">hotrod_pod_hash=&quot;{{args.canary-hash}}&quot;</span>
+<span class="w">              </span><span class="no">}[2m]))</span>
+<span class="w">            </span><span class="no">)</span>
+</code></pre></div>
+<p>Let's also open the Argo Rollouts dashboard and see the status of the last analysis run. We can see that the first check <code>error-rate-lt-5-percent</code> succeeded, but the second check <code>latency-p95-lt-1s</code> failed with <code>index out of range</code>.</p>
+<p><img alt="Analysis Run Failed" src="../images/expert/rollouts-analysis-1.png" /></p>
+<p>Let's take one step back and check and fix the queries one by one.</p>
+<p><strong>Traffic detection (&gt;= 0.05 req/s)</strong></p>
+<p>The existing queries check for error rate and latency, but there's no query for traffic detection. This metric ensures the canary receives real traffic before promotion—without it, a canary could be promoted even if it never handled any requests.</p>
+<p>Let's add a new metric. The configuration is explained in the comments:</p>
+<div class="highlight"><pre><span></span><code><span class="w">  </span><span class="nt">metrics</span><span class="p">:</span>
+<span class="w">    </span><span class="c1"># This metric ensures the canary is receiving real traffic before promotion.</span>
+<span class="w">    </span><span class="c1"># Without this check, a canary could be promoted even if it never handled</span>
+<span class="w">    </span><span class="c1"># any requests (e.g., due to routing issues or no traffic at all).</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">traffic-detection</span>
+<span class="w">      </span><span class="nt">initialDelay</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">90s</span><span class="w"> </span><span class="c1"># Wait 90 seconds before the first check to allow traffic to flow</span>
+<span class="w">      </span><span class="nt">interval</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">10s</span><span class="w"> </span><span class="c1"># Check every 10 seconds</span>
+<span class="w">      </span><span class="nt">count</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">5</span><span class="w"> </span><span class="c1"># Run 5 measurements total</span>
+<span class="w">      </span><span class="nt">successCondition</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">result[0] &gt;= 0.05</span><span class="w"> </span><span class="c1"># Success if there are at least 0.05 req/s (ensures real traffic)</span>
+<span class="w">      </span><span class="nt">failureLimit</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">3</span><span class="w"> </span><span class="c1"># Allow up to 3 failures before marking the analysis as failed</span>
+<span class="w">      </span><span class="nt">inconclusiveLimit</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">5</span><span class="w"> </span><span class="c1"># Allow up to 5 inconclusive results (e.g., no data yet)</span>
+<span class="w">      </span><span class="nt">consecutiveErrorLimit</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">3</span><span class="w"> </span><span class="c1"># Allow up to 3 consecutive errors (e.g., Prometheus unavailable)</span>
+<span class="w">      </span><span class="nt">provider</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">prometheus</span><span class="p">:</span>
+<span class="w">          </span><span class="nt">address</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">http://prometheus-server.prometheus.svc.cluster.local</span>
+<span class="w">          </span><span class="c1"># Calculate the per-second request rate over the last 2 minutes</span>
+<span class="w">          </span><span class="c1"># for the canary pods only (filtered by namespace and pod hash)</span>
+<span class="w">          </span><span class="nt">query</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">|</span>
+<span class="w">            </span><span class="no">sum(rate(hotrod_requests_total{</span>
+<span class="w">              </span><span class="no">namespace=&quot;{{args.namespace}}&quot;,</span>
+<span class="w">              </span><span class="no">rollouts_pod_template_hash=&quot;{{args.canary-hash}}&quot;</span>
+<span class="w">            </span><span class="no">}[2m]))</span>
+</code></pre></div>
+<p>With that, we're checking if there is traffic and avoiding idle canaries. Let's move on to the next one.</p>
+<p><strong>Error rate thresholds (&lt; 5%)</strong></p>
+<p>A metric for this already exists:</p>
+<div class="highlight"><pre><span></span><code><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">error-rate-lt-5-percent</span>
+<span class="w">      </span><span class="nt">initialDelay</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">60s</span>
+<span class="w">      </span><span class="nt">interval</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">10s</span>
+<span class="w">      </span><span class="nt">count</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">3</span>
+<span class="w">      </span><span class="nt">successCondition</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">result[0] &lt; 0.05</span>
+<span class="w">      </span><span class="nt">failureLimit</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">2</span>
+<span class="w">      </span><span class="nt">inconclusiveLimit</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">3</span>
+<span class="w">      </span><span class="nt">consecutiveErrorLimit</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">2</span>
+<span class="w">      </span><span class="nt">provider</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">prometheus</span><span class="p">:</span>
+<span class="w">          </span><span class="nt">address</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">http://prometheus-server.prometheus.svc.cluster.local</span>
+<span class="w">          </span><span class="nt">query</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">|</span>
+<span class="w">            </span><span class="no"># Error rate: ratio of failed requests to total requests</span>
+<span class="w">            </span><span class="no">sum(rate(hotrod_requests_total{</span>
+<span class="w">              </span><span class="no">namespace=&quot;{{args.namespace}}&quot;,</span>
+<span class="w">              </span><span class="no">rollouts_pod_template_hash=&quot;{{args.canary-hash}}&quot;,</span>
+<span class="w">              </span><span class="no">error=&quot;true&quot;</span>
+<span class="w">            </span><span class="no">}[2m])) </span>
+<span class="w">            </span><span class="no">/</span>
+<span class="w">            </span><span class="no">sum(rate(hotrod_requests_total{</span>
+<span class="w">              </span><span class="no">namespace=&quot;{{args.namespace}}&quot;,</span>
+<span class="w">              </span><span class="no">rollouts_pod_template_hash=&quot;{{args.canary-hash}}&quot;</span>
+<span class="w">            </span><span class="no">}[2m]))</span>
+</code></pre></div>
+<p>This metric succeeded in the last analysis run. After checking it again to be sure, it looks good. No changes needed here.</p>
+<p><strong>Latency thresholds for the 95th percentile (&lt; 1000ms)</strong></p>
+<p>A metric for this already exists:</p>
+<div class="highlight"><pre><span></span><code><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">latency-p95-lt-1s</span>
+<span class="w">      </span><span class="nt">initialDelay</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">90s</span>
+<span class="w">      </span><span class="nt">interval</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">10s</span>
+<span class="w">      </span><span class="nt">count</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">3</span>
+<span class="w">      </span><span class="nt">successCondition</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">result[0] &lt; 1000</span>
+<span class="w">      </span><span class="nt">failureLimit</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">2</span>
+<span class="w">      </span><span class="nt">inconclusiveLimit</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">3</span>
+<span class="w">      </span><span class="nt">consecutiveErrorLimit</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">2</span>
+<span class="w">      </span><span class="nt">provider</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">prometheus</span><span class="p">:</span>
+<span class="w">          </span><span class="nt">address</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">http://prometheus-server.prometheus.svc.cluster.local</span>
+<span class="w">          </span><span class="nt">query</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">|</span>
+<span class="w">            </span><span class="no"># P95 latency: should be under 1 second</span>
+<span class="w">            </span><span class="no">histogram_quantile(0.95,</span>
+<span class="w">              </span><span class="no">sum by (le) (rate(traces_span_metrics_duration_milliseconds_bucket{</span>
+<span class="w">                </span><span class="no">hotrod_namespace=&quot;{{args.namespace}}&quot;,</span>
+<span class="w">                </span><span class="no">hotrod_pod_hash=&quot;{{args.canary-hash}}&quot;</span>
+<span class="w">              </span><span class="no">}[2m]))</span>
+<span class="w">            </span><span class="no">)</span>
+</code></pre></div>
+<p>This one failed in the last analysis run with this error:</p>
+<div class="highlight"><pre><span></span><code>Metric &quot;latency-p95-lt-1s&quot; assessed Error due to consecutiveErrors (3) &gt; consecutiveErrorLimit (2): &quot;Error Message: reflect: slice index out of range&quot;
+</code></pre></div>
+<p>But when looking at it, everything looks fine. Thinking about this again, this failed before we had the OpenTelemetry Collector working. That means no metrics about traces were arriving in Prometheus at all.</p>
+<p>Now that we have the OpenTelemetry Collector working, let's push our changes, refresh the Argo CD app, and retry the rollout to see if this works now.</p>
+<div class="highlight"><pre><span></span><code>argocd<span class="w"> </span>app<span class="w"> </span>get<span class="w"> </span>hotrod<span class="w"> </span>--refresh
+kubectl<span class="w"> </span>argo<span class="w"> </span>rollouts<span class="w"> </span>retry<span class="w"> </span>rollout<span class="w"> </span>hotrod<span class="w"> </span>-n<span class="w"> </span>hotrod
+</code></pre></div>
+<p>Nice! The analysis run succeeded and we can be sure that we're actually checking an app with real traffic now.</p>
+<p><img alt="Analysis Run Succeeded" src="../images/expert/rollouts-analysis-2.png" /></p>
+<p>Here's the full <code>AnalysisTemplate</code> with all 3 metrics:</p>
+<div class="highlight"><pre><span></span><code><span class="nt">apiVersion</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">argoproj.io/v1alpha1</span>
+<span class="nt">kind</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">AnalysisTemplate</span>
+<span class="nt">metadata</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">hotrod-analysis</span>
+<span class="nt">spec</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">args</span><span class="p">:</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">namespace</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">canary-hash</span>
+<span class="w">  </span><span class="nt">metrics</span><span class="p">:</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">traffic-detection</span>
+<span class="w">      </span><span class="nt">initialDelay</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">90s</span><span class="w"> </span><span class="c1"># Wait 90 seconds before the first check to allow traffic to flow</span>
+<span class="w">      </span><span class="nt">interval</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">10s</span><span class="w"> </span><span class="c1"># Check every 10 seconds</span>
+<span class="w">      </span><span class="nt">count</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">5</span><span class="w"> </span><span class="c1"># Run 5 measurements total</span>
+<span class="w">      </span><span class="nt">successCondition</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">result[0] &gt;= 0.05</span><span class="w"> </span><span class="c1"># Success if there are at least 0.05 req/s (ensures real traffic)</span>
+<span class="w">      </span><span class="nt">failureLimit</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">3</span><span class="w"> </span><span class="c1"># Allow up to 3 failures before marking the analysis as failed</span>
+<span class="w">      </span><span class="nt">inconclusiveLimit</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">5</span><span class="w"> </span><span class="c1"># Allow up to 5 inconclusive results (e.g., no data yet)</span>
+<span class="w">      </span><span class="nt">consecutiveErrorLimit</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">3</span><span class="w"> </span><span class="c1"># Allow up to 3 consecutive errors (e.g., Prometheus unavailable)</span>
+<span class="w">      </span><span class="nt">provider</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">prometheus</span><span class="p">:</span>
+<span class="w">          </span><span class="nt">address</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">http://prometheus-server.prometheus.svc.cluster.local</span>
+<span class="w">          </span><span class="c1"># Calculate the per-second request rate over the last 2 minutes</span>
+<span class="w">          </span><span class="c1"># for the canary pods only (filtered by namespace and pod hash)</span>
+<span class="w">          </span><span class="nt">query</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">|</span>
+<span class="w">            </span><span class="no">sum(rate(hotrod_requests_total{</span>
+<span class="w">              </span><span class="no">namespace=&quot;{{args.namespace}}&quot;,</span>
+<span class="w">              </span><span class="no">rollouts_pod_template_hash=&quot;{{args.canary-hash}}&quot;</span>
+<span class="w">            </span><span class="no">}[2m]))</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">error-rate-lt-5-percent</span>
+<span class="w">      </span><span class="nt">initialDelay</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">60s</span>
+<span class="w">      </span><span class="nt">interval</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">10s</span>
+<span class="w">      </span><span class="nt">count</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">3</span>
+<span class="w">      </span><span class="nt">successCondition</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">result[0] &lt; 0.05</span>
+<span class="w">      </span><span class="nt">failureLimit</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">2</span>
+<span class="w">      </span><span class="nt">inconclusiveLimit</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">3</span>
+<span class="w">      </span><span class="nt">consecutiveErrorLimit</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">2</span>
+<span class="w">      </span><span class="nt">provider</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">prometheus</span><span class="p">:</span>
+<span class="w">          </span><span class="nt">address</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">http://prometheus-server.prometheus.svc.cluster.local</span>
+<span class="w">          </span><span class="nt">query</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">|</span>
+<span class="w">            </span><span class="no"># Error rate: ratio of failed requests to total requests</span>
+<span class="w">            </span><span class="no">sum(rate(hotrod_requests_total{</span>
+<span class="w">              </span><span class="no">namespace=&quot;{{args.namespace}}&quot;,</span>
+<span class="w">              </span><span class="no">rollouts_pod_template_hash=&quot;{{args.canary-hash}}&quot;,</span>
+<span class="w">              </span><span class="no">error=&quot;true&quot;</span>
+<span class="w">            </span><span class="no">}[2m])) </span>
+<span class="w">            </span><span class="no">/</span>
+<span class="w">            </span><span class="no">sum(rate(hotrod_requests_total{</span>
+<span class="w">              </span><span class="no">namespace=&quot;{{args.namespace}}&quot;,</span>
+<span class="w">              </span><span class="no">rollouts_pod_template_hash=&quot;{{args.canary-hash}}&quot;</span>
+<span class="w">            </span><span class="no">}[2m]))</span>
+
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">latency-p95-lt-1s</span>
+<span class="w">      </span><span class="nt">initialDelay</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">90s</span>
+<span class="w">      </span><span class="nt">interval</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">10s</span>
+<span class="w">      </span><span class="nt">count</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">3</span>
+<span class="w">      </span><span class="nt">successCondition</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">result[0] &lt; 1000</span>
+<span class="w">      </span><span class="nt">failureLimit</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">2</span>
+<span class="w">      </span><span class="nt">inconclusiveLimit</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">3</span>
+<span class="w">      </span><span class="nt">consecutiveErrorLimit</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">2</span>
+<span class="w">      </span><span class="nt">provider</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">prometheus</span><span class="p">:</span>
+<span class="w">          </span><span class="nt">address</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">http://prometheus-server.prometheus.svc.cluster.local</span>
+<span class="w">          </span><span class="nt">query</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">|</span>
+<span class="w">            </span><span class="no"># P95 latency: should be under 1 second</span>
+<span class="w">            </span><span class="no">histogram_quantile(0.95,</span>
+<span class="w">              </span><span class="no">sum by (le) (rate(traces_span_metrics_duration_milliseconds_bucket{</span>
+<span class="w">                </span><span class="no">hotrod_namespace=&quot;{{args.namespace}}&quot;,</span>
+<span class="w">                </span><span class="no">hotrod_pod_hash=&quot;{{args.canary-hash}}&quot;</span>
+<span class="w">              </span><span class="no">}[2m]))</span>
+<span class="w">            </span><span class="no">)</span>
+</code></pre></div>
+<h4 id="key-takeaways_1">Key Takeaways<a class="headerlink" href="#key-takeaways_1" title="Permanent link">#</a></h4>
+<ul>
+<li>If there's no traffic, canary deployments can be promoted without ever being tested under real conditions.</li>
+<li>Argo Rollouts AnalysisTemplates can use traces for verification when converting them to metrics with the Spanmetrics connector.</li>
+</ul>
+<h4 id="further-reading_1">Further Reading<a class="headerlink" href="#further-reading_1" title="Permanent link">#</a></h4>
+<ul>
+<li><a href="https://argo-rollouts.readthedocs.io/en/stable/features/analysis/">Argo Rollouts Analysis Documentation</a></li>
+<li><a href="https://prometheus.io/docs/prometheus/latest/querying/basics/">PromQL Basics</a></li>
+</ul>
+<h2 id="complete-solution">✅ Complete Solution<a class="headerlink" href="#complete-solution" title="Permanent link">#</a></h2>
+<p>Here's what your corrected files should look like with all fixes applied:</p>
+<p><strong>OpenTelemetry Collector Config:</strong>
+<div class="highlight"><pre><span></span><code><span class="nt">apiVersion</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">v1</span>
+<span class="nt">kind</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">ConfigMap</span>
+<span class="nt">metadata</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">collector-config</span>
+<span class="w">  </span><span class="nt">labels</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">app</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">collector</span>
+<span class="nt">data</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">collector-config.yaml</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">|</span>
+<span class="w">    </span><span class="no">receivers:</span>
+<span class="w">      </span><span class="no">otlp:</span>
+<span class="w">        </span><span class="no">protocols:</span>
+<span class="w">          </span><span class="no">http:</span>
+<span class="w">            </span><span class="no">endpoint: 0.0.0.0:4318</span>
+
+<span class="w">    </span><span class="no">connectors:</span>
+<span class="w">      </span><span class="no">spanmetrics:</span>
+<span class="w">        </span><span class="no">dimensions:</span>
+<span class="w">          </span><span class="no">- name: hotrod.namespace</span>
+<span class="w">          </span><span class="no">- name: hotrod.pod.name</span>
+<span class="w">          </span><span class="no">- name: hotrod.pod.hash</span>
+
+<span class="w">    </span><span class="no">exporters:</span>
+<span class="w">      </span><span class="no">debug:</span>
+<span class="w">        </span><span class="no">verbosity: detailed</span>
+<span class="w">      </span><span class="no">otlp:</span>
+<span class="w">        </span><span class="no">endpoint: jaeger-collector.jaeger.svc.cluster.local:4317</span>
+<span class="w">        </span><span class="no">tls:</span>
+<span class="w">          </span><span class="no">insecure: true</span>
+<span class="w">      </span><span class="no">prometheus:</span>
+<span class="w">        </span><span class="no">endpoint: &quot;0.0.0.0:8889&quot;</span>
+
+<span class="w">    </span><span class="no">extensions:</span>
+<span class="w">      </span><span class="no">health_check:</span>
+<span class="w">        </span><span class="no">endpoint: 0.0.0.0:13133</span>
+
+<span class="w">    </span><span class="no">service:</span>
+<span class="w">      </span><span class="no">extensions: [health_check]</span>
+<span class="w">      </span><span class="no">pipelines:</span>
+<span class="w">        </span><span class="no">traces:</span>
+<span class="w">          </span><span class="no">receivers: [otlp]</span>
+<span class="w">          </span><span class="no">exporters: [debug, otlp, spanmetrics]</span>
+<span class="w">        </span><span class="no">metrics:</span>
+<span class="w">          </span><span class="no">receivers: [ spanmetrics ]</span>
+<span class="w">          </span><span class="no">exporters: [ debug, prometheus ]</span>
+</code></pre></div></p>
+<p><strong>Analysis Template:</strong></p>
+<div class="highlight"><pre><span></span><code><span class="nt">apiVersion</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">argoproj.io/v1alpha1</span>
+<span class="nt">kind</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">AnalysisTemplate</span>
+<span class="nt">metadata</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">hotrod-analysis</span>
+<span class="nt">spec</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">args</span><span class="p">:</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">namespace</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">canary-hash</span>
+<span class="w">  </span><span class="nt">metrics</span><span class="p">:</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">traffic-detection</span>
+<span class="w">      </span><span class="nt">initialDelay</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">90s</span><span class="w"> </span><span class="c1"># Wait 90 seconds before the first check to allow traffic to flow</span>
+<span class="w">      </span><span class="nt">interval</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">10s</span><span class="w"> </span><span class="c1"># Check every 10 seconds</span>
+<span class="w">      </span><span class="nt">count</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">5</span><span class="w"> </span><span class="c1"># Run 5 measurements total</span>
+<span class="w">      </span><span class="nt">successCondition</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">result[0] &gt;= 0.05</span><span class="w"> </span><span class="c1"># Success if there are at least 0.05 req/s (ensures real traffic)</span>
+<span class="w">      </span><span class="nt">failureLimit</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">3</span><span class="w"> </span><span class="c1"># Allow up to 3 failures before marking the analysis as failed</span>
+<span class="w">      </span><span class="nt">inconclusiveLimit</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">5</span><span class="w"> </span><span class="c1"># Allow up to 5 inconclusive results (e.g., no data yet)</span>
+<span class="w">      </span><span class="nt">consecutiveErrorLimit</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">3</span><span class="w"> </span><span class="c1"># Allow up to 3 consecutive errors (e.g., Prometheus unavailable)</span>
+<span class="w">      </span><span class="nt">provider</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">prometheus</span><span class="p">:</span>
+<span class="w">          </span><span class="nt">address</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">http://prometheus-server.prometheus.svc.cluster.local</span>
+<span class="w">          </span><span class="c1"># Calculate the per-second request rate over the last 2 minutes</span>
+<span class="w">          </span><span class="c1"># for the canary pods only (filtered by namespace and pod hash)</span>
+<span class="w">          </span><span class="nt">query</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">|</span>
+<span class="w">            </span><span class="no">sum(rate(hotrod_requests_total{</span>
+<span class="w">              </span><span class="no">namespace=&quot;{{args.namespace}}&quot;,</span>
+<span class="w">              </span><span class="no">rollouts_pod_template_hash=&quot;{{args.canary-hash}}&quot;</span>
+<span class="w">            </span><span class="no">}[2m]))</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">error-rate-lt-5-percent</span>
+<span class="w">      </span><span class="nt">initialDelay</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">60s</span>
+<span class="w">      </span><span class="nt">interval</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">10s</span>
+<span class="w">      </span><span class="nt">count</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">3</span>
+<span class="w">      </span><span class="nt">successCondition</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">result[0] &lt; 0.05</span>
+<span class="w">      </span><span class="nt">failureLimit</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">2</span>
+<span class="w">      </span><span class="nt">inconclusiveLimit</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">3</span>
+<span class="w">      </span><span class="nt">consecutiveErrorLimit</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">2</span>
+<span class="w">      </span><span class="nt">provider</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">prometheus</span><span class="p">:</span>
+<span class="w">          </span><span class="nt">address</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">http://prometheus-server.prometheus.svc.cluster.local</span>
+<span class="w">          </span><span class="nt">query</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">|</span>
+<span class="w">            </span><span class="no"># Error rate: ratio of failed requests to total requests</span>
+<span class="w">            </span><span class="no">sum(rate(hotrod_requests_total{</span>
+<span class="w">              </span><span class="no">namespace=&quot;{{args.namespace}}&quot;,</span>
+<span class="w">              </span><span class="no">rollouts_pod_template_hash=&quot;{{args.canary-hash}}&quot;,</span>
+<span class="w">              </span><span class="no">error=&quot;true&quot;</span>
+<span class="w">            </span><span class="no">}[2m])) </span>
+<span class="w">            </span><span class="no">/</span>
+<span class="w">            </span><span class="no">sum(rate(hotrod_requests_total{</span>
+<span class="w">              </span><span class="no">namespace=&quot;{{args.namespace}}&quot;,</span>
+<span class="w">              </span><span class="no">rollouts_pod_template_hash=&quot;{{args.canary-hash}}&quot;</span>
+<span class="w">            </span><span class="no">}[2m]))</span>
+
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">latency-p95-lt-1s</span>
+<span class="w">      </span><span class="nt">initialDelay</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">90s</span>
+<span class="w">      </span><span class="nt">interval</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">10s</span>
+<span class="w">      </span><span class="nt">count</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">3</span>
+<span class="w">      </span><span class="nt">successCondition</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">result[0] &lt; 1000</span>
+<span class="w">      </span><span class="nt">failureLimit</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">2</span>
+<span class="w">      </span><span class="nt">inconclusiveLimit</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">3</span>
+<span class="w">      </span><span class="nt">consecutiveErrorLimit</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">2</span>
+<span class="w">      </span><span class="nt">provider</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">prometheus</span><span class="p">:</span>
+<span class="w">          </span><span class="nt">address</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">http://prometheus-server.prometheus.svc.cluster.local</span>
+<span class="w">          </span><span class="nt">query</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">|</span>
+<span class="w">            </span><span class="no"># P95 latency: should be under 1 second</span>
+<span class="w">            </span><span class="no">histogram_quantile(0.95,</span>
+<span class="w">              </span><span class="no">sum by (le) (rate(traces_span_metrics_duration_milliseconds_bucket{</span>
+<span class="w">                </span><span class="no">hotrod_namespace=&quot;{{args.namespace}}&quot;,</span>
+<span class="w">                </span><span class="no">hotrod_pod_hash=&quot;{{args.canary-hash}}&quot;</span>
+<span class="w">              </span><span class="no">}[2m]))</span>
+<span class="w">            </span><span class="no">)</span>
+</code></pre></div>
+<p>With these changes, your rollouts will now progress automatically through canary stages based on health metrics. This also means Objective 1 is now achieved—the rollout will automatically progress to HotROD version 1.76.0 driven by the observability signals we configured. All objectives of the challenge are met. Great job! 🎉</p>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "../../..", "features": ["content.code.copy"], "search": "../../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../../../assets/javascripts/bundle.79ae519e.min.js"></script>
+      
+    
+  </body>
+</html>
