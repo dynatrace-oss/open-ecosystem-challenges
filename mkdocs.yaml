@@ -8,6 +8,11 @@ nav:
       - start-a-challenge.md
       - verification.md
   - 'Adventures': '*include ./adventures/*/mkdocs.yaml'
+  - 'Contributing':
+      - contributing/index.md
+      - contributing/adventure-ideas.md
+      - contributing/adventures.md
+      - contributing/solution-walkthroughs.md
 plugins:
   - monorepo
   - search
