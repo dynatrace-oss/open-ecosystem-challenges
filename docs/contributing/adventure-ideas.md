@@ -7,13 +7,41 @@ adventure could look like and what learners would gain from it.
 
 ## Before You Start
 
-- **Check existing ideas.**
-  Browse [adventure idea issues](https://github.com/dynatrace-oss/open-ecosystem-challenges/issues?q=is%3Aissue+is%3Aopen+label%3A%22adventure+idea%22)
-  and [open PRs](https://github.com/dynatrace-oss/open-ecosystem-challenges/pulls) to avoid duplicates.
+- **Check existing ideas.** Browse [adventure idea issues](https://github.com/dynatrace-oss/open-ecosystem-challenges/issues?q=is%3Aissue+is%3Aopen+label%3A%22adventure+idea%22)
+  and [open PRs](https://github.com/dynatrace-oss/open-ecosystem-challenges/pulls) to make sure your idea hasn't already been submitted or is in the pipeline.
 - **Focus on actions, not tools.** Frame challenges around what learners will *do* (e.g., "release safely", "observe AI
   systems") rather than tools they'll use (e.g., "Argo Rollouts", "OpenTelemetry").
 - **Consider multiple levels.** Three levels (Beginner, Intermediate, Expert) are recommended but not required. Even a
   single well-designed level is valuable.
+
+## How to Submit
+
+1. **Copy** `ideas/adventure-idea-template.md` and rename it to `ideas/your-adventure-name.md`
+2. **Fill in the template** — replace all placeholders with your idea
+3. **[Open a pull request](https://github.com/dynatrace-oss/open-ecosystem-challenges/compare)** with the title `Adventure Idea: [emoji] Your Adventure Name`
+
+No issue required. Submit your idea directly as a PR.
+
+## From Idea to Adventure
+
+After you open a PR:
+
+1. **Review.** Maintainers review your idea for fit and feasibility.
+2. **Feedback.** We may suggest adjustments or ask clarifying questions.
+3. **Approval.** Once approved and merged, your idea becomes available for implementation via `make new-adventure`.
+4. **Implementation.** You or another contributor picks it up, builds it, and the idea moves to `ideas/.implemented/`.
+
+You're welcome to implement your own idea after approval, but there's no obligation to do so.
+
+### Idea Folder Structure
+
+Ideas are organized by their status:
+
+```
+ideas/
+├── [your-idea].md      # Proposals & approved ideas (submitted via PR)
+└── .implemented/       # Completed adventures (reference only)
+```
 
 ## What Makes a Good Adventure Idea?
 
@@ -55,86 +83,13 @@ A common mistake is packing too much into a single level. Each level should intr
 
 Adventure 01 is a useful reference: Beginner introduces Argo CD ApplicationSets → Intermediate adds Argo Rollouts and PromQL → Expert adds OpenTelemetry Collector and distributed tracing.
 
-## How to Submit
-
-1. **Create a new file** in `ideas/` named `your-adventure-name.md`
-2. **Use the template** below to describe your idea
-3. **[Open a pull request](https://github.com/dynatrace-oss/open-ecosystem-challenges/compare)** with the title `Adventure Idea: [emoji] Your Adventure Name`
-
-No issue required. Submit your idea directly as a PR.
-
 ## Adventure Idea Template
 
-Use this structure for your proposal. The three-level format is recommended but not required. Adjust based on your idea.
+A ready-to-use template is available at [`ideas/adventure-idea-template.md`](https://github.com/dynatrace-oss/open-ecosystem-challenges/blob/main/ideas/adventure-idea-template.md).
 
-```markdown
-# Adventure Idea: [emoji] [Your Adventure Name]
+Copy it, rename it to `ideas/your-adventure-name.md`, and fill in the placeholders. The three-level format is recommended but not required — adjust based on your idea.
 
-## Overview
-
-**Theme:** [2-3 sentences describing the scenario and what's at stake. Who is the learner in this story?]
-
-**Skills:**
-
-- [Action-oriented skill 1, e.g., "Deploy reliably across multiple environments"]
-- [Action-oriented skill 2]
-- [Action-oriented skill 3]
-
-**Technologies:** [Tools involved, e.g., Argo CD, Kubernetes, Prometheus]
-
-**Levels:**
-
-- 🟢 Beginner: [One-liner description]
-- 🟡 Intermediate: [One-liner description]
-- 🔴 Expert: [One-liner description]
-
----
-
-## Levels
-
-### 🟢 Beginner: [Level Name]
-
-#### Story
-
-[Brief narrative setup for this level]
-
-#### The Problem
-
-[What's broken or misconfigured? Be specific enough for an implementer, but don't reveal the solution.]
-
-#### Objective
-
-By the end of this level, the learner should:
-
-- [Concrete, verifiable outcome 1]
-- [Concrete, verifiable outcome 2]
-- [Concrete, verifiable outcome 3]
-
-> See **Writing Good Objectives** below the template for guidance on what makes a strong objective.
-
-#### What You'll Learn
-
-- [Specific concept 1]
-- [Specific concept 2]
-- [Specific concept 3]
-
-#### Tools & Infrastructure
-
-- **Tools:** [CLI tools, e.g., kubectl, argocd CLI]
-- **Infrastructure:** [What needs to run, e.g., Kubernetes Cluster, Argo CD]
-
----
-
-### 🟡 Intermediate: [Level Name]
-
-[Same structure as Beginner]
-
----
-
-### 🔴 Expert: [Level Name]
-
-[Same structure as Beginner]
-```
+See [Echoes Lost in Orbit](https://github.com/dynatrace-oss/open-ecosystem-challenges/blob/main/ideas/.implemented/echoes-lost-in-orbit.md) for a complete example of a well-written idea.
 
 ## Writing Good Objectives
 
@@ -145,16 +100,3 @@ Objectives are verifiable outcomes, not tasks. Write them as the state a partici
 | Fix the ApplicationSet | See two distinct Applications in the Argo CD dashboard |
 | Add instrumentation | Send traces to the OpenTelemetry Collector at `http://localhost:30107` |
 
-## Example
-
-See [Echoes Lost in Orbit](https://github.com/dynatrace-oss/open-ecosystem-challenges/blob/main/ideas/.implemented/echoes-lost-in-orbit.md)
-for a complete example of an implemented adventure idea.
-
-## What Happens Next?
-
-1. **Review.** Maintainers review your idea for fit and feasibility.
-2. **Feedback.** We may suggest adjustments or ask clarifying questions.
-3. **Approval.** Once approved, your idea becomes available for implementation.
-4. **Implementation.** You or another contributor can pick it up and build it.
-
-You're welcome to implement your own idea after approval, but there's no obligation to do so.

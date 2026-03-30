@@ -6,7 +6,7 @@ IDEAS_DIR="$REPO_ROOT/ideas"
 
 # ─── Select adventure ────────────────────────────────────────────────────────
 
-selected_slug=$(find "$IDEAS_DIR" -maxdepth 1 -name "*.md" -exec basename {} .md \; | sort \
+selected_slug=$(find "$IDEAS_DIR" -maxdepth 1 -name "*.md" ! -name "adventure-idea-template.md" -exec basename {} .md \; | sort \
   | gum choose --header "Which adventure do you want to scaffold?")
 selected_file="$IDEAS_DIR/$selected_slug.md"
 adventure_header=$(grep -m1 '^# Adventure Idea:' "$selected_file" | sed 's/^# Adventure Idea: *//')

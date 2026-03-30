@@ -26,6 +26,8 @@ jobs:
               f.status === 'added' &&
               f.filename.startsWith('ideas/') &&
               !f.filename.startsWith('ideas/.implemented/') &&
+              f.filename.split('/').length === 2 &&
+              f.filename !== 'ideas/adventure-idea-template.md' &&
               f.filename.endsWith('.md')
             );
             if (!ideaFile) {

@@ -4,8 +4,10 @@ Ready to turn an approved idea into a full adventure? This guide walks you throu
 
 ## Before You Start
 
-- **Pick an approved idea.** Browse [adventure idea issues](https://github.com/dynatrace-oss/open-ecosystem-challenges/issues?q=is%3Aissue+is%3Aopen+label%3A%22adventure+idea%22) and comment to claim one. Have your own idea? [Submit it first](adventure-ideas.md).
+- **Pick an approved idea.** Browse [open implementation issues](https://github.com/dynatrace-oss/open-ecosystem-challenges/issues?q=is%3Aissue+is%3Aopen+label%3A%22adventure+idea%22) to find unclaimed ideas. Once you pick one, comment on its issue to claim it.
 - **Read the idea thoroughly.** Understand the story, objectives, and learning outcomes.
+- **Have your own idea?** [Propose it](adventure-ideas.md) — ideas go through review before they're available for implementation.
+- **Ready to build?** Once an idea is approved and merged into `ideas/`, it's available via `make new-adventure`.
 
 ## What You'll Build
 
