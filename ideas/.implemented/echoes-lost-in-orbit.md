@@ -12,17 +12,15 @@
 
 **Technologies:** Argo CD, Argo Rollouts, OpenTelemetry, Prometheus, Jaeger, Kubernetes
 
-**Levels:**
-
-- 🟢 Beginner: Fix a broken multi-environment GitOps setup
-- 🟡 Intermediate: Stabilize a failing canary rollout with metrics-based analysis
-- 🔴 Expert: Build an observability pipeline to validate traffic before promoting releases
-
 ---
 
 ## Levels
 
 ### 🟢 Beginner: Broken Echoes
+
+#### Description
+
+Fix a broken multi-environment GitOps setup
 
 #### Story
 
@@ -58,6 +56,10 @@ By the end of this level, the learner should:
 
 ### 🟡 Intermediate: The Silent Canary
 
+#### Description
+
+Stabilize a failing canary rollout with metrics-based analysis
+
 #### Story
 
 After fixing the communication outage, the Intergalactic Union welcomed a new species: the Zephyrians. The communications team attempted to deploy their language files using a progressive delivery system, but the rollout is failing. The Zephyrians are still waiting to communicate with the rest of the galaxy.
@@ -92,6 +94,10 @@ By the end of this level, the learner should:
 ---
 
 ### 🔴 Expert: Hyperspace Operations & Transport
+
+#### Description
+
+Build an observability pipeline to validate traffic before promoting releases
 
 #### Story
 

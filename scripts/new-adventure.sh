@@ -107,7 +107,11 @@ extract_level_section() {
   ' "$selected_file"
 }
 
-level_summary=$(grep "^- $level_emoji $level_difficulty:" "$selected_file" | sed "s/^- $level_emoji [^:]*: //")
+level_summary=$(awk -v level="$selected_level" '
+  /^### / { in_level = ($0 == "### " level); next }
+  in_level && /^#### Description/ { in_desc = 1; next }
+  in_desc && NF > 0 { print; exit }
+' "$selected_file")
 level_story=$(extract_level_section "Story")
 level_objective=$(extract_level_section "Objective")
 level_learnings=$(extract_level_section "What You'll Learn")
