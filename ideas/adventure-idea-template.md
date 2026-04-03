@@ -41,7 +41,7 @@
 
 <!-- =========================================================================
   Each level is a standalone challenge. Include Beginner, Intermediate,
-  and/or Expert - delete any you don't need.
+  and/or Expert - delete any level block you don't need.
 
   DIFFICULTY GUIDE:
     🟢 Beginner - First encounter. Solvable in under an hour with just the docs.

@@ -4,14 +4,15 @@ set -euo pipefail
 REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 IDEAS_DIR="$REPO_ROOT/ideas"
 
+# shellcheck source=../lib/scripts/idea-parser.sh
+source "$REPO_ROOT/lib/scripts/idea-parser.sh"
+
 # ─── Select adventure ────────────────────────────────────────────────────────
 
 selected_slug=$(find "$IDEAS_DIR" -maxdepth 1 -name "*.md" ! -name "adventure-idea-template.md" -exec basename {} .md \; | sort \
   | gum choose --header "Which adventure do you want to scaffold?")
 selected_file="$IDEAS_DIR/$selected_slug.md"
-adventure_header=$(grep -m1 '^# Adventure Idea:' "$selected_file" | sed 's/^# Adventure Idea: *//')
-adventure_emoji=$(echo "$adventure_header" | awk '{print $1}')
-adventure_name=$(echo "$adventure_header" | cut -d' ' -f2-)
+parse_adventure_header "$selected_file"
 
 # ─── Select level ────────────────────────────────────────────────────────────
 
@@ -20,10 +21,7 @@ selected_level=$(echo "$level_lines" | gum choose --header "Which level do you w
 
 # ─── Parse level metadata ─────────────────────────────────────────────────────
 
-level_emoji=$(echo "$selected_level" | awk '{print $1}')
-level_difficulty=$(echo "$selected_level" | awk '{print $2}' | tr -d ':')
-level_name=$(echo "$selected_level" | sed 's/[^ ]* [^:]*: //')
-level_slug=$(echo "$level_difficulty" | tr '[:upper:]' '[:lower:]')
+parse_level_heading "$selected_level"
 
 # position of selected level among ### headings (1st = 01, 2nd = 02, ...)
 level_number=$(echo "$level_lines" \
@@ -38,12 +36,8 @@ echo ""
 # ─── Scaffold adventure base ──────────────────────────────────────────────────
 
 ADVENTURE_DIR="$REPO_ROOT/adventures/planned/00-$selected_slug"
-adventure_technologies=$(grep -m1 '^\*\*Technologies:\*\*' "$selected_file" | sed 's/^\*\*Technologies:\*\* *//')
-adventure_theme=$(awk '
-  /^\*\*Theme:\*\*/ { sub(/^\*\*Theme:\*\* */, ""); p=1; print; next }
-  p && /^\*\*/ { exit }
-  p { print }
-' "$selected_file")
+adventure_technologies=$(extract_overview_field "$selected_file" "Technologies")
+adventure_theme=$(extract_overview_field "$selected_file" "Theme")
 
 if [[ ! -d "$ADVENTURE_DIR" ]]; then
   echo "Creating adventure base at adventures/planned/00-$selected_slug/ ..."
@@ -96,26 +90,11 @@ fi
 
 # ─── Scaffold level doc ───────────────────────────────────────────────────────
 
-# Extracts a #### subsection for the selected level from the idea file
-extract_level_section() {
-  local section="$1"
-  awk -v level="$selected_level" -v section="$section" '
-    /^### /  { in_level = ($0 == "### " level); next }
-    in_level && $0 == "#### " section { in_section=1; next }
-    in_level && in_section && (/^#### / || /^---/) { in_section=0 }
-    in_level && in_section { print }
-  ' "$selected_file"
-}
-
-level_summary=$(awk -v level="$selected_level" '
-  /^### / { in_level = ($0 == "### " level); next }
-  in_level && /^#### Description/ { in_desc = 1; next }
-  in_desc && NF > 0 { print; exit }
-' "$selected_file")
-level_story=$(extract_level_section "Story")
-level_objective=$(extract_level_section "Objective")
-level_learnings=$(extract_level_section "What You'll Learn")
-level_tools=$(extract_level_section "Tools & Infrastructure")
+level_summary=$(extract_level_description "$selected_file" "$selected_level")
+level_story=$(extract_level_section "$selected_file" "$selected_level" "Story")
+level_objective=$(extract_level_section "$selected_file" "$selected_level" "Objective")
+level_learnings=$(extract_level_section "$selected_file" "$selected_level" "What You'll Learn")
+level_tools=$(extract_level_section "$selected_file" "$selected_level" "Tools & Infrastructure")
 
 LEVEL_DOC="$ADVENTURE_DIR/docs/$level_slug.md"
 
