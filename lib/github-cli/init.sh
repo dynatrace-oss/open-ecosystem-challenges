@@ -4,31 +4,42 @@ set -e
 help() {
   echo "Usage: $0 [OPTIONS]"
   echo "Options:"
-  echo " --help   Display this help message"
-  echo " --act    Installs the nektos/act extension"
+  echo " --help             Display this help message"
+  echo " --act              Installs the nektos/act extension"
+  echo " --version <ver>    GitHub CLI version to install (default: v2.86.0)"
 }
 
 # Parse flags
 act=false
+version="v2.86.0"
 
-for arg in "$@"; do
-  case "$arg" in
+while [[ $# -gt 0 ]]; do
+  case "$1" in
     --help)
       help
       exit 0
       ;;
     --act)
       act=true
+      shift
+      ;;
+    --version)
+      if [[ -z "${2-}" ]]; then
+        echo "Error: --version requires a value" >&2
+        exit 1
+      fi
+      version="$2"
+      shift 2
       ;;
     *)
-      echo "Unknown option: $arg" >&2
+      echo "Unknown option: $1" >&2
       exit 1
       ;;
   esac
 done
 
 echo "✨ Installing the GitHub CLI"
-curl -sS https://webi.sh/gh@v2.86.0 | sh
+curl -sS "https://webi.sh/gh@${version}" | sh
 
 if [ "$act" = true ]; then
   echo "✨ Installin nektos/act extension"

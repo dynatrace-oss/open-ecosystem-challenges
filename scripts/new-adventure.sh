@@ -349,7 +349,17 @@ track_codespace_created
 
 "\$REPO_ROOT/lib/shared/init.sh"
 
-# TODO: install & configure the tools you need by using the setup scripts located in `/lib` (e.g. "\$REPO_ROOT/lib/kubernetes/init.sh")
+# TODO: Install and configure the tools your adventure needs using the shared setup scripts in /lib.
+#       Every script accepts a --version flag to pin a specific tool version — use this instead of
+#       editing the shared script or duplicating install logic in this file.
+#
+#       Examples:
+#         "\$REPO_ROOT/lib/kubernetes/init.sh"
+#         "\$REPO_ROOT/lib/argocd/init.sh" --version v3.5.0
+#         "\$REPO_ROOT/lib/argocd/init.sh" --read-only --version v3.5.0
+#         "\$REPO_ROOT/lib/kubernetes/init.sh" --kubectl-version v1.35.0 --helm-version v4.1.0
+#
+#       Run any script with --help to see all available flags and their defaults.
 EOF
 
   cat > "$DEVCONTAINER_DIR/post-start.sh" << EOF
