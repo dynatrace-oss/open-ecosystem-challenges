@@ -47,7 +47,7 @@ By the end of this level, the learner should:
 
 #### What You'll Learn
 
-- How Kyverno ClusterPolicies and validate rules work
+- How Kyverno `ClusterPolicies` and `validate` rules work
 - The difference between `Audit` and `Enforce` enforcement modes
 - How to read and interpret Kyverno policy violations
 
