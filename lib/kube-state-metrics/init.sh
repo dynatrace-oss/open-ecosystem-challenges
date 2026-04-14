@@ -7,11 +7,11 @@ help() {
   echo "Usage: $0 [OPTIONS]"
   echo "Options:"
   echo " --help             Display this help message"
-  echo " --version <ver>    kube-state-metrics Helm chart version to install (default: 7.0.0)"
+  echo " --version <ver>    kube-state-metrics Helm chart version to install (required)"
 }
 
 # Parse flags
-version="7.0.0"
+version=""
 
 while [[ $# -gt 0 ]]; do
   case "$1" in
@@ -33,6 +33,11 @@ while [[ $# -gt 0 ]]; do
       ;;
   esac
 done
+
+if [[ -z "$version" ]]; then
+  echo "Error: --version is required" >&2
+  exit 1
+fi
 
 echo "✨ Adding prometheus-community Helm repo"
 helm repo add prometheus-community https://prometheus-community.github.io/helm-charts

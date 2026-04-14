@@ -7,19 +7,19 @@ help() {
   echo "Usage: $0 [OPTIONS]"
   echo "Options:"
   echo " --help                    Display this help message"
-  echo " --kind-version <ver>      kind version to install (default: v0.30.0)"
-  echo " --kubectl-version <ver>   kubectl version to install (default: v1.34.1)"
-  echo " --kubens-version <ver>    kubens version to install (default: v0.9.5)"
-  echo " --k9s-version <ver>       k9s version to install (default: 0.50.16)"
-  echo " --helm-version <ver>      Helm version to install (default: v4.0.1)"
+  echo " --kind-version <ver>      kind version to install (required)"
+  echo " --kubectl-version <ver>   kubectl version to install (required)"
+  echo " --kubens-version <ver>    kubens version to install (required)"
+  echo " --k9s-version <ver>       k9s version to install (required)"
+  echo " --helm-version <ver>      Helm version to install (required)"
 }
 
 # Parse flags
-kind_version="v0.30.0"
-kubectl_version="v1.34.1"
-kubens_version="v0.9.5"
-k9s_version="0.50.16"
-helm_version="v4.0.1"
+kind_version=""
+kubectl_version=""
+kubens_version=""
+k9s_version=""
+helm_version=""
 
 while [[ $# -gt 0 ]]; do
   case "$1" in
@@ -73,6 +73,27 @@ while [[ $# -gt 0 ]]; do
       ;;
   esac
 done
+
+if [[ -z "$kind_version" ]]; then
+  echo "Error: --kind-version is required" >&2
+  exit 1
+fi
+if [[ -z "$kubectl_version" ]]; then
+  echo "Error: --kubectl-version is required" >&2
+  exit 1
+fi
+if [[ -z "$kubens_version" ]]; then
+  echo "Error: --kubens-version is required" >&2
+  exit 1
+fi
+if [[ -z "$k9s_version" ]]; then
+  echo "Error: --k9s-version is required" >&2
+  exit 1
+fi
+if [[ -z "$helm_version" ]]; then
+  echo "Error: --helm-version is required" >&2
+  exit 1
+fi
 
 echo "✨ Installing Kind"
 curl -sS "https://webi.sh/kind@${kind_version}" | sh

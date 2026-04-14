@@ -7,11 +7,11 @@ help() {
   echo "Usage: $0 [OPTIONS]"
   echo "Options:"
   echo " --help             Display this help message"
-  echo " --version <ver>    Qdrant Helm chart version to install (default: 1.16.3)"
+  echo " --version <ver>    Qdrant Helm chart version to install (required)"
 }
 
 # Parse flags
-version="1.16.3"
+version=""
 
 while [[ $# -gt 0 ]]; do
   case "$1" in
@@ -33,6 +33,11 @@ while [[ $# -gt 0 ]]; do
       ;;
   esac
 done
+
+if [[ -z "$version" ]]; then
+  echo "Error: --version is required" >&2
+  exit 1
+fi
 
 echo "✨ Adding Qdrant Helm repo"
 helm repo add qdrant https://qdrant.github.io/qdrant-helm

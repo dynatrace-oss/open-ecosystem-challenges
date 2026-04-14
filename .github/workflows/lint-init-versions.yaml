@@ -1,0 +1,48 @@
+name: Lint init script versions
+
+on:
+  pull_request:
+    paths:
+      - '.devcontainer/**/post-create.sh'
+      - 'lib/**/init.sh'
+
+jobs:
+  check-versions-pinned:
+    name: All init.sh calls have pinned versions
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Check that every init.sh call has a version flag
+        run: |
+          set -euo pipefail
+
+          failed=0
+
+          while IFS= read -r file; do
+            while IFS= read -r line; do
+              # Skip blank lines, comments, and lines that don't reference an init script
+              [[ "$line" =~ ^[[:space:]]*# ]] && continue
+              [[ "$line" =~ init\.sh ]] || continue
+
+
+              # Skip continuation lines (they carry the version flags for kubernetes/init.sh)
+              [[ "$line" =~ \\[[:space:]]*$ ]] && continue
+              [[ "$line" =~ ^[[:space:]]+-- ]] && continue
+
+              # The line calls an init script — check it carries a version flag
+              if ! grep -qE '(--version|--kind-version|--kubectl-version|--kubens-version|--k9s-version|--helm-version)' <<< "$line"; then
+                echo "ERROR: $file: missing version flag on: $line"
+                failed=1
+              fi
+            done < "$file"
+          done < <(find .devcontainer -name 'post-create.sh')
+
+          if [[ $failed -eq 1 ]]; then
+            echo ""
+            echo "Every lib/**/init.sh call must pass a pinned --version flag."
+            echo "Run the script with --help to see available flags."
+            exit 1
+          fi
+
+          echo "✅ All init.sh calls have pinned version flags."

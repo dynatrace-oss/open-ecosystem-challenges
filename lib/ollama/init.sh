@@ -7,11 +7,11 @@ help() {
   echo "Usage: $0 [OPTIONS]"
   echo "Options:"
   echo " --help             Display this help message"
-  echo " --version <ver>    Ollama Helm chart version to install (default: 1.40.0)"
+  echo " --version <ver>    Ollama Helm chart version to install (required)"
 }
 
 # Parse flags
-version="1.40.0"
+version=""
 
 while [[ $# -gt 0 ]]; do
   case "$1" in
@@ -33,6 +33,11 @@ while [[ $# -gt 0 ]]; do
       ;;
   esac
 done
+
+if [[ -z "$version" ]]; then
+  echo "Error: --version is required" >&2
+  exit 1
+fi
 
 # Deploy Ollama to Kubernetes with TinyLlama model pre-loaded
 

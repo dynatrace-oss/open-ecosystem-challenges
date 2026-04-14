@@ -8,8 +8,8 @@ source "$REPO_ROOT/lib/scripts/tracker.sh"
 set_tracking_context "02-building-cloudhaven" "expert"
 track_codespace_created
 
-"$REPO_ROOT/lib/shared/init.sh"
+"$REPO_ROOT/lib/shared/init.sh" --version v0.17.0 # https://github.com/charmbracelet/gum/releases
 
-"$REPO_ROOT/lib/github-cli/init.sh"
-"$REPO_ROOT/lib/open-tofu/init.sh"
-"$REPO_ROOT/lib/gcp-api-mock/init.sh"
+"$REPO_ROOT/lib/github-cli/init.sh" --version v2.86.0 # https://github.com/cli/cli/releases
+"$REPO_ROOT/lib/open-tofu/init.sh" --version v1.11.2 # https://github.com/opentofu/opentofu/releases
+"$REPO_ROOT/lib/gcp-api-mock/init.sh" --version v1.1.4 # https://github.com/KatharinaSick/gcp-api-mock/releases

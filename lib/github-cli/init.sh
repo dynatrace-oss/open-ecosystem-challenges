@@ -6,12 +6,12 @@ help() {
   echo "Options:"
   echo " --help             Display this help message"
   echo " --act              Installs the nektos/act extension"
-  echo " --version <ver>    GitHub CLI version to install (default: v2.86.0)"
+  echo " --version <ver>    GitHub CLI version to install (required)"
 }
 
 # Parse flags
 act=false
-version="v2.86.0"
+version=""
 
 while [[ $# -gt 0 ]]; do
   case "$1" in
@@ -37,6 +37,11 @@ while [[ $# -gt 0 ]]; do
       ;;
   esac
 done
+
+if [[ -z "$version" ]]; then
+  echo "Error: --version is required" >&2
+  exit 1
+fi
 
 echo "✨ Installing the GitHub CLI"
 curl -sS "https://webi.sh/gh@${version}" | sh

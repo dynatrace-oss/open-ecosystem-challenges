@@ -8,12 +8,12 @@ help() {
   echo "Options:"
   echo " --help             Display this help message"
   echo " --read-only        Disables the ArgoCD admin user and only provides read-only access"
-  echo " --version <ver>    Argo CD version to install (default: v3.2.0)"
+  echo " --version <ver>    Argo CD version to install (required)"
 }
 
 # Parse flags
 read_only=false
-version="v3.2.0"
+version=""
 
 while [[ $# -gt 0 ]]; do
   case "$1" in
@@ -40,9 +40,20 @@ while [[ $# -gt 0 ]]; do
   esac
 done
 
+if [[ -z "$version" ]]; then
+  echo "Error: --version is required" >&2
+  exit 1
+fi
+
 echo "✨ Installing Argo CD"
 kubectl create namespace argocd
-kubectl apply -k "$SCRIPT_DIR/manifests"
+
+manifests_tmp="$(mktemp -d)"
+trap 'rm -rf "${manifests_tmp}"' EXIT
+cp -r "$SCRIPT_DIR/manifests/." "${manifests_tmp}/"
+sed -i "s|argoproj/argo-cd/v[^/]*/manifests/install.yaml|argoproj/argo-cd/${version}/manifests/install.yaml|" \
+  "${manifests_tmp}/kustomization.yaml"
+kubectl apply -k "${manifests_tmp}"
 
 echo "✨ Installing Argo CD CLI"
 curl -sSL -o argocd-linux-amd64 "https://github.com/argoproj/argo-cd/releases/download/${version}/argocd-linux-amd64"

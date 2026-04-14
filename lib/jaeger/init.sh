@@ -7,11 +7,11 @@ help() {
   echo "Usage: $0 [OPTIONS]"
   echo "Options:"
   echo " --help             Display this help message"
-  echo " --version <ver>    Jaeger Helm chart version to install (default: 4.1.5)"
+  echo " --version <ver>    Jaeger Helm chart version to install (required)"
 }
 
 # Parse flags
-version="4.1.5"
+version=""
 
 while [[ $# -gt 0 ]]; do
   case "$1" in
@@ -33,6 +33,11 @@ while [[ $# -gt 0 ]]; do
       ;;
   esac
 done
+
+if [[ -z "$version" ]]; then
+  echo "Error: --version is required" >&2
+  exit 1
+fi
 
 # Use a minimal Jaeger setup instead of deploying it via the operator to keep the Codespace lightweight and focused.
 

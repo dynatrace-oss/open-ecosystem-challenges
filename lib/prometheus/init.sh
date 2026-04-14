@@ -8,7 +8,7 @@ help() {
   echo "Options:"
   echo " --help             Display this help message"
   echo " --operator         Install Prometheus Operator instead of standalone Prometheus"
-  echo " --version <ver>    Helm chart version to install (operator default: 82.1.1; standalone: latest)"
+  echo " --version <ver>    Helm chart version to install (required)"
 }
 
 # Parse flags
@@ -42,9 +42,9 @@ done
 
 # Use a minimal Prometheus setup instead of kube-prometheus-stack to keep the Codespace lightweight and focused.
 
-# Apply mode-specific version defaults
-if [[ "$use_operator" = true && -z "$version" ]]; then
-  version="82.1.1"
+if [[ -z "$version" ]]; then
+  echo "Error: --version is required" >&2
+  exit 1
 fi
 
 echo "✨ Adding prometheus-community Helm repo"
@@ -66,15 +66,13 @@ if [ "$use_operator" = true ]; then
   echo "✅ Prometheus Operator is ready"
   echo "💡 Use PrometheusRule CRDs to define recording and alerting rules"
 else
-  helm_args=(prometheus prometheus-community/prometheus
-    --namespace prometheus
-    --values "$SCRIPT_DIR/standalone-values.yaml"
-    --wait
-    --timeout 5m)
-  [[ -n "$version" ]] && helm_args+=(--version "$version")
-
   echo "✨ Installing standalone Prometheus"
-  helm install "${helm_args[@]}"
+  helm install prometheus prometheus-community/prometheus \
+    --version "$version" \
+    --namespace prometheus \
+    --values "$SCRIPT_DIR/standalone-values.yaml" \
+    --wait \
+    --timeout 5m
 
   echo "✅ Prometheus is ready"
 fi

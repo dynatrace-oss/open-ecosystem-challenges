@@ -3,6 +3,9 @@ kind: Kustomization
 
 namespace: argocd
 
+# The version in the URL below is substituted at deploy time by init.sh using the
+# --version flag. Do not bump the version here directly — update the callers in
+# .devcontainer/**/post-create.sh instead.
 resources:
   - https://raw.githubusercontent.com/argoproj/argo-cd/v3.2.0/manifests/install.yaml
 

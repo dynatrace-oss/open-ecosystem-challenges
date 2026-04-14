@@ -5,11 +5,11 @@ help() {
   echo "Usage: $0 [OPTIONS]"
   echo "Options:"
   echo " --help             Display this help message"
-  echo " --version <ver>    GCP API Mock version to install (default: v1.1.4)"
+  echo " --version <ver>    GCP API Mock version to install (required)"
 }
 
 # Parse flags
-version="v1.1.4"
+version=""
 
 while [[ $# -gt 0 ]]; do
   case "$1" in
@@ -31,6 +31,11 @@ while [[ $# -gt 0 ]]; do
       ;;
   esac
 done
+
+if [[ -z "$version" ]]; then
+  echo "Error: --version is required" >&2
+  exit 1
+fi
 
 echo "✨ Starting the GCP API Mock"
 docker run -d -p 30104:8080 "ghcr.io/katharinasick/gcp-api-mock:${version}"

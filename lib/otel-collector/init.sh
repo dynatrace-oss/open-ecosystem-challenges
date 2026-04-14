@@ -7,8 +7,10 @@ help() {
   echo "Usage: $0 [OPTIONS]"
   echo "Options:"
   echo " --help             Display this help message"
-  echo " --version <ver>    Accepted for API consistency; the OTEL Collector version is defined in the manifests"
+  echo " --version <ver>    otel/opentelemetry-collector-contrib image tag (required)"
 }
+
+version=""
 
 # Parse flags
 while [[ $# -gt 0 ]]; do
@@ -22,7 +24,7 @@ while [[ $# -gt 0 ]]; do
         echo "Error: --version requires a value" >&2
         exit 1
       fi
-      echo "Warning: --version is ignored for otel-collector; the version is defined in the manifests" >&2
+      version="$2"
       shift 2
       ;;
     *)
@@ -32,11 +34,19 @@ while [[ $# -gt 0 ]]; do
   esac
 done
 
+if [[ -z "$version" ]]; then
+  echo "Error: --version is required" >&2
+  exit 1
+fi
+
 echo "✨ Creating otel namespace"
 kubectl create namespace otel || true
 
-echo "✨ Deploying OTEL Collector manifests"
-kubectl apply -n otel -f "$SCRIPT_DIR/manifests/"
+echo "✨ Deploying OTEL Collector manifests (version ${version})"
+kubectl apply -n otel -f "$SCRIPT_DIR/manifests/config.yaml"
+kubectl apply -n otel -f "$SCRIPT_DIR/manifests/service.yaml"
+sed "s|otel/opentelemetry-collector-contrib:.*|otel/opentelemetry-collector-contrib:${version}|" \
+  "$SCRIPT_DIR/manifests/deployment.yaml" | kubectl apply -n otel -f -
 
 echo "✨ Waiting for OTEL Collector to be ready"
 kubectl rollout status deployment/collector -n otel --timeout=120s
