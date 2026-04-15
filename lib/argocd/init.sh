@@ -6,35 +6,57 @@ SCRIPT_DIR="$(dirname "$(realpath "${BASH_SOURCE[0]}")")"
 help() {
   echo "Usage: $0 [OPTIONS]"
   echo "Options:"
-  echo " --help         Display this help message"
-  echo " --read-only    Disables the ArgoCD admin user and only provides read-only access"
+  echo " --help             Display this help message"
+  echo " --read-only        Disables the ArgoCD admin user and only provides read-only access"
+  echo " --version <ver>    Argo CD version to install (required)"
 }
 
 # Parse flags
 read_only=false
+version=""
 
-for arg in "$@"; do
-  case "$arg" in
+while [[ $# -gt 0 ]]; do
+  case "$1" in
     --help)
       help
       exit 0
       ;;
     --read-only)
       read_only=true
+      shift
+      ;;
+    --version)
+      if [[ -z "${2-}" ]]; then
+        echo "Error: --version requires a value" >&2
+        exit 1
+      fi
+      version="$2"
+      shift 2
       ;;
     *)
-      echo "Unknown option: $arg" >&2
+      echo "Unknown option: $1" >&2
       exit 1
       ;;
   esac
 done
 
+if [[ -z "$version" ]]; then
+  echo "Error: --version is required" >&2
+  exit 1
+fi
+
 echo "✨ Installing Argo CD"
 kubectl create namespace argocd
-kubectl apply -k "$SCRIPT_DIR/manifests"
+
+manifests_tmp="$(mktemp -d)"
+trap 'rm -rf "${manifests_tmp}"' EXIT
+cp -r "$SCRIPT_DIR/manifests/." "${manifests_tmp}/"
+sed -i "s|argoproj/argo-cd/[^/]*/manifests/install.yaml|argoproj/argo-cd/${version}/manifests/install.yaml|" \
+  "${manifests_tmp}/kustomization.yaml"
+kubectl apply -k "${manifests_tmp}"
 
 echo "✨ Installing Argo CD CLI"
-curl -sSL -o argocd-linux-amd64 https://github.com/argoproj/argo-cd/releases/download/v3.2.0/argocd-linux-amd64
+curl -sSL -o argocd-linux-amd64 "https://github.com/argoproj/argo-cd/releases/download/${version}/argocd-linux-amd64"
 sudo install -m 555 argocd-linux-amd64 /usr/local/bin/argocd
 rm argocd-linux-amd64
 
@@ -49,7 +71,7 @@ if [ "$read_only" = true ]; then
   argocd login localhost:30100 --username admin --password "$admin_password" --plaintext
   argocd account update-password \
     --account readonly \
-    --current-password $admin_password \
+    --current-password "$admin_password" \
     --new-password a-super-secure-password
 
   echo "✨ Disabling admin user for read-only mode"

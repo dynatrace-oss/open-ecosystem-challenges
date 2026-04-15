@@ -77,9 +77,17 @@ Open the generated `.devcontainer/00-adventure-name_NN-level/` files and fill in
 For Kubernetes-based adventures, [Adventure 01](../../adventures/01-echoes-lost-in-orbit/) is a good reference for what features and setup scripts to use.
 
 **post-create.sh** runs once when the container is created:
-- Install CLI tools using setup scripts from `lib/`
+- Install CLI tools using setup scripts from `lib/` — every script accepts a `--version` flag to pin a specific version. Run any script with `--help` to see available flags and defaults.
 - Pull container images
 - Set up one-time configurations
+
+Example calls in `post-create.sh`:
+```bash
+"$REPO_ROOT/lib/kubernetes/init.sh"                                            # use default versions
+"$REPO_ROOT/lib/argocd/init.sh" --version v3.5.0                              # pin a version
+"$REPO_ROOT/lib/argocd/init.sh" --read-only --version v3.5.0                  # combine flags
+"$REPO_ROOT/lib/kubernetes/init.sh" --kubectl-version v1.35.0 --helm-version v4.1.0  # per-tool versions
+```
 
 **post-start.sh** runs every time the container starts:
 - Start services (databases, clusters, etc.)
