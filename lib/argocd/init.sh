@@ -51,7 +51,7 @@ kubectl create namespace argocd
 manifests_tmp="$(mktemp -d)"
 trap 'rm -rf "${manifests_tmp}"' EXIT
 cp -r "$SCRIPT_DIR/manifests/." "${manifests_tmp}/"
-sed -i "s|argoproj/argo-cd/v[^/]*/manifests/install.yaml|argoproj/argo-cd/${version}/manifests/install.yaml|" \
+sed -i "s|argoproj/argo-cd/[^/]*/manifests/install.yaml|argoproj/argo-cd/${version}/manifests/install.yaml|" \
   "${manifests_tmp}/kustomization.yaml"
 kubectl apply -k "${manifests_tmp}"
 

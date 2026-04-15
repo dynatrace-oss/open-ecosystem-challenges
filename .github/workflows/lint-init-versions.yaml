@@ -1,3 +1,6 @@
+# This check exists to catch missing --version flags at PR time rather than when a
+# contributor's Codespace silently fails to start. Failing fast here gives a much
+# better experience than debugging a broken environment after the fact.
 name: Lint init script versions
 
 on:
@@ -27,7 +30,7 @@ jobs:
 
 
               # Skip continuation lines (they carry the version flags for kubernetes/init.sh)
-              [[ "$line" =~ \\[[:space:]]*$ ]] && continue
+              [[ "$line" == *\\ ]] && continue
               [[ "$line" =~ ^[[:space:]]+-- ]] && continue
 
               # The line calls an init script — check it carries a version flag

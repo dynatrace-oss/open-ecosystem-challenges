@@ -3,11 +3,11 @@ kind: Kustomization
 
 namespace: argocd
 
-# The version in the URL below is substituted at deploy time by init.sh using the
-# --version flag. Do not bump the version here directly — update the callers in
-# .devcontainer/**/post-create.sh instead.
+# ARGOCD_VERSION is a placeholder substituted by init.sh at deploy time via sed.
+# Applying this kustomization directly without going through init.sh will fail
+# intentionally, because kubectl cannot resolve the literal placeholder as a URL.
 resources:
-  - https://raw.githubusercontent.com/argoproj/argo-cd/v3.2.0/manifests/install.yaml
+  - https://raw.githubusercontent.com/argoproj/argo-cd/ARGOCD_VERSION/manifests/install.yaml
 
 patches:
   - path: overlays/argocd-server-service.yaml
