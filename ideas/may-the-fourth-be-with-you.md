@@ -2,7 +2,7 @@
 
 ## Overview
 
-**Theme:** The Alliance's most critical secret: the Death Star schematics, stored deep within the cluster at Massassi Station. ISB (Imperial Security Bureau) agents have infiltrated the network, and the defenses meant to protect the plans are broken, misconfigured, or simply not enough. As a Rebel Engineer in General Draven's intelligence cell, your mission: detect the breach, contain the threat, and prove the Rebellion's defenses will hold.
+**Theme:** The Alliance's most critical secret - the Death Star schematics, stored deep within the cluster at Massassi Station. ISB (Imperial Security Bureau) agents have infiltrated the network, and the defenses meant to protect the plans are broken, misconfigured, or simply not enough. As a Rebel Engineer in General Draven's intelligence cell, your mission: detect the breach, contain the threat, and prove the Rebellion's defenses will hold.
 
 **Skills:**
 
