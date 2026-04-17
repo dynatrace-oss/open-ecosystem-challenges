@@ -2,7 +2,7 @@
 
 ## Overview
 
-**Theme:** The Rebel Alliance's most critical secret - the Death Star schematics, stored deep within the cluster at Massassi Station. ISB (Imperial Security Bureau) agents have infiltrated the network, and the defenses meant to protect the plans are broken, misconfigured, or simply not enough. As a Jedi Engineer, your mission: detect the breach, contain the threat, and prove the Rebellion's defenses will hold.
+**Theme:** The Alliance's most critical secret: the Death Star schematics, stored deep within the cluster at Massassi Station. ISB (Imperial Security Bureau) agents have infiltrated the network, and the defenses meant to protect the plans are broken, misconfigured, or simply not enough. As a Rebel Engineer in General Draven's intelligence cell, your mission: detect the breach, contain the threat, and prove the Rebellion's defenses will hold.
 
 **Skills:**
 
@@ -24,7 +24,7 @@ Fix a broken Tetragon TracingPolicy to detect unauthorized access to the Death S
 
 #### Story
 
-The Death Star schematics are stored deep within the cluster at Massassi Station, the Rebellion's most closely guarded secret. Reports have confirmed what the Force already whispered: ISB agents have infiltrated the network. A Rebel engineer deployed Tetragon and wrote a TracingPolicy to stand guard, a silent tripwire on the schematics file. But something is wrong. The policy is applied, Tetragon is running, and nothing fires.
+The Death Star schematics are stored deep within the cluster at Massassi Station, the Rebellion's most closely guarded secret. Reports have confirmed what the Force already whispered: ISB agents have infiltrated the network. A fellow engineer deployed Tetragon and wrote a TracingPolicy to stand guard, a silent tripwire on the schematics file. But something is wrong. The policy is applied, Tetragon is running, and nothing fires.
 
 The agent could be reading the plans right now. Your mission: find what's broken in the TracingPolicy and restore the watch before the Empire learns what the Rebellion knows.
 
@@ -63,7 +63,7 @@ Fix misconfigured RBAC and a broken Tetragon enforcement policy to contain an IS
 
 The agent was caught - briefly. Tetragon fired, the event was logged, and the Rebellion breathed a sigh of relief. But relief was premature. Before the TracingPolicy ever fired, the agent's pod had quietly pulled classified intel through the Kubernetes API using a ServiceAccount with sweeping permissions across the cluster. And your TracingPolicy? It watched. It did not act.
 
-Another engineer started hardening the defences, tightening the ServiceAccount and configuring Tetragon to respond rather than just observe. The work was left unfinished. The RBAC is misconfigured and the enforcement action is broken. The agent is still in the cluster, and the schematics are still readable. Your mission: lock down what the agent can reach, and make the Death Star schematics vanish the moment an unauthorised process touches them.
+Another member of Draven's cell started hardening the defences, tightening the ServiceAccount and configuring Tetragon to respond rather than just observe. The work was left unfinished. The RBAC is misconfigured and the enforcement action is broken. The agent is still in the cluster, and the schematics are still readable. Your mission: lock down what the agent can reach, and make the Death Star schematics vanish the moment an unauthorised process touches them.
 
 #### The Problem
 
@@ -98,9 +98,9 @@ Complete a broken Chainsaw test suite that simulates the full attack chain and p
 
 #### Story
 
-Alliance High Command is impressed. Detection is in place, the override is active, the RBAC is locked down. But General Dodonna has one more question: "How do we know these defenses will hold next time?" A Jedi trusts the Force, but you realise you've never formally proven your policies work. You assumed they did because you configured them.
+General Draven is satisfied. General Dodonna is not. Detection is in place, the override is active, the RBAC is locked down. Dodonna has one more question: "How do we know these defenses will hold next time?" The Rebellion trusts its engineers, but trust without proof is just hope. You've never formally proven your policies work. You assumed they did because you configured them.
 
-An engineer started writing Chainsaw tests to simulate the attack: access the schematics file, attempt to escalate via the over-permissive ServiceAccount. The tests exist but are incomplete - missing assertions, broken attack simulations, and steps that don't actually trigger the policies. Your mission: complete the suite so it reliably passes on a correctly defended cluster and fails the moment a defense is removed.
+Another engineer started writing Chainsaw tests to simulate the attack: access the schematics file, attempt to escalate via the over-permissive ServiceAccount. The tests exist but are incomplete - missing assertions, broken attack simulations, and steps that don't actually trigger the policies. Your mission: complete the suite so it reliably passes on a correctly defended cluster and fails the moment a defense is removed.
 
 > 💡 **Beyond the challenge:** *"Secured the door, you have. Who forged the key, you never asked."* Runtime security catches what happens inside the cluster - but what about what was baked into the image before it ever arrived? Explore [Sigstore/cosign](https://docs.sigstore.dev/) to see what image provenance verification looks like, and imagine what a Chapter IV might look like.
 
