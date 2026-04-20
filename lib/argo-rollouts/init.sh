@@ -45,8 +45,10 @@ echo "✨ Waiting for Argo Rollouts controller to be ready"
 kubectl rollout status deployment/argo-rollouts -n argo-rollouts --timeout=300s
 
 echo "✨ Installing Argo Rollouts Kubectl plugin"
-curl -LO "https://github.com/argoproj/argo-rollouts/releases/download/${version}/kubectl-argo-rollouts-linux-amd64"
-chmod +x ./kubectl-argo-rollouts-linux-amd64
-sudo mv ./kubectl-argo-rollouts-linux-amd64 /usr/local/bin/kubectl-argo-rollouts
+# shellcheck disable=SC1091
+source "$(dirname "$(realpath "${BASH_SOURCE[0]}")")/../scripts/arch.sh"
+curl -LO "https://github.com/argoproj/argo-rollouts/releases/download/${version}/kubectl-argo-rollouts-linux-${ARCH}"
+chmod +x "./kubectl-argo-rollouts-linux-${ARCH}"
+sudo mv "./kubectl-argo-rollouts-linux-${ARCH}" /usr/local/bin/kubectl-argo-rollouts
 
 echo "✅ Argo Rollouts is ready"

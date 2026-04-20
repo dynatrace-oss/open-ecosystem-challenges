@@ -95,11 +95,14 @@ if [[ -z "$helm_version" ]]; then
   exit 1
 fi
 
+# shellcheck disable=SC1091
+source "$(dirname "$(realpath "${BASH_SOURCE[0]}")")/../scripts/arch.sh"
+
 echo "✨ Installing Kind"
 curl -sS "https://webi.sh/kind@${kind_version}" | sh
 
 echo "✨ Installing kubectl"
-curl -LO "https://dl.k8s.io/release/${kubectl_version}/bin/linux/amd64/kubectl"
+curl -LO "https://dl.k8s.io/release/${kubectl_version}/bin/linux/${ARCH}/kubectl"
 chmod +x kubectl
 sudo mv kubectl /usr/local/bin/
 
@@ -110,11 +113,11 @@ echo "✨ Installing k9s"
 curl -sS "https://webinstall.dev/k9s@${k9s_version}" | bash
 
 echo "✨ Installing Helm"
-curl -LO "https://get.helm.sh/helm-${helm_version}-linux-amd64.tar.gz"
-tar -zxvf "helm-${helm_version}-linux-amd64.tar.gz"
-chmod +x linux-amd64/helm
-sudo mv linux-amd64/helm /usr/local/bin/helm
-rm -rf linux-amd64 "helm-${helm_version}-linux-amd64.tar.gz"
+curl -LO "https://get.helm.sh/helm-${helm_version}-linux-${ARCH}.tar.gz"
+tar -zxvf "helm-${helm_version}-linux-${ARCH}.tar.gz"
+chmod +x "linux-${ARCH}/helm"
+sudo mv "linux-${ARCH}/helm" /usr/local/bin/helm
+rm -rf "linux-${ARCH}" "helm-${helm_version}-linux-${ARCH}.tar.gz"
 
 echo "✨ Starting Kind cluster"
 kind create cluster --config "$SCRIPT_DIR/config.yaml" --wait 300s

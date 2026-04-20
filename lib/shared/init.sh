@@ -38,10 +38,8 @@ if [[ -z "$version" ]]; then
 fi
 
 echo "✨ Installing gum"
-case "$(uname -m)" in
-    aarch64|arm64)     ARCH="arm64" ;;
-    *)                 ARCH="amd64" ;;
-esac
+# shellcheck disable=SC1091
+source "$(dirname "$(realpath "${BASH_SOURCE[0]}")")/../scripts/arch.sh"
 
 curl -LO "https://github.com/charmbracelet/gum/releases/download/${version}/gum_${version#v}_${ARCH}.deb"
 sudo apt install "./gum_${version#v}_${ARCH}.deb"
