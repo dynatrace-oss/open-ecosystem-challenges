@@ -1,0 +1,37 @@
+{
+  "flags": {
+    "vision_state": {
+      "state": "ENABLED",
+      "variants": {
+        "enhanced": "enhanced",
+        "sharp": "sharp",
+        "blurry": "blurry",
+        "clouded": "clouded"
+      },
+      "defaultVariant": "blurry",
+      "targeting": {
+        "if": [
+          {
+            "sem_ver": [
+              {
+                "var": "springVersion"
+              },
+              ">=",
+              "3.0.0"
+            ]
+          },
+          "enhanced",
+          {
+            "===": [
+              {
+                "var": "language"
+              },
+              "de"
+            ]
+          },
+          "sharp"
+        ]
+      }
+    }
+  }
+}

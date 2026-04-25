@@ -1,0 +1,59 @@
+{
+  "flags": {
+    "vision_state": {
+      "state": "ENABLED",
+      "variants": {
+        "enhanced": "enhanced",
+        "sharp": "sharp",
+        "blurry": "blurry",
+        "clouded": "clouded"
+      },
+      "defaultVariant": "blurry",
+      "targeting": {
+        "if": [
+          {
+            "sem_ver": [
+              {
+                "var": "springVersion"
+              },
+              ">=",
+              "3.0.0"
+            ]
+          },
+          "enhanced",
+          {
+            "===": [
+              {
+                "var": "language"
+              },
+              "de"
+            ]
+          },
+          "sharp"
+        ]
+      }
+    },
+    "vision_amplifier_v2": {
+      "state": "ENABLED",
+      "variants": {
+        "off": false,
+        "on": true
+      },
+      "defaultVariant": "off",
+      "targeting": {
+        "fractional": [
+          ["off", 0],
+          ["on", 100]
+        ]
+      }
+    },
+    "loadgen_active": {
+      "state": "ENABLED",
+      "variants": {
+        "off": false,
+        "on": true
+      },
+      "defaultVariant": "off"
+    }
+  }
+}

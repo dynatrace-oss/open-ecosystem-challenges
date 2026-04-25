@@ -1,0 +1,34 @@
+{
+  "name": "🧪 Adventure 00 | 🟢 Beginner (Stand up the dispenser)",
+  "image": "mcr.microsoft.com/devcontainers/java:1-21-bullseye",
+  "workspaceFolder": "/workspaces/${localWorkspaceFolderBasename}/adventures/planned/00-side-effects-may-vary/beginner",
+  "postCreateCommand": "bash /workspaces/${localWorkspaceFolderBasename}/.devcontainer/00-side-effects-may-vary_01-beginner/post-create.sh",
+  "postStartCommand": "bash /workspaces/${localWorkspaceFolderBasename}/.devcontainer/00-side-effects-may-vary_01-beginner/post-start.sh",
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "vscjava.vscode-java-pack",
+        "vmware.vscode-boot-dev-pack",
+        "redhat.vscode-xml"
+      ]
+    },
+    "codespaces": {
+      "openFiles": [
+        "adventures/planned/00-side-effects-may-vary/docs/beginner.md",
+        "adventures/planned/00-side-effects-may-vary/beginner/src/main/java/dev/openfeature/demo/java/demo/IndexController.java"
+      ]
+    }
+  },
+  "forwardPorts": [
+    8080
+  ],
+  "portsAttributes": {
+    "8080": {
+      "label": "Dispenser",
+      "onAutoForward": "notify"
+    }
+  },
+  "otherPortsAttributes": {
+    "onAutoForward": "ignore"
+  }
+}

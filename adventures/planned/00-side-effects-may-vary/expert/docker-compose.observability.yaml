@@ -1,0 +1,30 @@
+services:
+  lgtm:
+    image: grafana/otel-lgtm:latest
+    container_name: fun-with-flags-lgtm
+    ports:
+      - "3000:3000"     # Grafana UI (admin/admin)
+      - "4317:4317"     # OTLP gRPC (the Spring app exporter points here)
+      - "4318:4318"     # OTLP HTTP
+      - "9090:9090"     # Prometheus query API (used by verify.sh)
+      - "3200:3200"     # Tempo HTTP API (used by verify.sh)
+    environment:
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+    volumes:
+      - ./dashboards:/otel-lgtm/grafana/dashboards:ro
+
+  loadgen:
+    image: grafana/k6:latest
+    container_name: fun-with-flags-loadgen
+    command: ["run", "--quiet", "/scripts/script.js"]
+    volumes:
+      - ./loadgen/k6:/scripts:ro
+    environment:
+      # The k6 script idles when the loadgen_active flag is "off". Flip the
+      # flag in flags.json to "on" to start hammering :8080.
+      - BASE_URL=${BASE_URL:-http://host.docker.internal:8080}
+      - FLAGD_URL=${FLAGD_URL:-http://host.docker.internal:8014}
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    restart: unless-stopped

@@ -1,0 +1,62 @@
+{
+  "name": "Adventure 00 | 🟡 Intermediate (Dose by cohort)",
+  "image": "mcr.microsoft.com/devcontainers/base:bullseye",
+  "workspaceFolder": "/workspaces/${localWorkspaceFolderBasename}/adventures/planned/00-side-effects-may-vary/intermediate",
+  "features": {
+    "ghcr.io/devcontainers/features/java:1": {
+      "version": "21",
+      "jdkDistro": "tem",
+      "installMaven": "false"
+    },
+    "ghcr.io/devcontainers/features/docker-in-docker:2": {}
+  },
+  "postCreateCommand": "bash /workspaces/${localWorkspaceFolderBasename}/.devcontainer/00-side-effects-may-vary_02-intermediate/post-create.sh",
+  "postStartCommand": "bash /workspaces/${localWorkspaceFolderBasename}/.devcontainer/00-side-effects-may-vary_02-intermediate/post-start.sh",
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "vscjava.vscode-java-pack",
+        "vmware.vscode-spring-boot",
+        "vscjava.vscode-spring-boot-dashboard"
+      ]
+    },
+    "codespaces": {
+      "openFiles": [
+        "adventures/planned/00-side-effects-may-vary/README.md",
+        "adventures/planned/00-side-effects-may-vary/docs/intermediate.md"
+      ]
+    }
+  },
+  "forwardPorts": [
+    8080,
+    8013,
+    8014,
+    8015,
+    8016
+  ],
+  "portsAttributes": {
+    "8080": {
+      "label": "Dispenser (Spring Boot)",
+      "onAutoForward": "notify"
+    },
+    "8013": {
+      "label": "flagd gRPC",
+      "onAutoForward": "ignore"
+    },
+    "8014": {
+      "label": "flagd HTTP eval",
+      "onAutoForward": "ignore"
+    },
+    "8015": {
+      "label": "flagd OFREP",
+      "onAutoForward": "ignore"
+    },
+    "8016": {
+      "label": "flagd metrics",
+      "onAutoForward": "ignore"
+    }
+  },
+  "otherPortsAttributes": {
+    "onAutoForward": "ignore"
+  }
+}
