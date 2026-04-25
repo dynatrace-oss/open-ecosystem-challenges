@@ -58,7 +58,7 @@ Your Codespace comes pre-configured with the following tools:
 - `curl` and `jq` for poking at the lab
 - `tail -f` for watching the application log live
 
-No flagd container in this level — the FILE-mode provider reads `flags.json` directly. Docker-in-Docker is available in case you want to bring the docker-compose flagd setup online for the Expert level later.
+The FILE-mode provider reads `flags.json` directly inside the JVM, so the level itself does not need flagd as a container. There **is** a flagd sibling running in the devcontainer (reachable at `flagd:8013` from the workspace, `localhost:8013` from your host) — once you have FILE mode working you can flip the FlagdProvider to `Resolver.RPC` and point at it to see the same flag definitions served over gRPC. That is the bridge to the Expert level.
 
 ## ⏰ Deadline
 

@@ -56,7 +56,7 @@ if curl -fsS --max-time 5 -X POST "$FLAGD_HTTP/flagd.evaluation.v1.Service/Resol
   TESTS_PASSED=$((TESTS_PASSED + 1))
 else
   print_error_indent "flagd HTTP API is not reachable at $FLAGD_HTTP"
-  print_hint "Start flagd with: docker compose up -d"
+  print_hint "flagd is a sibling devcontainer service. Reopen the Codespace if it is not running."
   TESTS_FAILED=$((TESTS_FAILED + 1))
   FAILED_CHECKS+=("flagd_reachable")
 fi
@@ -69,7 +69,7 @@ if curl -fsS --max-time 5 "$GRAFANA_URL/api/health" >/dev/null 2>&1; then
   TESTS_PASSED=$((TESTS_PASSED + 1))
 else
   print_error_indent "Grafana is not reachable at $GRAFANA_URL"
-  print_hint "Start LGTM with: docker compose -f docker-compose.observability.yaml up -d"
+  print_hint "The LGTM stack is a sibling devcontainer service (lgtm). Reopen the Codespace if it is not running."
   TESTS_FAILED=$((TESTS_FAILED + 1))
   FAILED_CHECKS+=("lgtm_reachable")
 fi
@@ -109,7 +109,7 @@ PROM_RESPONSE=$(curl -fsS --max-time 5 -G "$PROMETHEUS_URL/api/v1/query" \
 
 if [[ -z "$PROM_RESPONSE" ]]; then
   print_error_indent "Could not query Prometheus at $PROMETHEUS_URL"
-  print_hint "The grafana/otel-lgtm container exposes Prometheus on port 9090. Make sure docker-compose.observability.yaml is up."
+  print_hint "The grafana/otel-lgtm container exposes Prometheus on port 9090. If port 9090 is not forwarded, the lgtm sibling container has not started — reopen the Codespace."
   TESTS_FAILED=$((TESTS_FAILED + 1))
   FAILED_CHECKS+=("prometheus_metrics")
 else
@@ -136,7 +136,7 @@ TEMPO_RESPONSE=$(curl -fsS --max-time 5 -G "$TEMPO_URL/api/search" \
 
 if [[ -z "$TEMPO_RESPONSE" ]]; then
   print_error_indent "Could not query Tempo at $TEMPO_URL"
-  print_hint "The grafana/otel-lgtm container exposes Tempo on port 3200. Make sure docker-compose.observability.yaml is up."
+  print_hint "The grafana/otel-lgtm container exposes Tempo on port 3200. If port 9090 is not forwarded, the lgtm sibling container has not started — reopen the Codespace."
   TESTS_FAILED=$((TESTS_FAILED + 1))
   FAILED_CHECKS+=("tempo_traces")
 else

@@ -103,9 +103,10 @@ Your Codespace comes pre-configured with the following tools:
 
 - [`curl`](https://curl.se/): HTTP client for hitting the lab, flagd, and Prometheus
 - [`./mvnw`](https://maven.apache.org/wrapper/): The Maven wrapper to build and run the Spring Boot lab
-- [`docker compose`](https://docs.docker.com/compose/): Orchestrate the flagd, LGTM, and loadgen containers
 - A browser pointed at [`http://localhost:3000`](http://localhost:3000) for Grafana (admin / admin)
 - [`jq`](https://jqlang.github.io/jq/): Pretty-print and filter JSON from `curl`
+
+flagd, the Grafana LGTM stack, and the k6 loadgen are **sibling devcontainer services** — they come up automatically when the Codespace boots. There is no `docker compose up` step. Inside the workspace they are reachable as `flagd`, `lgtm`, and `loadgen`; on the host they are forwarded to the same `localhost:NNNN` ports that `verify.sh` and the docs assume.
 
 ## ✅ How to Play
 
@@ -120,9 +121,11 @@ Quick start:
 - Fork the repo
 - Create a Codespace
 - Select **"Adventure 00 | 🔴 Expert (Phase 3 — read the chart)"**
-- Wait ~3-5 minutes for the containers to come up. The post-start script
-  brings up flagd, the Grafana LGTM stack, and the k6 loadgen container, then
-  starts the Spring Boot lab in the background.
+- Wait ~2-3 minutes for the sibling containers (flagd, Grafana LGTM, k6
+  loadgen) to come up. They are part of the devcontainer compose, so they
+  start automatically — no `docker compose up` step.
+- Once the IDE attaches to the workspace, start the Spring Boot lab yourself
+  with `./mvnw spring-boot:run` in the terminal.
 
 ### 2. Access the UIs
 
@@ -209,7 +212,7 @@ Edit `flags.json` in the expert directory and flip `loadgen_active`'s
 `defaultVariant` from `"off"` to `"on"`. flagd watches the file and picks up
 changes within a second. The k6 loadgen container has been polling
 `loadgen_active` every two seconds — it will notice and start hammering
-`http://host.docker.internal:8080/` with five virtual users.
+`http://workspace:8080/` with five virtual users (the workspace service name resolves inside the compose network).
 
 Now open the dashboard. Within ten to fifteen seconds you should see:
 
