@@ -58,7 +58,12 @@ Your Codespace comes pre-configured with the following tools:
 - `curl` and `jq` for poking at the lab
 - `tail -f` for watching the application log live
 
-The FILE-mode provider reads `flags.json` directly inside the JVM, so the level itself does not need flagd as a container. There **is** a flagd sibling running in the devcontainer (reachable at `flagd:8013` from the workspace, `localhost:8013` from your host) — once you have FILE mode working you can flip the FlagdProvider to `Resolver.RPC` and point at it to see the same flag definitions served over gRPC. That is the bridge to the Expert level.
+The FILE-mode provider reads `flags.json` directly inside the JVM, so the level itself does not need flagd as a container. There **is** a flagd sibling running in the devcontainer (reachable at `flagd:8013` from the workspace, `localhost:8013` from your host) so once FILE mode works you can switch the FlagdProvider to either of two remote modes against the same flag definitions:
+
+- `Resolver.RPC` + `host("flagd")` + `port(8013)` — every evaluation hits flagd over gRPC.
+- `Resolver.IN_PROCESS` + `host("flagd")` + `port(8015)` — flag *definitions* stream into the JVM via flagd's sync API on port 8015 and evaluation stays in-process. Best of both worlds: no per-call hop, and the flag definitions still come from a single source of truth.
+
+Both are good bridges to the Expert level.
 
 ## ⏰ Deadline
 
