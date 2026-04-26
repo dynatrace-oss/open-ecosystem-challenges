@@ -189,7 +189,15 @@ cd adventures/planned/00-side-effects-may-vary/intermediate
 
 Roll your own country at any time with `COUNTRY=<code> ./mvnw spring-boot:run | tee app.log`.
 
-The devcontainer also exports `COUNTRY=de` by default in the workspace environment, so a plain `./mvnw spring-boot:run` (or **F5** / **Run** in the Spring Boot Dashboard) already runs the German trial. To switch country from the IDE without reopening, stop the app and use one of the run scripts above.
+The devcontainer also exports `COUNTRY=de` by default in the workspace environment, so a plain `./mvnw spring-boot:run` (or **F5** / **Run** in the Spring Boot Dashboard) already runs the German trial.
+
+For one-click switching from the IDE, your Codespace also ships three named **Run and Debug** configurations (the post-create script materialises them into `.vscode/launch.json` at boot, since the repo's root `.gitignore` excludes `.vscode/` from being checked in):
+
+- 🇩🇪 **Run the Lab — Germany (COUNTRY=de)**
+- 🇦🇹 **Run the Lab — Austria (COUNTRY=at)**
+- 🌍 **Run the Lab — No country**
+
+Open the **Run and Debug** view (`Ctrl/Cmd + Shift + D`), pick one from the dropdown, and hit ▶. Switching country is a click; no terminal needed.
 
 ### 5. Verify Each Cohort by Hand
 
