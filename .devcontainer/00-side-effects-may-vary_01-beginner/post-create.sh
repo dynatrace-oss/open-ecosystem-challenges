@@ -25,49 +25,4 @@ cd "$CHALLENGE_DIR"
 chmod +x ./mvnw
 ./mvnw -q -B -DskipTests dependency:go-offline || true
 
-# --- Codespaces-only launch configs ---
-# The repo root .gitignore excludes .vscode/, so we materialize the launch
-# and task configs at codespace boot. They give participants F5 / "Run Task"
-# buttons without us shipping a checked-in .vscode/ directory.
-VSCODE_DIR="$CHALLENGE_DIR/.vscode"
-mkdir -p "$VSCODE_DIR"
-
-if [[ ! -f "$VSCODE_DIR/launch.json" ]]; then
-  cat > "$VSCODE_DIR/launch.json" <<'JSON'
-{
-  "version": "0.2.0",
-  "configurations": [
-    {
-      "type": "java",
-      "name": "🧪 Run the Lab",
-      "request": "launch",
-      "mainClass": "dev.openfeature.demo.java.demo.Laboratory",
-      "projectName": "demo",
-      "console": "integratedTerminal",
-      "cwd": "${workspaceFolder}"
-    }
-  ]
-}
-JSON
-fi
-
-if [[ ! -f "$VSCODE_DIR/tasks.json" ]]; then
-  cat > "$VSCODE_DIR/tasks.json" <<'JSON'
-{
-  "version": "2.0.0",
-  "tasks": [
-    {
-      "label": "🧪 Verify Solution",
-      "type": "shell",
-      "command": "./verify.sh",
-      "options": { "cwd": "${workspaceFolder}" },
-      "problemMatcher": [],
-      "presentation": { "reveal": "always", "panel": "dedicated" },
-      "group": { "kind": "test", "isDefault": true }
-    }
-  ]
-}
-JSON
-fi
-
 echo "✅ Post-create complete."

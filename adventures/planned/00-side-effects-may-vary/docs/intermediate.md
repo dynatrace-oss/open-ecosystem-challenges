@@ -191,7 +191,7 @@ Roll your own country at any time with `COUNTRY=<code> ./mvnw spring-boot:run | 
 
 The devcontainer also exports `COUNTRY=de` by default in the workspace environment, so a plain `./mvnw spring-boot:run` (or **F5** / **Run** in the Spring Boot Dashboard) already runs the German trial.
 
-For one-click switching from the IDE, your Codespace also ships three named **Run and Debug** configurations (the post-create script materialises them into `.vscode/launch.json` at boot, since the repo's root `.gitignore` excludes `.vscode/` from being checked in):
+For one-click switching from the IDE, the level ships three named **Run and Debug** configurations in `.vscode/launch.json`:
 
 - 🇩🇪 **Run the Lab — Germany (COUNTRY=de)**
 - 🇦🇹 **Run the Lab — Austria (COUNTRY=at)**

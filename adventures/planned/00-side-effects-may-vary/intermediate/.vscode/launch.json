@@ -1,0 +1,35 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "type": "java",
+      "name": "🇩🇪 Run the Lab — Germany (COUNTRY=de)",
+      "request": "launch",
+      "mainClass": "dev.openfeature.demo.java.demo.Laboratory",
+      "projectName": "demo",
+      "console": "integratedTerminal",
+      "cwd": "${workspaceFolder}",
+      "env": { "COUNTRY": "de" }
+    },
+    {
+      "type": "java",
+      "name": "🇦🇹 Run the Lab — Austria (COUNTRY=at)",
+      "request": "launch",
+      "mainClass": "dev.openfeature.demo.java.demo.Laboratory",
+      "projectName": "demo",
+      "console": "integratedTerminal",
+      "cwd": "${workspaceFolder}",
+      "env": { "COUNTRY": "at" }
+    },
+    {
+      "type": "java",
+      "name": "🌍 Run the Lab — No country",
+      "request": "launch",
+      "mainClass": "dev.openfeature.demo.java.demo.Laboratory",
+      "projectName": "demo",
+      "console": "integratedTerminal",
+      "cwd": "${workspaceFolder}",
+      "env": { "COUNTRY": "" }
+    }
+  ]
+}
