@@ -124,8 +124,10 @@ Quick start:
 - Wait ~2-3 minutes for the sibling containers (flagd, Grafana LGTM, k6
   loadgen) to come up. They are part of the devcontainer compose, so they
   start automatically — no `docker compose up` step.
-- Once the IDE attaches to the workspace, start the Spring Boot lab yourself
-  with `./mvnw spring-boot:run` in the terminal.
+- Once the IDE attaches to the workspace, start the Spring Boot lab. Press
+  **F5** (the launch config at `.vscode/launch.json` runs the
+  `DemoApplication` main class), or run `./mvnw spring-boot:run` from the
+  integrated terminal.
 
 ### 2. Access the UIs
 

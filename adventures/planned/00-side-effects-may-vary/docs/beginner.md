@@ -161,9 +161,14 @@ default client from `OpenFeatureAPI`, call
 
 #### e. Restart the lab, then prove hot-reload
 
-```bash
-./mvnw spring-boot:run
-```
+You have two ways to start the lab:
+
+- **Click ▶ in VS Code** — open the **Run and Debug** view (`Ctrl/Cmd + Shift + D`) and pick **🧪 Run the Lab**, or just press **F5**. The launch config is checked in at `.vscode/launch.json`. Spring Boot Dashboard also shows a one-click run for `DemoApplication` once the Java extensions finish loading.
+- **From the terminal** in the level folder:
+
+  ```bash
+  ./mvnw spring-boot:run
+  ```
 
 In another terminal:
 

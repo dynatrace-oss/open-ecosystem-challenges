@@ -103,7 +103,7 @@ The lab already has the OpenFeature SDK and the flagd contrib provider on the cl
 
 The catch: nothing in the application populates `language` or `springVersion`. Every request lands with an empty evaluation context, so neither targeting branch fires and every subject walks out with `"blurry"` (the default variant) — including the German-speaking ones.
 
-Boot the lab as-is to confirm the symptom:
+Boot the lab as-is to confirm the symptom — either press **F5** in VS Code (the launch config at `.vscode/launch.json` runs `DemoApplication`) or, from the terminal:
 
 ```bash
 cd adventures/planned/00-side-effects-may-vary/intermediate
@@ -147,12 +147,14 @@ The order matters less than you'd think — Spring will pick up `OpenFeatureConf
 
 ### 4. Run the Lab
 
+`verify.sh` greps the lab's stdout for the `CustomHook` log lines, so the run needs to write to a file `app.log` next to `pom.xml`. The terminal command is:
+
 ```bash
 cd adventures/planned/00-side-effects-may-vary/intermediate
 ./mvnw spring-boot:run | tee app.log
 ```
 
-Pipe through `tee` so you have a log file `verify.sh` can grep against.
+If you prefer **F5 → 🧪 Run the Lab** in VS Code, the run starts the same `DemoApplication` but doesn't pipe to `app.log` automatically — open the integrated terminal alongside and tail it with `./mvnw spring-boot:run | tee app.log` from there before running verify.
 
 ### 5. Verify Each Cohort by Hand
 
