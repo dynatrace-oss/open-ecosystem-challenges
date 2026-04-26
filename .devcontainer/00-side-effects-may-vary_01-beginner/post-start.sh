@@ -4,22 +4,40 @@ set -e
 REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 CHALLENGE_DIR="$REPO_ROOT/adventures/planned/00-side-effects-may-vary/beginner"
 
-echo "✨ Starting Adventure 00 — Level 1 (Beginner): Stand up the dispenser"
-echo ""
-echo "The Spring Boot dispenser lives in:"
-echo "  $CHALLENGE_DIR"
-echo ""
-echo "Start it with:"
-echo "  cd $CHALLENGE_DIR && ./mvnw spring-boot:run"
-echo ""
-echo "Then in another terminal, hit it:"
-echo "  curl -s http://localhost:8080/ | jq"
-echo ""
-echo "When you think you have it solved, run:"
-echo "  $CHALLENGE_DIR/verify.sh"
-echo ""
+cat <<EOF
+
+✨ Adventure 00 — Level 1 (🟢 Beginner): Stand up the lab
+
+📂 Challenge directory:
+   $CHALLENGE_DIR
+
+▶  Run the lab — one launch config in .vscode/launch.json:
+     🧪  Run the Lab
+   Open the Run and Debug view (Ctrl/Cmd + Shift + D) and hit ▶.
+
+   Or from the terminal:
+     ./mvnw spring-boot:run
+
+👉 In another terminal, hit it:
+     curl -s http://localhost:8080/ | jq
+
+✅ Run the verification when you're ready:
+     ./verify.sh
+   or use the 🧪 Verify Solution task: Tasks → Run Test Task.
+
+EOF
 
 # Track that the environment is ready.
 # shellcheck disable=SC1091
 source "$REPO_ROOT/lib/scripts/tracker.sh"
 track_codespace_initialized
+
+# Open the relevant files in the connected editor. customizations.codespaces.openFiles
+# is unreliable for dockerComposeFile-based devcontainers (the orchestrator merges
+# devcontainer.json and the field is sometimes dropped). `code` is the same CLI the
+# editor uses internally and works against either the web or desktop client.
+if command -v code >/dev/null 2>&1; then
+  code "$REPO_ROOT/adventures/planned/00-side-effects-may-vary/docs/beginner.md" \
+       "$CHALLENGE_DIR/src/main/java/dev/openfeature/demo/java/demo/Trial.java" \
+       2>/dev/null || true
+fi

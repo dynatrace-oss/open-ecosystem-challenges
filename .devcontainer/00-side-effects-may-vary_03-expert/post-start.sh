@@ -4,15 +4,33 @@ set -e
 REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 CHALLENGE_DIR="$REPO_ROOT/adventures/planned/00-side-effects-may-vary/expert"
 
-echo "✨ Starting Phase 3 — read the chart"
-echo ""
-echo "🧪 Sibling services already running (managed by devcontainer compose):"
-echo "   - flagd   → flagd:8013 (RPC) / flagd:8014 (HTTP eval)"
-echo "   - lgtm    → lgtm:4317 (OTLP) / Grafana on :3000 (admin / admin)"
-echo "   - loadgen → idles until loadgen_active flag flips to \"on\""
-echo ""
-echo "   All ports are forwarded to localhost on the host, so curl and"
-echo "   verify.sh can keep using localhost:NNNN."
+cat <<EOF
+
+✨ Adventure 00 — Level 3 (🔴 Expert): Phase 3 — read the chart
+
+📂 Challenge directory:
+   $CHALLENGE_DIR
+
+🧪 Sibling services already running (managed by devcontainer compose):
+   - flagd   → flagd:8013 (RPC) / flagd:8014 (HTTP eval)
+   - lgtm    → lgtm:4317 (OTLP) / Grafana on http://localhost:3000 (admin / admin)
+   - loadgen → idles until loadgen_active flag flips to "on"
+
+   All ports are forwarded to localhost on the host, so curl, verify.sh,
+   and the browser can keep using localhost:NNNN.
+
+▶  Run the lab — one launch config in .vscode/launch.json:
+     🧪  Run the Phase 3 Lab
+   Open the Run and Debug view (Ctrl/Cmd + Shift + D) and hit ▶.
+
+   Or from the terminal:
+     ./mvnw spring-boot:run
+
+✅ Run the verification when you're ready:
+     ./verify.sh
+   or use the 🧪 Verify Solution task: Tasks → Run Test Task.
+
+EOF
 
 # Track that the environment is ready
 # shellcheck disable=SC1091
@@ -20,15 +38,14 @@ source "$REPO_ROOT/lib/scripts/tracker.sh"
 set_tracking_context "side-effects-may-vary" "expert"
 track_codespace_initialized
 
-cat <<EOF
-
-🧪 Phase 3 environment is up.
-
-Next steps:
-  cd $CHALLENGE_DIR
-  ./mvnw spring-boot:run
-
-Then open http://localhost:3000 (admin/admin) for Grafana, or follow the docs:
-  adventures/planned/00-side-effects-may-vary/docs/expert.md
-
-EOF
+# Open the relevant files in the connected editor. customizations.codespaces.openFiles
+# is unreliable for dockerComposeFile-based devcontainers (the orchestrator merges
+# devcontainer.json and the field is sometimes dropped). `code` is the same CLI the
+# editor uses internally and works against either the web or desktop client.
+if command -v code >/dev/null 2>&1; then
+  code "$REPO_ROOT/adventures/planned/00-side-effects-may-vary/docs/expert.md" \
+       "$CHALLENGE_DIR/src/main/java/dev/openfeature/demo/java/demo/OpenTelemetryConfig.java" \
+       "$CHALLENGE_DIR/src/main/java/dev/openfeature/demo/java/demo/OpenFeatureConfig.java" \
+       "$CHALLENGE_DIR/flags.json" \
+       2>/dev/null || true
+fi
