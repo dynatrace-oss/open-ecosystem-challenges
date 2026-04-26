@@ -11,8 +11,11 @@ OBJECTIVE="By the end of this level, you should have:
 - A RaceInterceptor that captures ?race= into the OpenFeature transaction context
 - A global evaluation context carrying country (from the COUNTRY env var)
 - A CustomHook that logs every flag evaluation
+- Trial passes a 'dose' attribute as invocation context at the call site
 - curl /?race=zyklop returns 'enhanced'
-- curl / (with COUNTRY=de) returns 'sharp', and never returns the fallback 'untreated'
+- curl /?dose=standard returns 'sharp' (with COUNTRY=de) and never the fallback 'untreated'
+- curl /?dose=underdose returns 'clouded' (improper dosing for non-zyklops)
+- curl /?race=zyklop&dose=underdose returns 'enhanced' (race priority survives bad dose)
 - The application log contains audit lines emitted by CustomHook"
 
 DOCS_URL="https://dynatrace-oss.github.io/open-ecosystem-challenges/00-side-effects-may-vary/intermediate"
@@ -81,30 +84,71 @@ fi
 print_new_line
 
 # -----------------------------------------------------------------------------
-# 3. Trial-country targeting: GET / with COUNTRY=de in the env should resolve
-#    to "sharp". If the global eval context is not wired, the targeting
-#    falls through to the default variant and "blurry" comes back instead —
-#    which is what tells the participant the global wiring is missing. The
-#    only thing the script truly rejects is the literal fallback "untreated",
-#    which means no provider is resolving at all.
+# 3. Trial-country targeting: GET /?dose=standard with COUNTRY=de in the env
+#    should resolve to "sharp". We pin dose=standard explicitly so the random
+#    dose pick (which the controller does on the call site) cannot trip the
+#    "improper dose -> clouded" branch. If the global eval context is not
+#    wired, the targeting falls through to the default variant and "blurry"
+#    comes back instead. The only response we truly reject is the literal
+#    fallback "untreated", which means no provider is resolving at all.
 # -----------------------------------------------------------------------------
 print_test_section "Checking the trial-country branch fires for COUNTRY=de..."
-DEFAULT_VALUE="$(curl -s --max-time 5 'http://localhost:8080/' 2>/dev/null \
+COUNTRY_VALUE="$(curl -s --max-time 5 'http://localhost:8080/?dose=standard' 2>/dev/null \
   | jq -r '.value // empty' 2>/dev/null || echo "")"
 
-if [[ "$DEFAULT_VALUE" == "sharp" ]]; then
-  print_success_indent "GET / returned 'sharp' — country targeting is firing"
+if [[ "$COUNTRY_VALUE" == "sharp" ]]; then
+  print_success_indent "GET /?dose=standard returned 'sharp' — country targeting is firing"
   TESTS_PASSED=$((TESTS_PASSED + 1))
-elif [[ "$DEFAULT_VALUE" == "untreated" || -z "$DEFAULT_VALUE" ]]; then
-  print_error_indent "GET / returned: '$DEFAULT_VALUE' — provider isn't resolving"
+elif [[ "$COUNTRY_VALUE" == "untreated" || -z "$COUNTRY_VALUE" ]]; then
+  print_error_indent "GET /?dose=standard returned: '$COUNTRY_VALUE' — provider isn't resolving"
   print_hint "Check OpenFeatureConfig — the FlagdProvider should be registered before the first request."
   TESTS_FAILED=$((TESTS_FAILED + 1))
   FAILED_CHECKS+=("default_resolves")
 else
-  print_error_indent "GET / returned: '$DEFAULT_VALUE' (expected 'sharp' with COUNTRY=de)"
+  print_error_indent "GET /?dose=standard returned: '$COUNTRY_VALUE' (expected 'sharp' with COUNTRY=de)"
   print_hint "Did you populate the global evaluation context with country=System.getenv(\"COUNTRY\")? Did you start the lab via ./run-germany.sh or with COUNTRY=de set?"
   TESTS_FAILED=$((TESTS_FAILED + 1))
   FAILED_CHECKS+=("country_targeting")
+fi
+print_new_line
+
+# -----------------------------------------------------------------------------
+# 4. Invocation context: GET /?dose=underdose must return "clouded" — the
+#    controller passes the participant-supplied dose at the call site, the
+#    targeting catches improper doses for non-zyklop subjects.
+# -----------------------------------------------------------------------------
+print_test_section "Checking improper-dose targeting fires for ?dose=underdose..."
+UNDERDOSE_VALUE="$(curl -s --max-time 5 'http://localhost:8080/?dose=underdose' 2>/dev/null \
+  | jq -r '.value // empty' 2>/dev/null || echo "")"
+
+if [[ "$UNDERDOSE_VALUE" == "clouded" ]]; then
+  print_success_indent "GET /?dose=underdose returned 'clouded' — invocation context is firing"
+  TESTS_PASSED=$((TESTS_PASSED + 1))
+else
+  print_error_indent "GET /?dose=underdose returned: '$UNDERDOSE_VALUE' (expected 'clouded')"
+  print_hint "Does Trial.observeSubject pass an ImmutableContext with 'dose' to client.getStringDetails(...) at the call site?"
+  TESTS_FAILED=$((TESTS_FAILED + 1))
+  FAILED_CHECKS+=("invocation_context")
+fi
+print_new_line
+
+# -----------------------------------------------------------------------------
+# 5. Zyklop biology overrides bad dosing: even with ?dose=underdose, a zyklop
+#    subject should still resolve to "enhanced" because the targeting puts
+#    race-zyklop ahead of the improper-dose branch.
+# -----------------------------------------------------------------------------
+print_test_section "Checking zyklop biology survives an improper dose..."
+ZYKLOP_BAD_DOSE="$(curl -s --max-time 5 'http://localhost:8080/?race=zyklop&dose=underdose' 2>/dev/null \
+  | jq -r '.value // empty' 2>/dev/null || echo "")"
+
+if [[ "$ZYKLOP_BAD_DOSE" == "enhanced" ]]; then
+  print_success_indent "Zyklop + underdose returned 'enhanced' — race priority is correct"
+  TESTS_PASSED=$((TESTS_PASSED + 1))
+else
+  print_error_indent "Zyklop + underdose returned: '$ZYKLOP_BAD_DOSE' (expected 'enhanced')"
+  print_hint "Targeting order in flags.json should evaluate race=zyklop before the improper-dose branch."
+  TESTS_FAILED=$((TESTS_FAILED + 1))
+  FAILED_CHECKS+=("priority_race_over_dose")
 fi
 print_new_line
 

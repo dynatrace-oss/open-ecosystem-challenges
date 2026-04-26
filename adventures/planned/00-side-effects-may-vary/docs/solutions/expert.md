@@ -119,11 +119,53 @@ public class OpenFeatureConfig implements WebMvcConfigurer {
         api.addHooks(new CustomHook());
         api.addHooks(new TracesHook());
         api.addHooks(new MetricsHook(openTelemetry));
+        api.addHooks(new ContextSpanHook());
     }
 
     // addInterceptors(...) unchanged
 }
 ```
+
+### The `ContextSpanHook`
+
+A small `Hook` of your own, in a new file `ContextSpanHook.java`, that mirrors the merged evaluation context onto the active span. This is what lets Tempo show "this request had `dose=underdose` and got `variant=clouded`" on the same span.
+
+```java
+package dev.openfeature.demo.java.demo;
+
+import dev.openfeature.sdk.EvaluationContext;
+import dev.openfeature.sdk.Hook;
+import dev.openfeature.sdk.HookContext;
+import dev.openfeature.sdk.Value;
+import io.opentelemetry.api.trace.Span;
+
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+
+public class ContextSpanHook implements Hook {
+
+    private static final List<String> TRACKED = List.of("race", "country", "dose");
+
+    @Override
+    public Optional<EvaluationContext> before(HookContext ctx, Map hints) {
+        Span span = Span.current();
+        EvaluationContext ec = ctx.getCtx();
+        for (String key : TRACKED) {
+            Value v = ec.getValue(key);
+            if (v != null && v.asString() != null) {
+                span.setAttribute("feature_flag.context." + key, v.asString());
+            }
+        }
+        return Hook.super.before(ctx, hints);
+    }
+}
+```
+
+Two notes worth calling out:
+
+- `HookContext.getCtx()` returns the **merged** evaluation context — global + transaction + invocation, in that precedence order. So the hook reads whatever the SDK is about to use, regardless of which layer set the value.
+- `Span.current()` returns the no-op span if there is no active OTel context (e.g. in tests without an instrumented HTTP server). `setAttribute` on the no-op span is a safe no-op, so the hook does not need defensive guards.
 
 Restart the lab:
 

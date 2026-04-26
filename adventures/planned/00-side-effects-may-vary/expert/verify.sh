@@ -153,6 +153,36 @@ else
 fi
 print_new_line
 
+# ---- 6b. Tempo spans carry the dose context attribute ------------------
+# Generate a deterministic underdose request, give the exporter a moment to
+# flush, then query Tempo for spans with feature_flag.context.dose. If the
+# attribute is missing the participant has not registered the
+# ContextSpanHook (or it is not reading the merged eval context).
+print_test_section "Checking flag-context attributes on Tempo spans"
+curl -s --max-time 5 'http://localhost:8080/?dose=underdose' >/dev/null 2>&1 || true
+sleep 6  # OTel batch span processor flush window
+DOSE_TEMPO=$(curl -fsS --max-time 5 -G "$TEMPO_URL/api/search" \
+  --data-urlencode 'tags=feature_flag.context.dose=underdose' \
+  --data-urlencode 'limit=5' 2>/dev/null || echo "")
+
+if [[ -z "$DOSE_TEMPO" ]]; then
+  print_error_indent "Could not query Tempo for context attributes"
+  TESTS_FAILED=$((TESTS_FAILED + 1))
+  FAILED_CHECKS+=("tempo_context")
+else
+  DOSE_COUNT=$(echo "$DOSE_TEMPO" | jq '.traces | length // 0')
+  if [[ "$DOSE_COUNT" -gt 0 ]]; then
+    print_info_indent "✓ Tempo has $DOSE_COUNT span(s) tagged feature_flag.context.dose=underdose"
+    TESTS_PASSED=$((TESTS_PASSED + 1))
+  else
+    print_error_indent "No spans with feature_flag.context.dose=underdose found in Tempo"
+    print_hint "Did you register the ContextSpanHook that copies merged-eval-context attrs onto Span.current()?"
+    TESTS_FAILED=$((TESTS_FAILED + 1))
+    FAILED_CHECKS+=("tempo_context")
+  fi
+fi
+print_new_line
+
 # ---- 7. HTTP 5xx rate under threshold ----------------------------------
 print_test_section "Checking HTTP 5xx error rate (last 1m)"
 ERROR_QUERY='sum(rate(http_server_request_duration_seconds_count{http_response_status_code=~"5.."}[1m])) / clamp_min(sum(rate(http_server_request_duration_seconds_count[1m])), 1e-9)'

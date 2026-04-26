@@ -80,7 +80,9 @@ Four containers and one Spring Boot process, all on a shared Docker network.
 By the end of this level, you should have:
 
 - The OpenTelemetry **meter provider** wired and the OpenFeature **`MetricsHook`** registered
+- A **`ContextSpanHook`** of your own — a small `Hook` that copies the merged evaluation context (`race`, `country`, `dose`) onto the active span as `feature_flag.context.<key>` — registered alongside `TracesHook`/`MetricsHook`
 - **At least one trace** for service `fun-with-flags-java-spring` visible in Tempo
+- Spans tagged with **`feature_flag.context.dose=underdose`** searchable in Tempo and lining up with `feature_flag.variant=clouded` on the same span
 - The **`feature_flag_evaluation_requests_total`** counter non-zero in Prometheus
 - The **`vision_amplifier_v2`** fractional rollout flipped back to **100% off / 0% on**
 - The HTTP 5xx rate over the last minute below **1%**
@@ -102,6 +104,29 @@ The OpenFeature OTel contrib library ships two hooks that turn every flag evalua
 
 Both hooks need a global `OpenTelemetry` instance. The `TracesHook` works once you have a `TracerProvider`; the `MetricsHook` needs a `MeterProvider`.
 
+### Authoring your own hook to enrich spans with context
+
+`TracesHook` is great at recording **what** happened (the variant, the reason). It does not record **why** — the evaluation context attributes that drove the decision (`race`, `country`, `dose`) are not on the span by default. For dashboard correlation you want them there.
+
+The OpenFeature `Hook` interface is the right place to fix that, in three lines:
+
+```java
+public class ContextSpanHook implements Hook {
+    @Override
+    public Optional<EvaluationContext> before(HookContext ctx, Map hints) {
+        Span span = Span.current();           // active HTTP request span
+        EvaluationContext ec = ctx.getCtx();  // global + transaction + invocation, merged
+        for (String key : List.of("race", "country", "dose")) {
+            Value v = ec.getValue(key);
+            if (v != null) span.setAttribute("feature_flag.context." + key, v.asString());
+        }
+        return Hook.super.before(ctx, hints);
+    }
+}
+```
+
+Register it next to `TracesHook` / `MetricsHook` in `OpenFeatureConfig`. Now every flag evaluation tags its parent span with the context attributes the lab cares about. In Tempo: **Search → Service: fun-with-flags-java-spring → +Tag → `feature_flag.context.dose=underdose`** lights up exactly the requests where a tech mis-dosed, with the resolved variant on the same span event.
+
 ### `flagd` `fractional` operation + `targetingKey`
 
 `fractional` is flagd's bucketing operation. Given a list of `[variant, percent]` pairs, it deterministically assigns each evaluation to one variant based on a hash of the **targeting key** on the evaluation context. Same key → same bucket → same variant, every request. Different keys spread across the percentages.
@@ -117,6 +142,9 @@ When `vision_amplifier_v2` is set to "100 percent on" and stabilisation goes sid
 - How the OpenFeature OpenTelemetry hooks (`TracesHook` and `MetricsHook`) join
   flag evaluations to the rest of an application's telemetry without a
   separate ingestion path
+- How to **author your own `Hook`** — a tiny class that copies merged-eval-context
+  attributes onto the active OTel span — to close the loop between *why* a
+  flag resolved the way it did and *what* the operator sees in Tempo
 - How [`fractional`](https://flagd.dev/reference/custom-operations/fractional-operation/)
   rollout in flagd buckets users by `targetingKey` — same key, same bucket, every
   request — and how to read that bucketing off a dashboard

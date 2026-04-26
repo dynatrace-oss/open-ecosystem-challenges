@@ -2,9 +2,9 @@
 
 The trial is widening. Subjects from outside the lab's local population are getting the wrong reading, and the lab director has just walked into the lab holding a stack of complaint forms. She wants the audit log to tell her, after the fact, exactly which formulation went to which subject — and she wants the lab to read the chart properly before it doses anyone.
 
-Right now the lab reads `flags.json` and hands out the same variant to every subject walking in. The OpenFeature client never sees what **species** is on the table (each subject brings their own — humans, zyklops, you name it), never sees which **country** this trial is registered in (set once when the lab boots), and there is no audit hook recording who got what. The flag definition in `flags.json` already has a `race == zyklop` targeting branch and a `country == de` branch — the prescriptions are written, the rules are loaded — but neither attribute is in the evaluation context yet, so the targeting has nothing to fire on.
+Right now the lab reads `flags.json` and hands out the same variant to every subject walking in. The OpenFeature client never sees what **species** is on the table (each subject brings their own — humans, zyklops, you name it), never sees which **country** this trial is registered in (set once when the lab boots), never sees the **dose** the clinical staff just measured out (varies per evaluation — and let's be honest, some staff do not follow protocol), and there is no audit hook recording who got what. The flag definition in `flags.json` already has all three targeting branches loaded — `race == zyklop`, improper-`dose` for non-zyklops, and `country == de` — but none of those attributes are in the evaluation context yet, so the targeting has nothing to fire on.
 
-Your shift: teach the lab to read each subject's species off the request, attach the trial's **country of registration** (set on the JVM via the `COUNTRY` environment variable) to the global context, and register an audit hook that records every dose with its variant and reason.
+Your shift: teach the lab to read each subject's species off the request, attach the trial's **country of registration** (set on the JVM via the `COUNTRY` environment variable) to the global context, pass the **dose** as invocation context at the moment of the flag evaluation, and register an audit hook that records every dose with its variant and reason.
 
 ## 🏗️ Architecture
 
@@ -13,8 +13,8 @@ Your shift: teach the lab to read each subject's species off the request, attach
 │  Spring Boot lab  (this challenge)                                   │
 │                                                                      │
 │  HTTP ──► RaceInterceptor ──► Trial ──► OpenFeature                  │
-│           (transaction ctx:               (global ctx:               │
-│            race=?race=)                    country=$COUNTRY)         │
+│           (transaction ctx:    (invocation ctx:   (global ctx:       │
+│            race=?race=)         dose=random/?dose=) country=$COUNTRY)│
 │                                                            │         │
 │                                                            ▼         │
 │                                                       CustomHook     │
@@ -37,9 +37,13 @@ By the end of this level, you should have:
 
 - A Spring `HandlerInterceptor` that reads `?race=` from each incoming request, sets it on the OpenFeature **transaction context** for the duration of the request, and clears it on completion
 - A **global evaluation context** that carries `country` from the `COUNTRY` environment variable (`System.getenv("COUNTRY")`) the lab was started with
+- A `Trial` controller that, on each evaluation, passes the **`dose`** as **invocation context** — `"standard"` most of the time, `"underdose"` or `"overdose"` when the lab tech mis-measures (overridable with `?dose=`)
 - A custom `Hook` registered on the OpenFeature API that logs every flag evaluation with the flag key, variant, and reason
-- `curl http://localhost:8080/?race=zyklop` returns the species-targeted variant (`"enhanced"`)
-- `curl http://localhost:8080/` (no `race`) returns the trial-country-targeted variant — `"sharp"` when the lab was started with `COUNTRY=de`, or the default `"blurry"` for any other country — but **never** the literal fallback `"untreated"`
+- `curl /?race=zyklop` → `"enhanced"` — zyklop biology dominates regardless of dose or country
+- `curl /?dose=standard` → `"sharp"` (with `COUNTRY=de`) — proper dose, country branch fires
+- `curl /?dose=underdose` → `"clouded"` — improper dosing causes side effects in non-zyklop subjects
+- `curl /?race=zyklop&dose=underdose` → `"enhanced"` — zyklop biology survives bad dosing
+- The response is never the literal fallback `"untreated"`
 - The application log shows at least one line emitted by your `CustomHook` per request
 
 ## 📚 Concepts you'll touch
@@ -67,13 +71,32 @@ The subject's `race` is the canonical request-scoped attribute: it changes from 
 
 A second slot of evaluation context, set once at startup, that **every** request sees. Use this for attributes that don't change per-request: the trial's country of registration, the deployment region, the build number. The targeting in `flags.json` already has a `country == de` branch waiting on it — your job is to read `System.getenv("COUNTRY")` at startup and put it on the global context.
 
+### OpenFeature **invocation context** (the call-site one)
+
+A third slot of evaluation context, passed **at the moment** of `client.getXxxDetails(...)` as an `EvaluationContext` argument. Use this for attributes that are known only at the call site — not on the request, not at startup. The classic example is something the controller computes seconds before the call: a real-time reading, a per-evaluation choice the application code is making.
+
+In this lab, the canonical example is the **dose** that's about to be administered. Most of the lab's clinical staff follow protocol and dispense `"standard"` doses, but a fraction underdose or overdose subjects — let's call it 30% underdose, 10% overdose. The dose isn't on the request and isn't a property of the lab; it's a piece of state the controller computes (or accepts via `?dose=`) and feeds straight into the call. The flag's targeting catches `dose ∈ {underdose, overdose}` for non-zyklop subjects and returns `clouded`.
+
+The three context layers merge before evaluation, with **invocation context taking precedence** over transaction, which takes precedence over global, on conflict.
+
 ### OpenFeature `Hook`
 
 An interceptor for **flag evaluations** (not HTTP requests). Implements four lifecycle phases — `before`, `after`, `error`, `finallyAfter` — fired around every `client.getXxxDetails(...)` call. Register once with `api.addHooks(...)` and it applies to every evaluation. Same shape as a Spring HandlerInterceptor but at the OpenFeature layer instead of the HTTP layer; in this level you'll write a hook that emits an audit log line per evaluation.
 
 ### `flagd` targeting
 
-The targeting rule in `flags.json` is a small expression tree. The `===` operator does an exact-string match on a context attribute. The first `if` arm checks `race == zyklop`; if that doesn't match, the second arm checks `country == de`; if neither matches, the `defaultVariant` (`blurry`) wins. Your job is to make sure the attributes the rules reference are *on* the evaluation context — not to write the rule.
+The targeting rule in `flags.json` is a small expression tree, evaluated top-to-bottom:
+
+```jsonc
+"if": [
+  { "===": [{"var":"race"},    "zyklop"] },                  "enhanced",
+  { "in":  [{"var":"dose"},    ["underdose", "overdose"]] }, "clouded",
+  { "===": [{"var":"country"}, "de"] },                       "sharp"
+]
+// fall-through to defaultVariant: "blurry"
+```
+
+The first arm checks `race == zyklop`; zyklops are robust enough that improper dosing doesn't faze them, so this is checked first and wins outright. The second arm catches `dose ∈ {underdose, overdose}` for everyone else — improper dosing causes `clouded` readings. Then `country == de` for proper-dose non-zyklop subjects in the German trial. If none match, `defaultVariant: "blurry"` wins. Your job is to make sure the attributes the rules reference are *on* the evaluation context — not to write the rule.
 
 ## 🧠 What You'll Learn
 

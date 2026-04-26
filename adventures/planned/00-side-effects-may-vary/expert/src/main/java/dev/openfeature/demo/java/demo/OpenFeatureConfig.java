@@ -46,9 +46,18 @@ public class OpenFeatureConfig implements WebMvcConfigurer {
 
         api.addHooks(new CustomHook());
         api.addHooks(new TracesHook());
-        // TODO Phase 3 task: register the matching MetricsHook here once the
-        // meter provider has been wired up in OpenTelemetryConfig. Without it
-        // the Grafana feature-flag dashboard cannot draw its panels.
+        // TODO Phase 3 task #1: register the matching MetricsHook here once
+        // the meter provider has been wired up in OpenTelemetryConfig. Without
+        // it the Grafana feature-flag dashboard cannot draw its panels.
+        //
+        // TODO Phase 3 task #2: write a small ContextSpanHook that copies the
+        // merged evaluation context attributes (race, country, dose) onto the
+        // active OpenTelemetry span — for example as
+        // `feature_flag.context.<key>` — and register it here. Lets you search
+        // Tempo for `feature_flag.context.dose=underdose` and see, on the same
+        // span, which `feature_flag.variant` the lab handed out. Closes the
+        // loop between why an outcome happened and what the dispenser knew at
+        // the time.
     }
 
     @Override

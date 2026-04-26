@@ -13,6 +13,8 @@
         "if": [
           { "===": [{ "var": "race" }, "zyklop"] },
           "enhanced",
+          { "in": [{ "var": "dose" }, ["underdose", "overdose"]] },
+          "clouded",
           { "===": [{ "var": "country" }, "de"] },
           "sharp"
         ]
