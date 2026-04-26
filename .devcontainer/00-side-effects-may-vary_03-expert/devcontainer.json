@@ -30,10 +30,10 @@
     "4318": { "label": "OTLP HTTP", "onAutoForward": "ignore" },
     "9090": { "label": "Prometheus", "onAutoForward": "ignore" },
     "3200": { "label": "Tempo HTTP API", "onAutoForward": "ignore" },
-    "8013": { "label": "flagd gRPC", "onAutoForward": "ignore" },
-    "8014": { "label": "flagd HTTP eval", "onAutoForward": "ignore" },
-    "8015": { "label": "flagd metrics", "onAutoForward": "ignore" },
-    "8016": { "label": "flagd ofrep", "onAutoForward": "ignore" }
+    "8013": { "label": "flagd gRPC eval", "onAutoForward": "ignore" },
+    "8014": { "label": "flagd management/metrics", "onAutoForward": "ignore" },
+    "8015": { "label": "flagd sync (IN_PROCESS)", "onAutoForward": "ignore" },
+    "8016": { "label": "flagd OFREP", "onAutoForward": "ignore" }
   },
   "otherPortsAttributes": {
     "onAutoForward": "ignore"

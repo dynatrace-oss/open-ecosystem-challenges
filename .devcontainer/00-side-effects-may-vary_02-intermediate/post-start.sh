@@ -12,8 +12,9 @@ cat <<EOF
    $CHALLENGE_DIR
 
 🧪 Sibling services already running (managed by devcontainer compose):
-   - flagd  → reachable at flagd:8013 (RPC) / flagd:8014 (HTTP eval)
-              Also forwarded to localhost on the same ports.
+   - flagd  → reachable at flagd:8013 (gRPC eval) / flagd:8016 (OFREP HTTP)
+              Management/metrics on :8014, sync stream on :8015.
+              All four ports are forwarded to localhost.
 
 ▶  Run the lab — three named launch configs ship in .vscode/launch.json:
      🇩🇪  Run the Lab — Germany (COUNTRY=de)

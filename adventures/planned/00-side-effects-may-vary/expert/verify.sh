@@ -29,7 +29,7 @@ TESTS_FAILED=0
 FAILED_CHECKS=()
 
 APP_URL="http://localhost:8080"
-FLAGD_HTTP="http://localhost:8014"
+FLAGD_HTTP="http://localhost:8013"
 PROMETHEUS_URL="http://localhost:9090"
 TEMPO_URL="http://localhost:3200"
 GRAFANA_URL="http://localhost:3000"

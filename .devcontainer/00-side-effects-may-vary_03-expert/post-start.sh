@@ -12,7 +12,8 @@ cat <<EOF
    $CHALLENGE_DIR
 
 🧪 Sibling services already running (managed by devcontainer compose):
-   - flagd   → flagd:8013 (RPC) / flagd:8014 (HTTP eval)
+   - flagd   → flagd:8013 (gRPC eval) / flagd:8016 (OFREP HTTP)
+               Management/metrics on :8014, sync stream on :8015.
    - lgtm    → lgtm:4317 (OTLP) / Grafana on http://localhost:3000 (admin / admin)
    - loadgen → idles until loadgen_active flag flips to "on"
 

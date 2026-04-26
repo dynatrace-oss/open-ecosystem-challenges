@@ -69,8 +69,12 @@ Four containers and one Spring Boot process, all on a shared Docker network.
       │ (RPC mode)                                           │
 ┌─────▼────────────────┐                           ┌─────────┴──────────────┐
 │  flagd               │ ◀──── poll loadgen flag ──│  k6 loadgen            │
-│  :8013 (gRPC)        │                           │  HTTP GET /            │
-│  :8014 (HTTP eval)   │                           │  with userId param     │
+│  :8013 (gRPC + HTTP  │                           │  HTTP GET /            │
+│         eval gateway)│                           │  with userId param     │
+│  :8014 management /  │                           │                        │
+│        metrics       │                           │                        │
+│  :8015 sync stream   │                           │                        │
+│  :8016 OFREP         │                           │                        │
 │  flags.json mounted  │                           │                        │
 └──────────────────────┘                           └────────────────────────┘
 ```
@@ -218,16 +222,24 @@ Tempo's own HTTP API. The `verify.sh` script uses
 `http://localhost:3200/api/search?tags=service.name=fun-with-flags-java-spring`
 to assert traces are flowing.
 
-#### flagd (Ports `8013` / `8014`)
+#### flagd (Ports `8013` / `8014` / `8015` / `8016`)
 
-`8013` is the gRPC RPC port the SDK talks to. `8014` is the HTTP eval port,
-which is convenient for CLI checks. Example:
+- **`8013`** — gRPC eval (what the SDK uses in `Resolver.RPC` mode). flagd multiplexes
+  HTTP/1.1 and gRPC on this port via cmux, so the same gRPC-Gateway routes are
+  reachable over plain JSON-over-HTTP — convenient for CLI checks. Example:
 
-```bash
-curl -s -X POST http://localhost:8014/flagd.evaluation.v1.Service/ResolveBoolean \
-  -H 'Content-Type: application/json' \
-  -d '{"flagKey":"vision_amplifier_v2","context":{"targetingKey":"subject-1"}}' | jq
-```
+  ```bash
+  curl -s -X POST http://localhost:8013/flagd.evaluation.v1.Service/ResolveBoolean \
+    -H 'Content-Type: application/json' \
+    -d '{"flagKey":"vision_amplifier_v2","context":{"targetingKey":"subject-1"}}' | jq
+  ```
+
+- **`8014`** — management port. Prometheus `/metrics` for flagd itself plus `/healthz`,
+  `/readyz`. Not an evaluation endpoint.
+- **`8015`** — sync stream (gRPC). Used by flagd providers running in `Resolver.IN_PROCESS`
+  mode to receive flag definitions as they change.
+- **`8016`** — OFREP HTTP eval API. The vendor-neutral evaluation protocol; the path is
+  `/ofrep/v1/evaluate/flags/{flag_key}` and works against any OFREP-compliant flag service.
 
 #### OTLP receivers (Ports `4317` / `4318`)
 

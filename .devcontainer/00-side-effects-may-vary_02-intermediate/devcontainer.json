@@ -24,10 +24,10 @@
   "forwardPorts": [8080, 8013, 8014, 8015, 8016],
   "portsAttributes": {
     "8080": { "label": "Lab (Spring Boot)", "onAutoForward": "notify" },
-    "8013": { "label": "flagd gRPC", "onAutoForward": "ignore" },
-    "8014": { "label": "flagd HTTP eval", "onAutoForward": "ignore" },
-    "8015": { "label": "flagd OFREP", "onAutoForward": "ignore" },
-    "8016": { "label": "flagd metrics", "onAutoForward": "ignore" }
+    "8013": { "label": "flagd gRPC eval", "onAutoForward": "ignore" },
+    "8014": { "label": "flagd management/metrics", "onAutoForward": "ignore" },
+    "8015": { "label": "flagd sync (IN_PROCESS)", "onAutoForward": "ignore" },
+    "8016": { "label": "flagd OFREP", "onAutoForward": "ignore" }
   },
   "otherPortsAttributes": {
     "onAutoForward": "ignore"

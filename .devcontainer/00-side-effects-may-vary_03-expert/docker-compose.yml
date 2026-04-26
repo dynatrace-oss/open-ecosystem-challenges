@@ -63,7 +63,7 @@ services:
       # The script idles while loadgen_active is "off". Flip it in flags.json
       # to start hammering the lab.
       - BASE_URL=http://workspace:8080
-      - FLAGD_URL=http://flagd:8014
+      - FLAGD_URL=http://flagd:8013
     restart: unless-stopped
     depends_on:
       - flagd

@@ -4,8 +4,9 @@
 // starts hammering within seconds. Flip it back and it goes idle.
 //
 // The script targets one app instance via BASE_URL — point it at :8080 of
-// whichever folder you're running. FLAGD_URL is the flagd HTTP eval endpoint
-// of the same instance.
+// whichever folder you're running. FLAGD_URL is flagd's eval endpoint on
+// :8013 (the gRPC port also serves HTTP/JSON via gRPC-Gateway, so a plain
+// curl-style POST works against the same port the SDK uses).
 
 import http from 'k6/http';
 import { sleep } from 'k6';
@@ -16,7 +17,7 @@ export const options = {
 };
 
 const BASE_URL = __ENV.BASE_URL || 'http://host.docker.internal:8080';
-const FLAGD_URL = __ENV.FLAGD_URL || 'http://host.docker.internal:8014';
+const FLAGD_URL = __ENV.FLAGD_URL || 'http://host.docker.internal:8013';
 
 // Pool of subject species. Empty string means "no query parameter" — exercises
 // the country-fallback or default branch. The mix is deliberately uneven so the
