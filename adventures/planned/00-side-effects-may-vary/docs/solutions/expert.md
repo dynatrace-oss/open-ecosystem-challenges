@@ -113,7 +113,7 @@ public class OpenFeatureConfig implements WebMvcConfigurer {
         api.setProviderAndWait(new FlagdProvider(flagdOptions));
 
         HashMap<String, Value> attributes = new HashMap<>();
-        attributes.put("springVersion", new Value(SpringVersion.getVersion()));
+        attributes.put("country", new Value(Optional.ofNullable(System.getenv("COUNTRY")).orElse("")));
         api.setEvaluationContext(new ImmutableContext(attributes));
 
         api.addHooks(new CustomHook());

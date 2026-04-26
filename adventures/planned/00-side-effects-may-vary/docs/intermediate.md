@@ -1,20 +1,20 @@
 # 🟡 Intermediate: Dose by cohort
 
-The trial is widening. Subjects arriving from the German-speaking clinics are getting the wrong reading, and the lab director has just walked into the lab holding a stack of complaint forms. She wants the audit log to tell her, after the fact, exactly which formulation went to which cohort — and she wants the lab to read the chart properly before it doses anyone.
+The trial is widening. Subjects from outside the lab's local population are getting the wrong reading, and the lab director has just walked into the lab holding a stack of complaint forms. She wants the audit log to tell her, after the fact, exactly which formulation went to which subject — and she wants the lab to read the chart properly before it doses anyone.
 
-Right now the lab reads `flags.json` and hands out the same variant to every subject walking in. The OpenFeature client never sees the subject's preferred language, never sees the framework version of the lab itself, and there is no audit hook recording who got what. The flag definition in `flags.json` already has a `language == de` targeting branch and a `springVersion >= 3.0.0` branch — the prescriptions are written, the rules are loaded — but neither attribute is in the evaluation context yet, so the targeting has nothing to fire on.
+Right now the lab reads `flags.json` and hands out the same variant to every subject walking in. The OpenFeature client never sees what **species** is on the table (each subject brings their own — humans, zyklops, you name it), never sees which **country** this trial is registered in (set once when the lab boots), and there is no audit hook recording who got what. The flag definition in `flags.json` already has a `race == zyklop` targeting branch and a `country == de` branch — the prescriptions are written, the rules are loaded — but neither attribute is in the evaluation context yet, so the targeting has nothing to fire on.
 
-Your shift: teach the lab to read the subject's cohort from the request, attach the lab's framework version to the global context so older builds of the lab can be steered to a different formulation, and register an audit hook that records every dose with its variant and reason.
+Your shift: teach the lab to read each subject's species off the request, attach the trial's **country of registration** (set on the JVM via the `COUNTRY` environment variable) to the global context, and register an audit hook that records every dose with its variant and reason.
 
 ## 🏗️ Architecture
 
 ```
 ┌──────────────────────────────────────────────────────────────────────┐
-│  Spring Boot lab  (this challenge)                             │
+│  Spring Boot lab  (this challenge)                                   │
 │                                                                      │
-│  HTTP ──► LanguageInterceptor ──► IndexController ──► OpenFeature    │
-│           (transaction ctx:                          (global ctx:    │
-│            language=?language=)                       springVersion) │
+│  HTTP ──► RaceInterceptor ──► Trial ──► OpenFeature                  │
+│           (transaction ctx:               (global ctx:               │
+│            race=?race=)                    country=$COUNTRY)         │
 │                                                            │         │
 │                                                            ▼         │
 │                                                       CustomHook     │
@@ -29,17 +29,17 @@ Your shift: teach the lab to read the subject's cohort from the request, attach 
 └──────────────────────────────────────────────────────────────────────┘
 ```
 
-The lab is a single Spring Boot service. flagd is **not** running as a container yet — the provider reads `flags.json` directly from disk in `Resolver.FILE` mode. The targeting rules live entirely inside `flags.json`; your job is to make sure the attributes the rules reference (`language`, `springVersion`) are populated on every evaluation.
+The lab is a single Spring Boot service. flagd is **not** running as a container yet — the provider reads `flags.json` directly from disk in `Resolver.FILE` mode. The targeting rules live entirely inside `flags.json`; your job is to make sure the attributes the rules reference (`race`, `country`) are populated on every evaluation.
 
 ## 🎯 Objective
 
 By the end of this level, you should have:
 
-- A Spring `HandlerInterceptor` that reads `?language=` from each incoming request, sets it on the OpenFeature **transaction context** for the duration of the request, and clears it on completion
-- A **global evaluation context** that carries `springVersion` from `org.springframework.core.SpringVersion.getVersion()`
+- A Spring `HandlerInterceptor` that reads `?race=` from each incoming request, sets it on the OpenFeature **transaction context** for the duration of the request, and clears it on completion
+- A **global evaluation context** that carries `country` from the `COUNTRY` environment variable (`System.getenv("COUNTRY")`) the lab was started with
 - A custom `Hook` registered on the OpenFeature API that logs every flag evaluation with the flag key, variant, and reason
-- `curl http://localhost:8080/?language=de` returns the German variant (`"sharp"`)
-- `curl http://localhost:8080/` (no `language`) returns the framework-version-targeted variant (`"enhanced"`) when running on Spring 3.x or newer, or the default `"blurry"` on older builds — but **never** the literal fallback `"untreated"`
+- `curl http://localhost:8080/?race=zyklop` returns the species-targeted variant (`"enhanced"`)
+- `curl http://localhost:8080/` (no `race`) returns the trial-country-targeted variant — `"sharp"` when the lab was started with `COUNTRY=de`, or the default `"blurry"` for any other country — but **never** the literal fallback `"untreated"`
 - The application log shows at least one line emitted by your `CustomHook` per request
 
 ## 📚 Concepts you'll touch
@@ -61,24 +61,25 @@ You register an interceptor by adding it to a `WebMvcConfigurer`'s `addIntercept
 
 A request-scoped slot of evaluation context. You set it once at the start of the request; every flag evaluation in that request sees it; you clear it at the end. The OpenFeature SDK does not know what "a request" is — that knowledge is wrapped in a **transaction context propagator**. For a thread-per-request servlet app, `ThreadLocalTransactionContextPropagator` is the right one — register it once on `OpenFeatureAPI` at startup, and `api.setTransactionContext(...)` then stores into a `ThreadLocal` so the controller (running on the same thread) can read it back without a parameter.
 
+The subject's `race` is the canonical request-scoped attribute: it changes from one subject to the next.
+
 ### OpenFeature **global evaluation context**
 
-A second slot of evaluation context, set once at startup, that **every** request sees. Use this for attributes that don't change per-request: framework version, region, deployment stage, build number. The targeting in `flags.json` already has a `springVersion >= 3.0.0` branch waiting on it.
+A second slot of evaluation context, set once at startup, that **every** request sees. Use this for attributes that don't change per-request: the trial's country of registration, the deployment region, the build number. The targeting in `flags.json` already has a `country == de` branch waiting on it — your job is to read `System.getenv("COUNTRY")` at startup and put it on the global context.
 
 ### OpenFeature `Hook`
 
 An interceptor for **flag evaluations** (not HTTP requests). Implements four lifecycle phases — `before`, `after`, `error`, `finallyAfter` — fired around every `client.getXxxDetails(...)` call. Register once with `api.addHooks(...)` and it applies to every evaluation. Same shape as a Spring HandlerInterceptor but at the OpenFeature layer instead of the HTTP layer; in this level you'll write a hook that emits an audit log line per evaluation.
 
-### `flagd` `sem_ver` targeting
+### `flagd` targeting
 
-Read the targeting rule in `flags.json` carefully. The `sem_ver` operator does a version-range match on a context attribute. The rule there says "if `springVersion >= 3.0.0`, return `enhanced`". Your job is to make sure the `springVersion` attribute is *on* the evaluation context — not to write the rule.
+The targeting rule in `flags.json` is a small expression tree. The `===` operator does an exact-string match on a context attribute. The first `if` arm checks `race == zyklop`; if that doesn't match, the second arm checks `country == de`; if neither matches, the `defaultVariant` (`blurry`) wins. Your job is to make sure the attributes the rules reference are *on* the evaluation context — not to write the rule.
 
 ## 🧠 What You'll Learn
 
 - How OpenFeature's **transaction-context propagation** works in a thread-per-request server, and why a `ThreadLocalTransactionContextPropagator` is the right primitive for Servlet-based apps
-- The difference between **request-scoped context** (the subject's language) and **global evaluation context** (the lab's framework version) — and when each is the right tool
+- The difference between **request-scoped context** (the subject's species) and **global evaluation context** (the trial's country) — and when each is the right tool
 - How **hooks** let you attach cross-cutting behaviour — audit logging today, OpenTelemetry tracing tomorrow — without modifying every flag evaluation call site
-- How `flagd`'s targeting expressions read context attributes, including the `sem_ver` operator for version-range rules
 
 ## 🧰 Toolbox
 
@@ -126,15 +127,15 @@ The lab already has the OpenFeature SDK and the flagd contrib provider on the cl
 ```json
 "targeting": {
   "if": [
-    { "sem_ver": [{"var": "springVersion"}, ">=", "3.0.0"] }, "enhanced",
-    { "===":     [{"var": "language"},      "de"] },          "sharp"
+    { "===": [{"var": "race"},    "zyklop"] }, "enhanced",
+    { "===": [{"var": "country"}, "de"] },     "sharp"
   ]
 }
 ```
 
-The catch: nothing in the application populates `language` or `springVersion`. Every request lands with an empty evaluation context, so neither targeting branch fires and every subject walks out with `"blurry"` (the default variant) — including the German-speaking ones.
+The catch: nothing in the application populates `race` or `country`. Every request lands with an empty evaluation context, so neither targeting branch fires and every subject walks out with `"blurry"` (the default variant) — even when they show up as a zyklop.
 
-Boot the lab as-is to confirm the symptom — either click **Run** on `DemoApplication` in the Spring Boot Dashboard panel (or press **F5** with `DemoApplication.java` open), or, from the terminal:
+Boot the lab as-is to confirm the symptom — either click **Run** on `Laboratory` in the Spring Boot Dashboard panel (or press **F5** with `Laboratory.java` open), or, from the terminal:
 
 ```bash
 cd adventures/planned/00-side-effects-may-vary/intermediate
@@ -144,7 +145,7 @@ cd adventures/planned/00-side-effects-may-vary/intermediate
 In another terminal:
 
 ```bash
-curl 'http://localhost:8080/?language=de'
+curl 'http://localhost:8080/?race=zyklop'
 # => {"value":"blurry", ...}    ← wrong cohort, no targeting fired
 ```
 
@@ -154,51 +155,54 @@ Stop the app (`Ctrl+C`) and start fixing.
 
 You need three pieces.
 
-#### 3a. A `LanguageInterceptor`
+#### 3a. A `RaceInterceptor`
 
-Create `src/main/java/dev/openfeature/demo/java/demo/LanguageInterceptor.java`. It implements Spring's `HandlerInterceptor` and does three things:
+Create `src/main/java/dev/openfeature/demo/java/demo/RaceInterceptor.java`. It implements Spring's `HandlerInterceptor` and does three things:
 
-- In `preHandle`, read the `language` query parameter. If it's non-null, build an `ImmutableContext` with one attribute (`language` → `Value`) and set it on the OpenFeature **transaction context** via `OpenFeatureAPI.getInstance().setTransactionContext(...)`.
-- In `afterCompletion`, clear the transaction context with an empty `ImmutableContext()` so the request's cohort doesn't leak into the next request that reuses this thread.
+- In `preHandle`, read the `race` query parameter. If it's non-null, build an `ImmutableContext` with one attribute (`race` → `Value`) and set it on the OpenFeature **transaction context** via `OpenFeatureAPI.getInstance().setTransactionContext(...)`.
+- In `afterCompletion`, clear the transaction context with an empty `ImmutableContext()` so the request's species doesn't leak into the next request that reuses this thread.
 - In a static initialiser, register a `ThreadLocalTransactionContextPropagator` on the OpenFeature API. This is what makes the transaction context survive across the SDK call inside the controller.
 
 #### 3b. Wire the interceptor + global context + hook in `OpenFeatureConfig`
 
 Update `OpenFeatureConfig` to:
 
-- Implement `WebMvcConfigurer` and override `addInterceptors(InterceptorRegistry registry)` to register your new `LanguageInterceptor`.
-- After `setProviderAndWait`, build an `ImmutableContext` containing `springVersion` → `SpringVersion.getVersion()`, and call `api.setEvaluationContext(...)`. This is the **global** evaluation context — it's merged into every flag evaluation regardless of request.
+- Implement `WebMvcConfigurer` and override `addInterceptors(InterceptorRegistry registry)` to register your new `RaceInterceptor`.
+- After `setProviderAndWait`, read `System.getenv("COUNTRY")` (with a sensible fallback like `""` when unset), build an `ImmutableContext` containing `country` → `Value`, and call `api.setEvaluationContext(...)`. This is the **global** evaluation context — it's merged into every flag evaluation regardless of request.
 - Call `api.addHooks(new CustomHook())` to register your audit hook globally.
 
 #### 3c. A `CustomHook`
 
 Create `src/main/java/dev/openfeature/demo/java/demo/CustomHook.java`. It implements `dev.openfeature.sdk.Hook`. At minimum, override `before(...)` and `after(...)` to log a line each — `LOG.info("Before hook")` and `LOG.info("After hook - {}", details.getReason())` is enough for the audit trail. You can also override `error(...)` and `finallyAfter(...)` for completeness.
 
-The order matters less than you'd think — Spring will pick up `OpenFeatureConfig` as a `@Configuration` class on boot, the `@PostConstruct` will run once, and from then on every evaluation the `IndexController` performs will see both contexts and trigger your hook.
+The order matters less than you'd think — Spring will pick up `OpenFeatureConfig` as a `@Configuration` class on boot, the `@PostConstruct` will run once, and from then on every evaluation the `Trial` performs will see both contexts and trigger your hook.
 
 ### 4. Run the Lab
 
-`verify.sh` greps the lab's stdout for the `CustomHook` log lines, so the run needs to write to a file `app.log` next to `pom.xml`. The terminal command is:
+`verify.sh` greps the lab's stdout for the `CustomHook` log lines, so the run needs to write to a file `app.log` next to `pom.xml`. **The trial's country of registration is set via the `COUNTRY` environment variable.** The level ships two convenience scripts in the project root that handle the env var and the `tee app.log` for you:
 
 ```bash
 cd adventures/planned/00-side-effects-may-vary/intermediate
-./mvnw spring-boot:run | tee app.log
+./run-germany.sh   # COUNTRY=de — exercises the country-targeting branch
+./run-austria.sh   # COUNTRY=at — country branch does NOT fire; default applies
 ```
 
-If you'd rather click **Run** in the Spring Boot Dashboard panel, the run starts the same `DemoApplication` but does not write to `app.log` automatically — for the verify step you still need the terminal command above.
+Roll your own country at any time with `COUNTRY=<code> ./mvnw spring-boot:run | tee app.log`.
+
+The devcontainer also exports `COUNTRY=de` by default in the workspace environment, so a plain `./mvnw spring-boot:run` (or **F5** / **Run** in the Spring Boot Dashboard) already runs the German trial. To switch country from the IDE without reopening, stop the app and use one of the run scripts above.
 
 ### 5. Verify Each Cohort by Hand
 
 In another terminal:
 
 ```bash
-# German cohort — language targeting should fire
-curl -s 'http://localhost:8080/?language=de' | jq .value
-# => "sharp"
+# Per-subject targeting — race wins over country
+curl -s 'http://localhost:8080/?race=zyklop' | jq .value
+# => "enhanced"
 
-# Default cohort — springVersion targeting should fire on Spring 3.x+
+# No race on the request, country=de from the env — country branch fires
 curl -s 'http://localhost:8080/' | jq .value
-# => "enhanced"   (or "blurry" on Spring 2.x — both acceptable)
+# => "sharp"
 ```
 
 Tail the log to see the audit trail:
@@ -215,7 +219,7 @@ You should see one `Before hook` and one `After hook` line per `curl` call.
 adventures/planned/00-side-effects-may-vary/intermediate/verify.sh
 ```
 
-The script checks that the app is reachable, the German and default cohorts return the right values, and the log file contains audit-hook lines.
+The script checks that the app is reachable, the zyklop and German cohorts return the right values, and the log file contains audit-hook lines.
 
 ## ✅ Verification
 

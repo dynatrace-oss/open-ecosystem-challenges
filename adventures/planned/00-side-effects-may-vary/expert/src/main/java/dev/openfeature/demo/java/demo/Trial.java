@@ -15,7 +15,7 @@ import java.util.concurrent.ThreadLocalRandom;
  * baseline {@code vision_state} flag still drives the response body.
  */
 @RestController
-public class IndexController {
+public class Trial {
 
     @GetMapping("/")
     public ResponseEntity<?> helloWorld() {

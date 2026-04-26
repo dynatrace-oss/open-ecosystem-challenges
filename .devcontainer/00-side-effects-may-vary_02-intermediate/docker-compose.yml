@@ -18,6 +18,12 @@ services:
       # OpenFeatureConfig do not have to hard-code the hostname.
       - FLAGD_HOST=flagd
       - FLAGD_PORT=8013
+      # The trial's country of registration. Used by OpenFeatureConfig
+      # via System.getenv("COUNTRY") to populate the global eval context.
+      # `de` by default so F5 / Spring Boot Dashboard runs already exercise
+      # the country-targeting branch. Override with run-austria.sh or
+      # `COUNTRY=at ./mvnw spring-boot:run` to flip.
+      - COUNTRY=de
 
   flagd:
     image: ghcr.io/open-feature/flagd:latest

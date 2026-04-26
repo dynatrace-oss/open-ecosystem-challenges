@@ -11,24 +11,9 @@
       "defaultVariant": "blurry",
       "targeting": {
         "if": [
-          {
-            "sem_ver": [
-              {
-                "var": "springVersion"
-              },
-              ">=",
-              "3.0.0"
-            ]
-          },
+          { "===": [{ "var": "race" }, "zyklop"] },
           "enhanced",
-          {
-            "===": [
-              {
-                "var": "language"
-              },
-              "de"
-            ]
-          },
+          { "===": [{ "var": "country" }, "de"] },
           "sharp"
         ]
       }

@@ -100,7 +100,7 @@ Three required fields per flag in flagd file mode:
 
 ## 4. Read the chart from the controller
 
-Update `src/main/java/dev/openfeature/demo/java/demo/IndexController.java` so it asks OpenFeature for the reading
+Update `src/main/java/dev/openfeature/demo/java/demo/Trial.java` so it asks OpenFeature for the reading
 instead of returning a literal:
 
 ```java
@@ -113,7 +113,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-public class IndexController {
+public class Trial {
 
     @GetMapping("/")
     public FlagEvaluationDetails<String> helloWorld() {

@@ -1,11 +1,11 @@
-// k6 script that hits the demo's GET / with random language values, but only
+// k6 script that hits the demo's GET / with random race values, but only
 // when the OpenFeature flag `loadgen_active` is true. Flip the flag in the
 // running flagd's flags.json (defaultVariant: "off" → "on") and the script
 // starts hammering within seconds. Flip it back and it goes idle.
 //
-// The script targets *one* language variant via BASE_URL — point it at
-// :8080 of whichever folder you're running. FLAGD_URL is the flagd HTTP
-// eval endpoint of the same instance.
+// The script targets one app instance via BASE_URL — point it at :8080 of
+// whichever folder you're running. FLAGD_URL is the flagd HTTP eval endpoint
+// of the same instance.
 
 import http from 'k6/http';
 import { sleep } from 'k6';
@@ -18,12 +18,12 @@ export const options = {
 const BASE_URL = __ENV.BASE_URL || 'http://host.docker.internal:8080';
 const FLAGD_URL = __ENV.FLAGD_URL || 'http://host.docker.internal:8014';
 
-// Pool of language values. Empty string means "no query parameter" — exercises
-// the default-variant path. The mix is deliberately uneven so the variant
-// distribution panel in Grafana looks like real traffic, not a flat split.
-const LANGUAGES = ['de', 'de', 'de', 'en', 'en', 'fr', 'es', 'it', ''];
+// Pool of subject species. Empty string means "no query parameter" — exercises
+// the country-fallback or default branch. The mix is deliberately uneven so the
+// variant distribution panel in Grafana looks like real traffic, not a flat split.
+const RACES = ['zyklop', 'zyklop', 'human', 'human', 'human', 'orc', 'elf', 'goblin', ''];
 
-// Generate a random user id per request. Step 7's `vision_amplifier_v2` flag
+// Generate a random user id per request. The Phase 3 `vision_amplifier_v2` flag
 // uses a fractional rollout that buckets on the OpenFeature targetingKey, so
 // without a stable per-request id every request would land in the same bucket.
 function randomUserId() {
@@ -52,11 +52,11 @@ export default function () {
     return;
   }
 
-  const lang = LANGUAGES[Math.floor(Math.random() * LANGUAGES.length)];
+  const race = RACES[Math.floor(Math.random() * RACES.length)];
   const userId = randomUserId();
   const params = [`userId=${userId}`];
-  if (lang) params.push(`language=${lang}`);
+  if (race) params.push(`race=${race}`);
   const url = `${BASE_URL}/?${params.join('&')}`;
-  http.get(url, { tags: { language: lang || 'default' } });
+  http.get(url, { tags: { race: race || 'default' } });
   sleep(0.1);
 }

@@ -11,22 +11,20 @@ import org.springframework.web.servlet.HandlerInterceptor;
 import java.util.HashMap;
 
 /**
- * Per-request OpenFeature transaction context. Reads {@code language} (drives
- * the German targeting branch on {@code vision_state}) and {@code userId} (used
- * as the OpenFeature targetingKey, so the fractional rollout on
+ * Per-request OpenFeature transaction context. Reads {@code race} (drives the
+ * species targeting branch on {@code vision_state}) and {@code userId} (used as
+ * the OpenFeature targetingKey, so the fractional rollout on
  * {@code vision_amplifier_v2} is sticky per caller).
  */
-public class LanguageInterceptor implements HandlerInterceptor {
-    public LanguageInterceptor() {
-    }
+public class RaceInterceptor implements HandlerInterceptor {
 
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
-        String language = request.getParameter("language");
+        String race = request.getParameter("race");
         String userId = request.getParameter("userId");
         HashMap<String, Value> attributes = new HashMap<>();
-        if (language != null) {
-            attributes.put("language", new Value(language));
+        if (race != null) {
+            attributes.put("race", new Value(race));
         }
         ImmutableContext evaluationContext = userId != null
                 ? new ImmutableContext(userId, attributes)
@@ -35,6 +33,7 @@ public class LanguageInterceptor implements HandlerInterceptor {
         return HandlerInterceptor.super.preHandle(request, response, handler);
     }
 
+    @Override
     public void afterCompletion(HttpServletRequest request, HttpServletResponse response, Object handler, Exception ex) throws Exception {
         OpenFeatureAPI.getInstance().setTransactionContext(new ImmutableContext());
         HandlerInterceptor.super.afterCompletion(request, response, handler, ex);

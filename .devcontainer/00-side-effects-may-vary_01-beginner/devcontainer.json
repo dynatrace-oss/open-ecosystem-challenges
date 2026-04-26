@@ -15,7 +15,7 @@
     "codespaces": {
       "openFiles": [
         "adventures/planned/00-side-effects-may-vary/docs/beginner.md",
-        "adventures/planned/00-side-effects-may-vary/beginner/src/main/java/dev/openfeature/demo/java/demo/IndexController.java"
+        "adventures/planned/00-side-effects-may-vary/beginner/src/main/java/dev/openfeature/demo/java/demo/Trial.java"
       ]
     }
   },

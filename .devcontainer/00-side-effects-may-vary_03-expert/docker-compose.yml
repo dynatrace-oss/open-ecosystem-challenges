@@ -21,6 +21,9 @@ services:
       - OTEL_EXPORTER_OTLP_ENDPOINT=http://lgtm:4317
       - OTEL_EXPORTER_OTLP_PROTOCOL=grpc
       - OTEL_SERVICE_NAME=fun-with-flags-java-spring
+      # Trial country of registration. Read by OpenFeatureConfig via
+      # System.getenv("COUNTRY") and put on the global eval context.
+      - COUNTRY=de
 
   flagd:
     image: ghcr.io/open-feature/flagd:latest

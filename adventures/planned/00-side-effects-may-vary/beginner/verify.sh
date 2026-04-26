@@ -53,7 +53,7 @@ FLAG_KEY=$(echo "$RESPONSE" | jq -r '.flagKey // .flag_key // empty' 2>/dev/null
 if [[ "$FLAG_KEY" != "vision_state" ]]; then
   print_error_indent "Response did not include 'flagKey':'vision_state'"
   print_info_indent "Actual response: $RESPONSE"
-  print_hint "Wire client.getStringDetails(\"vision_state\", ...) in IndexController and return the FlagEvaluationDetails."
+  print_hint "Wire client.getStringDetails(\"vision_state\", ...) in Trial and return the FlagEvaluationDetails."
   TESTS_FAILED=$((TESTS_FAILED + 1))
   FAILED_CHECKS+=("flag_key_missing")
 else

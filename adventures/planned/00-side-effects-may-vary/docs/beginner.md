@@ -10,20 +10,20 @@ The Spring Boot lab is already running on `:8080`. The OpenFeature SDK is **not*
 
 This level runs entirely in your Codespace — a single Spring Boot service, no containers, no external infrastructure.
 
-- **The lab** — a Spring Boot 4 service on `http://localhost:8080/` with one endpoint, `GET /`. Today it returns a hard-coded `"untreated"` literal from `IndexController`.
+- **The lab** — a Spring Boot 4 service on `http://localhost:8080/` with one endpoint, `GET /`. Today it returns a hard-coded `"untreated"` literal from `Trial`.
 - **The chart** — a `flags.json` file you will create next to `pom.xml`. flagd in **FILE mode** reads this file directly and re-reads it whenever it changes on disk.
 - **The dosing protocol** — the OpenFeature Java SDK plus the **flagd contrib provider** in `Resolver.FILE`/`Resolver.IN_PROCESS` mode. No flagd container is required at this level.
 
 ```
-            ┌──────────────────────┐
-  GET /     │   Spring Boot app    │
-─────────►  │  IndexController     │
-            │   └─ OF Client       │
-            │       └─ FlagdProvider (FILE)
-            └──────────┬───────────┘
-                       │  reads + watches
-                       ▼
-                  flags.json
+            ┌──────────────────────────────┐
+  GET /     │   Laboratory (Spring Boot)   │
+─────────►  │     Trial                    │
+            │       └─ OF Client           │
+            │           └─ FlagdProvider (FILE)
+            └──────────────┬───────────────┘
+                           │  reads + watches
+                           ▼
+                      flags.json
 ```
 
 ## 🎯 Objective
@@ -67,7 +67,7 @@ _Discussion link will be added when this adventure goes live._
 > solving it on your own first. Consider coming back here only if you get stuck or want to check your approach.
 
 Need the answer key? Follow the [step-by-step beginner solution walkthrough](./solutions/beginner.md) for the final
-`pom.xml` dependencies, `OpenFeatureConfig`, `flags.json`, and `IndexController`.
+`pom.xml` dependencies, `OpenFeatureConfig`, `flags.json`, and `Trial`.
 
 ## ✅ How to Play
 
@@ -149,7 +149,7 @@ Create a `flags.json` file next to `pom.xml`. flagd file mode expects this shape
 
 Two variants give you something to flip in the verification step.
 
-#### d. Read the chart from `IndexController`
+#### d. Read the chart from `Trial`
 
 Replace the hard-coded `return "untreated";` with a call through the OpenFeature client. The handler should grab the
 default client from `OpenFeatureAPI`, call
@@ -163,7 +163,7 @@ default client from `OpenFeatureAPI`, call
 
 You have two ways to start the lab:
 
-- **Click ▶ in VS Code.** The Spring Boot Dashboard panel (one of the recommended extensions in this devcontainer) lists `DemoApplication` with a **Run** button. Or press **F5** with `DemoApplication.java` open and pick **Java** as the debugger — Spring's main class is detected automatically; no launch.json needed.
+- **Click ▶ in VS Code.** The Spring Boot Dashboard panel (one of the recommended extensions in this devcontainer) lists `Laboratory` with a **Run** button. Or press **F5** with `Laboratory.java` open and pick **Java** as the debugger — Spring's main class is detected automatically; no launch.json needed.
 - **From the terminal** in the level folder:
 
   ```bash

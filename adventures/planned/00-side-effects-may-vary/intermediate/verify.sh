@@ -8,11 +8,11 @@ source "$SCRIPT_DIR/../../../../lib/scripts/loader.sh"
 
 OBJECTIVE="By the end of this level, you should have:
 
-- A LanguageInterceptor that captures ?language= into the OpenFeature transaction context
-- A global evaluation context carrying springVersion
+- A RaceInterceptor that captures ?race= into the OpenFeature transaction context
+- A global evaluation context carrying country (from the COUNTRY env var)
 - A CustomHook that logs every flag evaluation
-- curl /?language=de returns the German variant ('Hallo Welt!')
-- curl / never returns the literal fallback 'No World'
+- curl /?race=zyklop returns 'enhanced'
+- curl / (with COUNTRY=de) returns 'sharp', and never returns the fallback 'untreated'
 - The application log contains audit lines emitted by CustomHook"
 
 DOCS_URL="https://dynatrace-oss.github.io/open-ecosystem-challenges/00-side-effects-may-vary/intermediate"
@@ -56,47 +56,55 @@ if curl -s --max-time 5 "http://localhost:8080/" >/dev/null 2>&1; then
   TESTS_PASSED=$((TESTS_PASSED + 1))
 else
   print_error_indent "App not reachable at http://localhost:8080/"
-  print_hint "Start the lab with: ./mvnw spring-boot:run | tee app.log"
+  print_hint "Start the lab with: ./run-germany.sh   (or COUNTRY=de ./mvnw spring-boot:run | tee app.log)"
   TESTS_FAILED=$((TESTS_FAILED + 1))
   FAILED_CHECKS+=("app_reachable")
 fi
 print_new_line
 
 # -----------------------------------------------------------------------------
-# 2. German cohort: ?language=de must return "sharp"
+# 2. Per-subject targeting: ?race=zyklop must return "enhanced"
 # -----------------------------------------------------------------------------
-print_test_section "Checking the German cohort gets 'Hallo Welt!'..."
-DE_VALUE="$(curl -s --max-time 5 'http://localhost:8080/?language=de' 2>/dev/null \
+print_test_section "Checking the zyklop subject gets 'enhanced'..."
+ZYKLOP_VALUE="$(curl -s --max-time 5 'http://localhost:8080/?race=zyklop' 2>/dev/null \
   | jq -r '.value // empty' 2>/dev/null || echo "")"
 
-if [[ "$DE_VALUE" == "sharp" ]]; then
-  print_success_indent "GET /?language=de returned 'Hallo Welt!'"
+if [[ "$ZYKLOP_VALUE" == "enhanced" ]]; then
+  print_success_indent "GET /?race=zyklop returned 'enhanced'"
   TESTS_PASSED=$((TESTS_PASSED + 1))
 else
-  print_error_indent "GET /?language=de returned: '$DE_VALUE' (expected 'Hallo Welt!')"
-  print_hint "Did you wire LanguageInterceptor and register a ThreadLocalTransactionContextPropagator?"
+  print_error_indent "GET /?race=zyklop returned: '$ZYKLOP_VALUE' (expected 'enhanced')"
+  print_hint "Did you wire RaceInterceptor and register a ThreadLocalTransactionContextPropagator?"
   TESTS_FAILED=$((TESTS_FAILED + 1))
-  FAILED_CHECKS+=("language_targeting")
+  FAILED_CHECKS+=("race_targeting")
 fi
 print_new_line
 
 # -----------------------------------------------------------------------------
-# 3. Default cohort: GET / must NOT return the literal fallback "untreated".
-#    Either "enhanced" (sem_ver branch fires on Spring 3.x+) or
-#    "blurry" (default variant on older Spring) is acceptable.
+# 3. Trial-country targeting: GET / with COUNTRY=de in the env should resolve
+#    to "sharp". If the global eval context is not wired, the targeting
+#    falls through to the default variant and "blurry" comes back instead —
+#    which is what tells the participant the global wiring is missing. The
+#    only thing the script truly rejects is the literal fallback "untreated",
+#    which means no provider is resolving at all.
 # -----------------------------------------------------------------------------
-print_test_section "Checking the default cohort doesn't fall back to 'No World'..."
+print_test_section "Checking the trial-country branch fires for COUNTRY=de..."
 DEFAULT_VALUE="$(curl -s --max-time 5 'http://localhost:8080/' 2>/dev/null \
   | jq -r '.value // empty' 2>/dev/null || echo "")"
 
-if [[ -n "$DEFAULT_VALUE" && "$DEFAULT_VALUE" != "untreated" ]]; then
-  print_success_indent "GET / returned a real variant: '$DEFAULT_VALUE'"
+if [[ "$DEFAULT_VALUE" == "sharp" ]]; then
+  print_success_indent "GET / returned 'sharp' — country targeting is firing"
   TESTS_PASSED=$((TESTS_PASSED + 1))
-else
-  print_error_indent "GET / returned: '$DEFAULT_VALUE' (expected anything except 'No World')"
-  print_hint "If you see 'No World' the provider isn't resolving — check OpenFeatureConfig."
+elif [[ "$DEFAULT_VALUE" == "untreated" || -z "$DEFAULT_VALUE" ]]; then
+  print_error_indent "GET / returned: '$DEFAULT_VALUE' — provider isn't resolving"
+  print_hint "Check OpenFeatureConfig — the FlagdProvider should be registered before the first request."
   TESTS_FAILED=$((TESTS_FAILED + 1))
   FAILED_CHECKS+=("default_resolves")
+else
+  print_error_indent "GET / returned: '$DEFAULT_VALUE' (expected 'sharp' with COUNTRY=de)"
+  print_hint "Did you populate the global evaluation context with country=System.getenv(\"COUNTRY\")? Did you start the lab via ./run-germany.sh or with COUNTRY=de set?"
+  TESTS_FAILED=$((TESTS_FAILED + 1))
+  FAILED_CHECKS+=("country_targeting")
 fi
 print_new_line
 
@@ -106,7 +114,7 @@ print_new_line
 print_test_section "Checking CustomHook audit lines in application log..."
 if [[ -z "$APP_LOG" ]]; then
   print_error_indent "Couldn't find app.log next to verify.sh"
-  print_hint "Start the lab with: ./mvnw spring-boot:run | tee app.log"
+  print_hint "Start the lab with: ./run-germany.sh   (or COUNTRY=de ./mvnw spring-boot:run | tee app.log)"
   TESTS_FAILED=$((TESTS_FAILED + 1))
   FAILED_CHECKS+=("app_log_missing")
 elif grep -Eq "Before hook|After hook" "$APP_LOG"; then

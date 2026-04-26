@@ -152,8 +152,8 @@ Quick start:
   loadgen) to come up. They are part of the devcontainer compose, so they
   start automatically — no `docker compose up` step.
 - Once the IDE attaches to the workspace, start the Spring Boot lab. Click
-  **Run** on `DemoApplication` in the Spring Boot Dashboard panel (or press
-  **F5** with `DemoApplication.java` open), or run `./mvnw spring-boot:run`
+  **Run** on `Laboratory` in the Spring Boot Dashboard panel (or press
+  **F5** with `Laboratory.java` open), or run `./mvnw spring-boot:run`
   from the integrated terminal.
 
 ### 2. Access the UIs

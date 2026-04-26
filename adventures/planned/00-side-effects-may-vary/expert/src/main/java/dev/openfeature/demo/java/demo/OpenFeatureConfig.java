@@ -9,11 +9,11 @@ import dev.openfeature.sdk.OpenFeatureAPI;
 import dev.openfeature.sdk.Value;
 import jakarta.annotation.PostConstruct;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.core.SpringVersion;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 import java.util.HashMap;
+import java.util.Optional;
 
 /**
  * Wires the OpenFeature client to a remote flagd container ({@code Resolver.RPC},
@@ -38,8 +38,9 @@ public class OpenFeatureConfig implements WebMvcConfigurer {
 
         api.setProviderAndWait(new FlagdProvider(flagdOptions));
 
+        String country = Optional.ofNullable(System.getenv("COUNTRY")).orElse("");
         HashMap<String, Value> attributes = new HashMap<>();
-        attributes.put("springVersion", new Value(SpringVersion.getVersion()));
+        attributes.put("country", new Value(country));
         ImmutableContext evaluationContext = new ImmutableContext(attributes);
         api.setEvaluationContext(evaluationContext);
 
@@ -52,6 +53,6 @@ public class OpenFeatureConfig implements WebMvcConfigurer {
 
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
-        registry.addInterceptor(new LanguageInterceptor());
+        registry.addInterceptor(new RaceInterceptor());
     }
 }
