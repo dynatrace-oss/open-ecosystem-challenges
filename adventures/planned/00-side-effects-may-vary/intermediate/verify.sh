@@ -10,7 +10,7 @@ OBJECTIVE="By the end of this level, you should have:
 
 - A RaceInterceptor that captures ?race= into the OpenFeature transaction context
 - A global evaluation context carrying country (from the COUNTRY env var)
-- A AuditHook that logs every flag evaluation
+- An AuditHook that logs every flag evaluation
 - Trial passes a 'dose' attribute as invocation context at the call site
 - curl /?race=zyklop returns 'enhanced'
 - curl /?dose=standard returns 'sharp' (with COUNTRY=de) and never the fallback 'untreated'
