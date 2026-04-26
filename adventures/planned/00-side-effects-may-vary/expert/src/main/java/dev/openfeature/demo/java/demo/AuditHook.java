@@ -21,9 +21,9 @@ import java.util.Map;
  * a {@code ContextSpanHook} for real-time correlation in Tempo — both hooks
  * stay registered, they just serve different downstreams.</p>
  */
-public class CustomHook implements Hook {
+public class AuditHook implements Hook {
 
-    private static final Logger LOG = LoggerFactory.getLogger(CustomHook.class);
+    private static final Logger LOG = LoggerFactory.getLogger(AuditHook.class);
 
     /** Allowlist of context attributes safe to drop into the audit log. */
     private static final List<String> AUDITED = List.of("race", "country", "dose");

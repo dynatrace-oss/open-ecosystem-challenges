@@ -10,13 +10,13 @@ OBJECTIVE="By the end of this level, you should have:
 
 - A RaceInterceptor that captures ?race= into the OpenFeature transaction context
 - A global evaluation context carrying country (from the COUNTRY env var)
-- A CustomHook that logs every flag evaluation
+- A AuditHook that logs every flag evaluation
 - Trial passes a 'dose' attribute as invocation context at the call site
 - curl /?race=zyklop returns 'enhanced'
 - curl /?dose=standard returns 'sharp' (with COUNTRY=de) and never the fallback 'untreated'
 - curl /?dose=underdose returns 'clouded' (improper dosing for non-zyklops)
 - curl /?race=zyklop&dose=underdose returns 'enhanced' (race priority survives bad dose)
-- The application log contains audit lines emitted by CustomHook"
+- The application log contains audit lines emitted by AuditHook"
 
 DOCS_URL="https://dynatrace-oss.github.io/open-ecosystem-challenges/00-side-effects-may-vary/intermediate"
 
@@ -153,20 +153,20 @@ fi
 print_new_line
 
 # -----------------------------------------------------------------------------
-# 4. CustomHook audit lines must appear in the application log.
+# 4. AuditHook audit lines must appear in the application log.
 # -----------------------------------------------------------------------------
-print_test_section "Checking CustomHook audit lines in application log..."
+print_test_section "Checking AuditHook audit lines in application log..."
 if [[ -z "$APP_LOG" ]]; then
   print_error_indent "Couldn't find app.log next to verify.sh"
   print_hint "Start the lab with: ./run-germany.sh   (or COUNTRY=de ./mvnw spring-boot:run | tee app.log)"
   TESTS_FAILED=$((TESTS_FAILED + 1))
   FAILED_CHECKS+=("app_log_missing")
 elif grep -Eq "AUDIT|Before hook|After hook" "$APP_LOG"; then
-  print_success_indent "Found CustomHook audit lines in $APP_LOG"
+  print_success_indent "Found AuditHook audit lines in $APP_LOG"
   TESTS_PASSED=$((TESTS_PASSED + 1))
 else
   print_error_indent "No 'Before hook'/'After hook' lines found in $APP_LOG"
-  print_hint "Did you implement CustomHook and register it via api.addHooks(...)?"
+  print_hint "Did you implement AuditHook and register it via api.addHooks(...)?"
   TESTS_FAILED=$((TESTS_FAILED + 1))
   FAILED_CHECKS+=("custom_hook_log")
 fi

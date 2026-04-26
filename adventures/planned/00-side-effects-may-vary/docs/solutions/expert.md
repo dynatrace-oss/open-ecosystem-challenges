@@ -116,7 +116,7 @@ public class OpenFeatureConfig implements WebMvcConfigurer {
         attributes.put("country", new Value(Optional.ofNullable(System.getenv("COUNTRY")).orElse("")));
         api.setEvaluationContext(new ImmutableContext(attributes));
 
-        api.addHooks(new CustomHook());
+        api.addHooks(new AuditHook());
         api.addHooks(new TracesHook());
         api.addHooks(new MetricsHook(openTelemetry));
         api.addHooks(new ContextSpanHook());

@@ -44,7 +44,7 @@ public class OpenFeatureConfig implements WebMvcConfigurer {
         ImmutableContext evaluationContext = new ImmutableContext(attributes);
         api.setEvaluationContext(evaluationContext);
 
-        api.addHooks(new CustomHook());
+        api.addHooks(new AuditHook());
         api.addHooks(new TracesHook());
         // TODO Phase 3 task #1: register the matching MetricsHook here once
         // the meter provider has been wired up in OpenTelemetryConfig. Without

@@ -10,7 +10,7 @@ You need three pieces of code wired together:
 
 1. A `RaceInterceptor` that captures the `?race=` query parameter into the OpenFeature **transaction context** for the duration of the request.
 2. An updated `OpenFeatureConfig` that registers the interceptor, reads `COUNTRY` from the environment and sets it on the **global** evaluation context, and registers the audit hook.
-3. A `CustomHook` that logs every flag evaluation.
+3. A `AuditHook` that logs every flag evaluation.
 
 The flag definition in `flags.json` is already targeting-rich — both the `race == zyklop` branch and the `country == de` branch are in place.
 
@@ -63,9 +63,9 @@ A few details worth calling out:
 - `afterCompletion` clears the context. Servlet container threads are pooled, so leaving the previous request's `race` on the thread would leak it into the *next* request unlucky enough to land on the same thread.
 - `preHandle` only sets the context if `race` is present. A `null` `race` query parameter must not poison the context — the country-targeting branch needs a clean slate when no per-request race is given.
 
-## 🧩 Step 3: The `CustomHook`
+## 🧩 Step 3: The `AuditHook`
 
-Create `src/main/java/dev/openfeature/demo/java/demo/CustomHook.java`. The lab director wants an audit trail: every evaluation logged with the cohort attributes that drove the outcome, and a warning when a subject ends up `clouded` (improper dosing, the safety officer needs to follow up):
+Create `src/main/java/dev/openfeature/demo/java/demo/AuditHook.java`. The lab director wants an audit trail: every evaluation logged with the cohort attributes that drove the outcome, and a warning when a subject ends up `clouded` (improper dosing, the safety officer needs to follow up):
 
 ```java
 package dev.openfeature.demo.java.demo;
@@ -81,8 +81,8 @@ import org.slf4j.LoggerFactory;
 import java.util.List;
 import java.util.Map;
 
-public class CustomHook implements Hook {
-    private static final Logger LOG = LoggerFactory.getLogger(CustomHook.class);
+public class AuditHook implements Hook {
+    private static final Logger LOG = LoggerFactory.getLogger(AuditHook.class);
 
     /** Allowlist of context attributes that are safe to drop into the audit log. */
     private static final List<String> AUDITED = List.of("race", "country", "dose");
@@ -162,7 +162,7 @@ public class OpenFeatureConfig implements WebMvcConfigurer {
         ImmutableContext evaluationContext = new ImmutableContext(attributes);
         api.setEvaluationContext(evaluationContext);
 
-        api.addHooks(new CustomHook());
+        api.addHooks(new AuditHook());
     }
 
     @Override
@@ -176,7 +176,7 @@ What changed compared to the broken-state file:
 
 - The class now `implements WebMvcConfigurer` and overrides `addInterceptors` to register `RaceInterceptor`. Spring picks this up automatically because the class is a `@Configuration`.
 - After `setProviderAndWait`, we read `System.getenv("COUNTRY")`, build a one-attribute `ImmutableContext` with `country` set to that value, and call `api.setEvaluationContext(...)`. This context merges into every evaluation regardless of request.
-- We call `api.addHooks(new CustomHook())` to register the audit hook on every evaluation.
+- We call `api.addHooks(new AuditHook())` to register the audit hook on every evaluation.
 
 ## ✅ Step 5: Verify
 

@@ -17,7 +17,7 @@ Your shift: teach the lab to read each subject's species off the request, attach
 │            race=?race=)         dose=random/?dose=) country=$COUNTRY)│
 │                                                            │         │
 │                                                            ▼         │
-│                                                       CustomHook     │
+│                                                       AuditHook     │
 │                                                       (audit log)    │
 │                                                            │         │
 │                                                            ▼         │
@@ -44,7 +44,7 @@ By the end of this level, you should have:
 - `curl /?dose=underdose` → `"clouded"` — improper dosing causes side effects in non-zyklop subjects
 - `curl /?race=zyklop&dose=underdose` → `"enhanced"` — zyklop biology survives bad dosing
 - The response is never the literal fallback `"untreated"`
-- The application log shows at least one line emitted by your `CustomHook` per request
+- The application log shows at least one line emitted by your `AuditHook` per request
 
 ## 📚 Concepts you'll touch
 
@@ -194,11 +194,11 @@ Update `OpenFeatureConfig` to:
 
 - Implement `WebMvcConfigurer` and override `addInterceptors(InterceptorRegistry registry)` to register your new `RaceInterceptor`.
 - After `setProviderAndWait`, read `System.getenv("COUNTRY")` (with a sensible fallback like `""` when unset), build an `ImmutableContext` containing `country` → `Value`, and call `api.setEvaluationContext(...)`. This is the **global** evaluation context — it's merged into every flag evaluation regardless of request.
-- Call `api.addHooks(new CustomHook())` to register your audit hook globally.
+- Call `api.addHooks(new AuditHook())` to register your audit hook globally.
 
-#### 3c. A `CustomHook`
+#### 3c. A `AuditHook`
 
-Create `src/main/java/dev/openfeature/demo/java/demo/CustomHook.java`. It implements `dev.openfeature.sdk.Hook`. The lab director wants an **audit trail**, not a "got here" trace, so do something useful with the data the hook can see:
+Create `src/main/java/dev/openfeature/demo/java/demo/AuditHook.java`. It implements `dev.openfeature.sdk.Hook`. The lab director wants an **audit trail**, not a "got here" trace, so do something useful with the data the hook can see:
 
 - In `after(...)`, read `HookContext.getCtx()` (the **merged** evaluation context) for the attributes the lab cares about — `race`, `country`, `dose` — and write an `[AUDIT]` log line that names the flag, the resolved variant, the reason, and those attributes. When `details.getVariant()` is `clouded`, log at **`WARN`** so the safety officer can grep for it; otherwise `INFO`.
 - In `error(...)`, log at `WARN` so failed evaluations don't disappear silently.
@@ -209,7 +209,7 @@ The order matters less than you'd think — Spring will pick up `OpenFeatureConf
 
 ### 4. Run the Lab
 
-`verify.sh` greps the lab's stdout for the `CustomHook` log lines, so the run needs to write to a file `app.log` next to `pom.xml`. **The trial's country of registration is set via the `COUNTRY` environment variable.** The level ships two convenience scripts in the project root that handle the env var and the `tee app.log` for you:
+`verify.sh` greps the lab's stdout for the `AuditHook` log lines, so the run needs to write to a file `app.log` next to `pom.xml`. **The trial's country of registration is set via the `COUNTRY` environment variable.** The level ships two convenience scripts in the project root that handle the env var and the `tee app.log` for you:
 
 ```bash
 cd adventures/planned/00-side-effects-may-vary/intermediate
