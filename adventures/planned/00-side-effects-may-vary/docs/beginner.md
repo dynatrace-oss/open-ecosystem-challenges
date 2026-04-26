@@ -163,7 +163,7 @@ default client from `OpenFeatureAPI`, call
 
 You have two ways to start the lab:
 
-- **Click ▶ in VS Code** — open the **Run and Debug** view (`Ctrl/Cmd + Shift + D`) and pick **🧪 Run the Lab**, or just press **F5**. The launch config is checked in at `.vscode/launch.json`. Spring Boot Dashboard also shows a one-click run for `DemoApplication` once the Java extensions finish loading.
+- **Click ▶ in VS Code.** The Spring Boot Dashboard panel (one of the recommended extensions in this devcontainer) lists `DemoApplication` with a **Run** button. Or press **F5** with `DemoApplication.java` open and pick **Java** as the debugger — Spring's main class is detected automatically; no launch.json needed.
 - **From the terminal** in the level folder:
 
   ```bash
