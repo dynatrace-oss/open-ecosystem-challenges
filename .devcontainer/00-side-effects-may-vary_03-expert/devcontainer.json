@@ -15,7 +15,10 @@
     },
     "codespaces": {
       "openFiles": [
-        "adventures/planned/00-side-effects-may-vary/docs/expert.md"
+        "adventures/planned/00-side-effects-may-vary/docs/expert.md",
+        "adventures/planned/00-side-effects-may-vary/expert/src/main/java/dev/openfeature/demo/java/demo/OpenTelemetryConfig.java",
+        "adventures/planned/00-side-effects-may-vary/expert/src/main/java/dev/openfeature/demo/java/demo/OpenFeatureConfig.java",
+        "adventures/planned/00-side-effects-may-vary/expert/flags.json"
       ]
     }
   },

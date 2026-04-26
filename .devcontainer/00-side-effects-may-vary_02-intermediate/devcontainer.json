@@ -15,8 +15,9 @@
     },
     "codespaces": {
       "openFiles": [
-        "adventures/planned/00-side-effects-may-vary/README.md",
-        "adventures/planned/00-side-effects-may-vary/docs/intermediate.md"
+        "adventures/planned/00-side-effects-may-vary/docs/intermediate.md",
+        "adventures/planned/00-side-effects-may-vary/intermediate/src/main/java/dev/openfeature/demo/java/demo/OpenFeatureConfig.java",
+        "adventures/planned/00-side-effects-may-vary/intermediate/flags.json"
       ]
     }
   },

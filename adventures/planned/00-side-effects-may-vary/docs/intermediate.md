@@ -42,6 +42,37 @@ By the end of this level, you should have:
 - `curl http://localhost:8080/` (no `language`) returns the framework-version-targeted variant (`"enhanced"`) when running on Spring 3.x or newer, or the default `"blurry"` on older builds — but **never** the literal fallback `"untreated"`
 - The application log shows at least one line emitted by your `CustomHook` per request
 
+## 📚 Concepts you'll touch
+
+If any of these are unfamiliar, read this section before opening the code — the puzzle will make a lot more sense afterwards.
+
+### Spring `HandlerInterceptor`
+
+A Spring MVC component that sits between the servlet container and your `@RestController`. The framework calls four hooks per request, in order:
+
+1. `preHandle(...)` — runs **before** the controller. Return `true` to let the request through. This is where you read query parameters and stash anything per-request.
+2. The controller method runs.
+3. `postHandle(...)` — runs after the controller, before the response is written.
+4. `afterCompletion(...)` — runs after the response, even on exceptions. **Use this to clear thread-local state.**
+
+You register an interceptor by adding it to a `WebMvcConfigurer`'s `addInterceptors(InterceptorRegistry)` method.
+
+### OpenFeature **transaction context**
+
+A request-scoped slot of evaluation context. You set it once at the start of the request; every flag evaluation in that request sees it; you clear it at the end. The OpenFeature SDK does not know what "a request" is — that knowledge is wrapped in a **transaction context propagator**. For a thread-per-request servlet app, `ThreadLocalTransactionContextPropagator` is the right one — register it once on `OpenFeatureAPI` at startup, and `api.setTransactionContext(...)` then stores into a `ThreadLocal` so the controller (running on the same thread) can read it back without a parameter.
+
+### OpenFeature **global evaluation context**
+
+A second slot of evaluation context, set once at startup, that **every** request sees. Use this for attributes that don't change per-request: framework version, region, deployment stage, build number. The targeting in `flags.json` already has a `springVersion >= 3.0.0` branch waiting on it.
+
+### OpenFeature `Hook`
+
+An interceptor for **flag evaluations** (not HTTP requests). Implements four lifecycle phases — `before`, `after`, `error`, `finallyAfter` — fired around every `client.getXxxDetails(...)` call. Register once with `api.addHooks(...)` and it applies to every evaluation. Same shape as a Spring HandlerInterceptor but at the OpenFeature layer instead of the HTTP layer; in this level you'll write a hook that emits an audit log line per evaluation.
+
+### `flagd` `sem_ver` targeting
+
+Read the targeting rule in `flags.json` carefully. The `sem_ver` operator does a version-range match on a context attribute. The rule there says "if `springVersion >= 3.0.0`, return `enhanced`". Your job is to make sure the `springVersion` attribute is *on* the evaluation context — not to write the rule.
+
 ## 🧠 What You'll Learn
 
 - How OpenFeature's **transaction-context propagation** works in a thread-per-request server, and why a `ThreadLocalTransactionContextPropagator` is the right primitive for Servlet-based apps

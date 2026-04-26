@@ -85,6 +85,33 @@ By the end of this level, you should have:
 - The **`vision_amplifier_v2`** fractional rollout flipped back to **100% off / 0% on**
 - The HTTP 5xx rate over the last minute below **1%**
 
+## 📚 Concepts you'll touch
+
+If you came in fresh on OpenTelemetry SDK plumbing or flagd's fractional rule, read this section first.
+
+### OpenTelemetry **TracerProvider** vs **MeterProvider**
+
+OTel ships two parallel pipelines, one for **traces** (spans, distributed timing) and one for **metrics** (counters, histograms). Each has its own provider, its own SDK, its own exporter. In this level the `TracerProvider` is already wired (spans are flowing into Tempo). The `MeterProvider` is not — that is your fix. Both providers register globally via `GlobalOpenTelemetry`, so once you wire the meter, the OpenFeature `MetricsHook` finds it without any further plumbing.
+
+### OpenFeature `TracesHook` and `MetricsHook`
+
+The OpenFeature OTel contrib library ships two hooks that turn every flag evaluation into telemetry:
+
+- **`TracesHook`** — emits a span event (`feature_flag.evaluation`) on the active span with `feature_flag.key`, `feature_flag.variant`, and `feature_flag.reason` attributes. This is why flag evaluations show up nested inside HTTP request spans in Tempo.
+- **`MetricsHook`** — emits four counters per evaluation: `feature_flag_evaluation_requests_total`, `_success_total`, `_error_total`, and an active-count up/down counter. These power the dashboard panels.
+
+Both hooks need a global `OpenTelemetry` instance. The `TracesHook` works once you have a `TracerProvider`; the `MetricsHook` needs a `MeterProvider`.
+
+### `flagd` `fractional` operation + `targetingKey`
+
+`fractional` is flagd's bucketing operation. Given a list of `[variant, percent]` pairs, it deterministically assigns each evaluation to one variant based on a hash of the **targeting key** on the evaluation context. Same key → same bucket → same variant, every request. Different keys spread across the percentages.
+
+In this level the lab's middleware reads `?userId=...` and sets it as the OpenFeature `targetingKey` so the rollout buckets are stable per subject. Look at the loadgen script if you want to see the user-ID generation; the dashboard's variant-distribution panel reflects the fractional split directly.
+
+### Why a flag flip beats a redeploy
+
+When `vision_amplifier_v2` is set to "100 percent on" and stabilisation goes sideways, two operational levers exist: the deploy pipeline (revert the bad code path, rebuild, push, roll out — minutes to hours) or the flag (`flags.json` edit — seconds, no redeploy). The whole point of the level is to feel the second lever in your hands.
+
 ## 🧠 What You'll Learn
 
 - How the OpenFeature OpenTelemetry hooks (`TracesHook` and `MetricsHook`) join
