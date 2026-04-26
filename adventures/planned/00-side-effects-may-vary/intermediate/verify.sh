@@ -161,7 +161,7 @@ if [[ -z "$APP_LOG" ]]; then
   print_hint "Start the lab with: ./run-germany.sh   (or COUNTRY=de ./mvnw spring-boot:run | tee app.log)"
   TESTS_FAILED=$((TESTS_FAILED + 1))
   FAILED_CHECKS+=("app_log_missing")
-elif grep -Eq "Before hook|After hook" "$APP_LOG"; then
+elif grep -Eq "AUDIT|Before hook|After hook" "$APP_LOG"; then
   print_success_indent "Found CustomHook audit lines in $APP_LOG"
   TESTS_PASSED=$((TESTS_PASSED + 1))
 else

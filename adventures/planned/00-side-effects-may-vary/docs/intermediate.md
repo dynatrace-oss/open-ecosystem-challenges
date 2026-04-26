@@ -81,7 +81,9 @@ The three context layers merge before evaluation, with **invocation context taki
 
 ### OpenFeature `Hook`
 
-An interceptor for **flag evaluations** (not HTTP requests). Implements four lifecycle phases — `before`, `after`, `error`, `finallyAfter` — fired around every `client.getXxxDetails(...)` call. Register once with `api.addHooks(...)` and it applies to every evaluation. Same shape as a Spring HandlerInterceptor but at the OpenFeature layer instead of the HTTP layer; in this level you'll write a hook that emits an audit log line per evaluation.
+An interceptor for **flag evaluations** (not HTTP requests). Implements four lifecycle phases — `before`, `after`, `error`, `finallyAfter` — fired around every `client.getXxxDetails(...)` call. Register once with `api.addHooks(...)` and it applies to every evaluation. Same shape as a Spring HandlerInterceptor but at the OpenFeature layer instead of the HTTP layer.
+
+What makes a hook *valuable* (rather than just a "got here" log line) is that `HookContext.getCtx()` exposes the **merged** evaluation context the SDK was about to evaluate against — global + transaction + invocation, all three layers. So a hook can write a real audit trail: which flag resolved to which variant, for a subject of which `race`, in which trial `country`, with which `dose`. In this level your hook does exactly that; in the Expert level the same shape pushes the same attributes onto OpenTelemetry spans instead of log lines.
 
 ### `flagd` targeting
 
@@ -196,7 +198,12 @@ Update `OpenFeatureConfig` to:
 
 #### 3c. A `CustomHook`
 
-Create `src/main/java/dev/openfeature/demo/java/demo/CustomHook.java`. It implements `dev.openfeature.sdk.Hook`. At minimum, override `before(...)` and `after(...)` to log a line each — `LOG.info("Before hook")` and `LOG.info("After hook - {}", details.getReason())` is enough for the audit trail. You can also override `error(...)` and `finallyAfter(...)` for completeness.
+Create `src/main/java/dev/openfeature/demo/java/demo/CustomHook.java`. It implements `dev.openfeature.sdk.Hook`. The lab director wants an **audit trail**, not a "got here" trace, so do something useful with the data the hook can see:
+
+- In `after(...)`, read `HookContext.getCtx()` (the **merged** evaluation context) for the attributes the lab cares about — `race`, `country`, `dose` — and write an `[AUDIT]` log line that names the flag, the resolved variant, the reason, and those attributes. When `details.getVariant()` is `clouded`, log at **`WARN`** so the safety officer can grep for it; otherwise `INFO`.
+- In `error(...)`, log at `WARN` so failed evaluations don't disappear silently.
+
+> ⚠️ **Audit-log PII discipline.** Audit logs are typically retained longer than application logs, often shipped to a SIEM or long-term archive, and are hard to redact after the fact. Use a **fixed allowlist** (e.g. `List.of("race", "country", "dose")`) instead of iterating over the whole context — `targetingKey` and any other PII the host app stuffs into the OpenFeature context shouldn't end up here. Same allowlist discipline that the Expert level's OTel hook will need (see [OpenTelemetry security & privacy guidance](https://opentelemetry.io/docs/security/) for the broader rule), just with shorter retention.
 
 The order matters less than you'd think — Spring will pick up `OpenFeatureConfig` as a `@Configuration` class on boot, the `@PostConstruct` will run once, and from then on every evaluation the `Trial` performs will see both contexts and trigger your hook.
 

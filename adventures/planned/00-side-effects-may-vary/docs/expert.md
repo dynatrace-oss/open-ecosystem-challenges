@@ -106,7 +106,7 @@ Both hooks need a global `OpenTelemetry` instance. The `TracesHook` works once y
 
 ### Authoring your own hook to enrich spans with context
 
-`TracesHook` is great at recording **what** happened (the variant, the reason). It does not record **why** — the evaluation context attributes that drove the decision (`race`, `country`, `dose`) are not on the span by default. For dashboard correlation you want them there.
+The `CustomHook` carried over from Intermediate already records the same context attributes (race / country / dose) into a durable `[AUDIT]` log line — that is the safety officer's tool, useful weeks later for forensic follow-up. What it does not give you is **real-time correlation in the dashboard**: log lines do not show up alongside `feature_flag.variant` on a Tempo span. So `TracesHook` is great at recording **what** happened (the variant, the reason), `CustomHook` records the audit-archive view, and there is still a gap — the evaluation context attributes that drove the decision are not on the span. The two hooks stay; you add a third for the on-call's view.
 
 The OpenFeature `Hook` interface is the right place to fix that, in three lines:
 

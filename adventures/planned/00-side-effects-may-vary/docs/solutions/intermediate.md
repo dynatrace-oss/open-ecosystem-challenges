@@ -65,7 +65,7 @@ A few details worth calling out:
 
 ## 🧩 Step 3: The `CustomHook`
 
-Create `src/main/java/dev/openfeature/demo/java/demo/CustomHook.java`:
+Create `src/main/java/dev/openfeature/demo/java/demo/CustomHook.java`. The lab director wants an audit trail: every evaluation logged with the cohort attributes that drove the outcome, and a warning when a subject ends up `clouded` (improper dosing, the safety officer needs to follow up):
 
 ```java
 package dev.openfeature.demo.java.demo;
@@ -74,42 +74,50 @@ import dev.openfeature.sdk.EvaluationContext;
 import dev.openfeature.sdk.FlagEvaluationDetails;
 import dev.openfeature.sdk.Hook;
 import dev.openfeature.sdk.HookContext;
+import dev.openfeature.sdk.Value;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 public class CustomHook implements Hook {
     private static final Logger LOG = LoggerFactory.getLogger(CustomHook.class);
 
-    @Override
-    public Optional<EvaluationContext> before(HookContext ctx, Map hints) {
-        LOG.info("Before hook");
-        return Hook.super.before(ctx, hints);
-    }
+    /** Allowlist of context attributes that are safe to drop into the audit log. */
+    private static final List<String> AUDITED = List.of("race", "country", "dose");
 
     @Override
     public void after(HookContext ctx, FlagEvaluationDetails details, Map hints) {
-        LOG.info("After hook - {}", details.getReason());
-        Hook.super.after(ctx, details, hints);
+        StringBuilder ctxLine = new StringBuilder();
+        EvaluationContext ec = ctx.getCtx();
+        for (String key : AUDITED) {
+            Value v = ec != null ? ec.getValue(key) : null;
+            ctxLine.append(' ').append(key).append('=').append(v != null ? v.asString() : "(absent)");
+        }
+        String message = String.format("[AUDIT] flag=%s variant=%s reason=%s%s",
+                ctx.getFlagKey(), details.getVariant(), details.getReason(), ctxLine);
+
+        if ("clouded".equals(details.getVariant())) {
+            LOG.warn("{} -- improper dosing or off-protocol cohort, follow-up required", message);
+        } else {
+            LOG.info("{}", message);
+        }
     }
 
     @Override
-    public void error(HookContext ctx, Exception error, Map hints) {
-        LOG.error("Error hook", error);
-        Hook.super.error(ctx, error, hints);
-    }
-
-    @Override
-    public void finallyAfter(HookContext ctx, FlagEvaluationDetails details, Map hints) {
-        LOG.info("Finally After hook - {}", details.getReason());
-        Hook.super.finallyAfter(ctx, details, hints);
+    public void error(HookContext ctx, Exception err, Map hints) {
+        LOG.warn("[AUDIT] flag evaluation error flag={} err={}", ctx.getFlagKey(), err.toString());
     }
 }
 ```
 
-Today this hook just writes log lines — that's enough to satisfy the audit requirement. In the Expert level you'll swap this homemade hook for the OpenFeature OTel `MetricsHook` and `TracesHook`, which join flag evaluations to the rest of the application's telemetry without modifying any controller.
+Two things worth pinning down:
+
+- The hook reads from `HookContext.getCtx()` — the **merged** context the SDK was about to evaluate against. So whether the attribute came from the global eval context (`country`), the transaction context (`race` via `RaceInterceptor`), or the invocation context (`dose` from the controller call site), the audit line sees it.
+- `AUDITED` is a **fixed allowlist** on purpose. Audit logs are usually retained longer than application logs and are often shipped to a SIEM. Don't iterate over the whole context — `targetingKey` and other PII routinely sit there in real apps. Same discipline that the Expert level's OTel hook needs, just with weaker retention. The OpenTelemetry [security & privacy guidance](https://opentelemetry.io/docs/security/) says it best.
+
+What you trade up to in the Expert level: the same `Hook` shape but the output goes onto OpenTelemetry spans instead of a log file, so the dashboard can correlate variants with context attrs in real time.
 
 ## 🧩 Step 4: Update `OpenFeatureConfig`
 
