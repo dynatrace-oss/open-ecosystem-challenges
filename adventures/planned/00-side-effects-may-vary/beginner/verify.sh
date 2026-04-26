@@ -68,7 +68,7 @@ REASON=$(echo "$RESPONSE" | jq -r '.reason // empty' 2>/dev/null || echo "")
 
 if [[ "$VALUE" == "untreated" ]]; then
   print_error_indent "Value is still the hard-coded fallback 'untreated' (reason=$REASON)"
-  print_hint "Configure a FlagdProvider in FILE mode pointing at ./flags.json and add a 'vision_state' flag."
+  print_hint "Configure a FlagdProvider in RPC mode (talks to the flagd sidecar on flagd:8013) and add a 'vision_state' flag to flags.json."
   TESTS_FAILED=$((TESTS_FAILED + 1))
   FAILED_CHECKS+=("fallback_value")
 elif [[ -z "$VALUE" ]]; then
@@ -132,7 +132,7 @@ else
         TESTS_PASSED=$((TESTS_PASSED + 1))
       else
         print_error_indent "Editing flags.json did not change the response (still '$AFTER_VALUE')"
-        print_hint "Use FlagdProvider in FILE mode (offlineFlagSourcePath('./flags.json')) so the file watcher reloads on save."
+        print_hint "flagd's file watcher should pick up the edit. Confirm flagd is running (docker compose ps) and that flags.json sits where the compose file mounts it."
         TESTS_FAILED=$((TESTS_FAILED + 1))
         FAILED_CHECKS+=("hot_reload_failed")
       fi

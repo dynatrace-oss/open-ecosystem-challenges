@@ -31,7 +31,7 @@ The first one is the vendor-neutral OpenFeature client — the API you call from
 **provider**: the piece that knows how to talk to flagd. The SDK is provider-agnostic on purpose; you swap the
 provider, your call sites stay the same.
 
-## 2. Configure the FlagdProvider in file mode
+## 2. Point the FlagdProvider at the flagd sibling
 
 The provider has to be registered with OpenFeature before any evaluation can happen. Create a new file
 `src/main/java/dev/openfeature/demo/java/demo/OpenFeatureConfig.java`:
@@ -53,8 +53,7 @@ public class OpenFeatureConfig {
     public void initProvider() {
         OpenFeatureAPI api = OpenFeatureAPI.getInstance();
         FlagdOptions flagdOptions = FlagdOptions.builder()
-                .resolverType(Config.Resolver.FILE)
-                .offlineFlagSourcePath("./flags.json")
+                .resolverType(Config.Resolver.RPC)
                 .build();
 
         api.setProviderAndWait(new FlagdProvider(flagdOptions));
@@ -64,16 +63,29 @@ public class OpenFeatureConfig {
 
 A few things worth noting:
 
-- `Resolver.FILE` is what avoids needing a flagd container at this level. The provider reads the JSON directly and
-  watches the file for changes.
-- `offlineFlagSourcePath("./flags.json")` is resolved relative to the working directory when the JVM starts — that's
-  the project root when you run `./mvnw spring-boot:run`.
+- `Resolver.RPC` tells the provider to talk to a flagd process over gRPC. The flagd sibling is already running in your
+  Codespace (look in the **Ports** tab for the `flagd gRPC` row on `:8013`).
+- We do **not** hard-code a host or port. The Java flagd provider reads `FLAGD_HOST` / `FLAGD_PORT` from the
+  environment when no explicit value is set. The devcontainer's compose file pre-sets `FLAGD_HOST=flagd` so the lab
+  resolves the sibling by service name; running outside the devcontainer falls back to `localhost:8013` via the
+  published port.
 - `setProviderAndWait` blocks until the provider has finished initializing, which means the first request the
   controller serves is already wired up.
 
+> 💡 The flagd contrib provider supports three resolver modes:
+>
+> - `RPC` — one gRPC round-trip per evaluation. Simplest wire model, easiest to reason about.
+> - `IN_PROCESS` — the SDK opens a gRPC sync stream and the flag definitions stream **into** the JVM. Evaluations
+>   then happen locally, with no per-call network hop. This is the most common shape in real production deployments
+>   (flagd as a sidecar) — we lead with `RPC` here only because the wire model is more explicit and easier to
+>   debug at level 1. Intermediate has a sidebar on flipping to `IN_PROCESS` against the same flagd sibling.
+> - `FILE` — read flags.json from local disk, no flagd at all. Useful for tests and local development without a
+>   sidecar.
+
 ## 3. Author the flag file
 
-Create `flags.json` at the project root (next to `pom.xml`):
+The broken state already ships a `flags.json` next to `pom.xml` — it just has an empty `flags` object so the flagd
+sibling has a valid file to mount at boot. Open it and add the `vision_state` flag definition:
 
 ```json
 {
@@ -90,13 +102,17 @@ Create `flags.json` at the project root (next to `pom.xml`):
 }
 ```
 
-Three required fields per flag in flagd file mode:
+Three required fields per flag in flagd:
 
 - **`state`** — `"ENABLED"` (or `"DISABLED"` to force the SDK fallback).
 - **`variants`** — a map from variant name to value. Two variants here give you something to flip in the verification
   step.
 - **`defaultVariant`** — which variant gets returned when no targeting rules match. There are no rules at this level,
   so this is the variant every request gets.
+
+Save. flagd is watching this file (the devcontainer mounts it read-only into the flagd sibling and tells it to
+`start --uri file:.../flags.json`), so the next evaluation already sees the new flag — no flagd restart, no app
+restart.
 
 ## 4. Read the chart from the controller
 
@@ -148,7 +164,9 @@ curl -s http://localhost:8080/ | jq
 
 You should see `"value": "blurry"` and `"flagKey": "vision_state"`. Edit `flags.json`, change
 `"defaultVariant": "blurry"` to `"defaultVariant": "clouded"`, save, and `curl` again — the value flips to
-`"clouded"` without restarting the app. That's the file watcher inside the flagd provider doing its job.
+`"clouded"` without restarting the app. That's the **flagd container** noticing the file changed on its read-only
+mount and serving the new variant on the next gRPC evaluation. Neither the lab nor flagd had to restart; nothing
+was redeployed.
 
 Run the smoke test from the repo root:
 

@@ -2,29 +2,37 @@
 
 The lab is on its first shift and it isn't reading the chart. Every subject who walks through the door gets the same hard-coded reading on their record — no matter the formulation the lab director just signed off on. The label coming out of the lab is a literal string baked into the controller, not a formulation pulled from the protocol.
 
-Your mission: replace that hard-coded label with an OpenFeature client, point that client at **flagd in file mode**, and let the formulation in `flags.json` decide what gets recorded as the subject's `vision_state`. While you're at it, prove the lab can change the formulation **without restarting the lab** — drop a new dose into `flags.json`, save, and the next subject through the door receives it.
+Your mission: replace that hard-coded label with an OpenFeature client, point that client at the **flagd sidecar** that already runs next to your Codespace, and let the formulation in `flags.json` decide what gets recorded as the subject's `vision_state`. While you're at it, prove the lab can change the formulation **without restarting anything** — edit `flags.json`, save, and the next subject through the door receives the new dose.
 
-The Spring Boot lab is already running on `:8080`. The OpenFeature SDK is **not** wired in yet. There is no `flags.json` in the working directory and no provider configured. That is your job.
+The Spring Boot lab is already running on `:8080`. A flagd container is already running on `:8013` next to it. The OpenFeature SDK is **not** wired in yet, and `flags.json` is an empty skeleton (`{"flags": {}}`) — flagd has nothing to evaluate. Wiring the lab to flagd, and authoring the first flag, is your job.
 
 ## 🏗️ Architecture
 
-This level runs entirely in your Codespace — a single Spring Boot service, no containers, no external infrastructure.
+This level runs as two containers side-by-side in your Codespace — the Spring Boot lab and a flagd sidecar.
 
 - **The lab** — a Spring Boot 4 service on `http://localhost:8080/` with one endpoint, `GET /`. Today it returns a hard-coded `"untreated"` literal from `Trial`.
-- **The chart** — a `flags.json` file you will create next to `pom.xml`. flagd in **FILE mode** reads this file directly and re-reads it whenever it changes on disk.
-- **The dosing protocol** — the OpenFeature Java SDK plus the **flagd contrib provider** in `Resolver.FILE`/`Resolver.IN_PROCESS` mode. No flagd container is required at this level.
+- **The chart** — a `flags.json` file in the level folder, mounted **read-only** into the flagd sidecar. The participant edits it through the IDE; flagd's file watcher picks up the change.
+- **The flagd sidecar** — `ghcr.io/open-feature/flagd:latest`, started by the devcontainer compose stack. It serves flag evaluations over **gRPC on `:8013`**, watches `flags.json` on disk, and reloads when it changes.
+- **The dosing protocol** — the OpenFeature Java SDK plus the **flagd contrib provider** in `Resolver.RPC` mode. The provider reads `FLAGD_HOST=flagd` / `FLAGD_PORT=8013` from the environment (the compose file pre-sets them), so there is no host or port to hard-code.
 
 ```
-            ┌──────────────────────────────┐
-  GET /     │   Laboratory (Spring Boot)   │
-─────────►  │     Trial                    │
-            │       └─ OF Client           │
-            │           └─ FlagdProvider (FILE)
-            └──────────────┬───────────────┘
-                           │  reads + watches
-                           ▼
-                      flags.json
+                ┌──────────────────────────────┐
+   GET /        │   Laboratory (Spring Boot)   │
+ ────────►      │     Trial                    │
+                │       └─ OF Client           │
+                │           └─ FlagdProvider (RPC)
+                └────────────────┬─────────────┘
+                                 │  gRPC :8013
+                                 ▼
+                ┌──────────────────────────────┐
+                │   flagd  (sidecar)           │
+                └────────────────┬─────────────┘
+                                 │  reads + watches
+                                 ▼
+                            flags.json
 ```
+
+> 💡 **Why a sidecar instead of file mode in-process?** The flagd provider can also read `flags.json` directly inside the JVM (`Resolver.FILE`), and that is fine for tests. In real deployments, however, flagd typically runs as a separate process: it's language-agnostic (one flag service serves Java, Go, Python, Node services in the same cluster) and it concentrates the watch / reload / authentication concerns in one place. Starting the adventure with the sidecar shape means everything you learn in Beginner carries straight into Intermediate and Expert without re-plumbing.
 
 ## 🎯 Objective
 
@@ -37,7 +45,8 @@ By the end of this level, you should:
 ## 🧠 What You'll Learn
 
 - How an OpenFeature client and provider work together — the SDK is provider-agnostic and the flagd provider plugs in via dependency only
-- What `flags.json` looks like for flagd file mode (`state`, `variants`, `defaultVariant`)
+- What "remote provider" means in practice — the SDK calls a separate flag service (flagd) over gRPC; the SDK does not parse `flags.json` itself
+- What `flags.json` looks like for flagd (`state`, `variants`, `defaultVariant`)
 - Why hot-reload of the flag file matters operationally — configuration without redeploy
 
 ## 🧰 Toolbox
@@ -47,8 +56,7 @@ Your Codespace comes pre-configured with the following tools to help you solve t
 - [`./mvnw`](https://maven.apache.org/wrapper/): The Maven wrapper checked in next to `pom.xml`. Builds and runs the Spring Boot lab.
 - [`curl`](https://curl.se/): Hits `http://localhost:8080/` and shows you what reading the lab is recording.
 - [`jq`](https://jqlang.org/): Pretty-prints and filters the JSON evaluation details that come back from the SDK.
-
-No flagd container, no Docker, no Kubernetes at this level — only the JVM and your editor.
+- A **flagd sidecar** — already running in the devcontainer's compose stack. It listens on `:8013` (gRPC eval), `:8014` (management — Prometheus metrics + health), `:8015` (gRPC sync stream — used by IN_PROCESS mode), `:8016` (OFREP HTTP eval API). For this level you only talk to `:8013`.
 
 ## ⏰ Deadline
 
@@ -86,11 +94,13 @@ terminal in
 
 ### 2. Access the UIs
 
-There is only one port to forward at this level:
+Open the **Ports** tab in the bottom panel. You should see:
 
-- Open the **Ports** tab in the bottom panel.
-- Find the row for port **8080** (label: **Lab**) and click the forwarded address. You should see the current
-  hard-coded response: `untreated`.
+- **8080 — Lab (Spring Boot).** Click the forwarded address. You should see the current hard-coded response: `untreated`.
+- **8013 — flagd gRPC.** This is the flagd sidecar. Nothing to click yet, but knowing it's there is the point: the lab
+  is going to talk to this in step 3.
+- **8014 — management/metrics, 8015 — sync stream, 8016 — OFREP HTTP.** Auxiliary endpoints; you don't need them for
+  the Beginner level.
 
 ### 3. Implement the Objective
 
@@ -122,15 +132,22 @@ the full reference.
 #### b. Configure the OpenFeature provider
 
 Create a new Spring `@Configuration` class — `OpenFeatureConfig.java` — that runs at startup, builds a `FlagdProvider`
-in **file/in-process mode** pointing at `./flags.json`, and registers it on the global `OpenFeatureAPI` instance.
+in **RPC mode**, and registers it on the global `OpenFeatureAPI` instance.
 
-The lab's protocol is: build `FlagdOptions` with `Resolver.FILE` (or `Resolver.IN_PROCESS`) and
-`offlineFlagSourcePath("./flags.json")`, then call `api.setProviderAndWait(new FlagdProvider(options))` from a
-`@PostConstruct` method.
+The lab's protocol is: build `FlagdOptions` with `Resolver.RPC` (no host or port — the provider reads `FLAGD_HOST`
+and `FLAGD_PORT` from the environment, and the devcontainer pre-sets them to `flagd:8013`), then call
+`api.setProviderAndWait(new FlagdProvider(options))` from a `@PostConstruct` method.
 
-#### c. Drop the formulation into `flags.json`
+> ℹ️ The flagd provider supports three resolver modes: **`RPC`** (gRPC round-trip per evaluation; the simplest wire
+> shape), **`IN_PROCESS`** (a gRPC sync stream pushes the flag set into the SDK so evaluations stay local — this is
+> the most common shape in real production deployments, and Intermediate has a sidebar on flipping to it against
+> the same flagd sibling), and **`FILE`** (read flags.json directly from disk, no flagd container at all). We use
+> RPC here because the wire model is the easiest to reason about for a first contact with OpenFeature.
 
-Create a `flags.json` file next to `pom.xml`. flagd file mode expects this shape:
+#### c. Author the `vision_state` flag in `flags.json`
+
+The level ships an empty `flags.json` next to `pom.xml` (`{"flags": {}}`) so the flagd sidecar has a valid file to
+mount at boot. Open it and add the first flag definition:
 
 ```json
 {
@@ -147,7 +164,8 @@ Create a `flags.json` file next to `pom.xml`. flagd file mode expects this shape
 }
 ```
 
-Two variants give you something to flip in the verification step.
+Two variants give you something to flip in the verification step. Save — flagd's file watcher picks the change up
+within about a second; no restart needed.
 
 #### d. Read the chart from `Trial`
 
@@ -176,9 +194,10 @@ In another terminal:
 curl -s http://localhost:8080/ | jq
 ```
 
-You should see `"value": "blurry"` and `"flagKey": "vision_state"`. Now, **without stopping the app**, edit
-`flags.json` and change `"defaultVariant": "blurry"` to `"defaultVariant": "clouded"`. Save, then re-run the `curl`. The
-value should flip to `"clouded"`.
+You should see `"value": "blurry"` and `"flagKey": "vision_state"`. Now, **without stopping the app or the flagd
+sidecar**, edit `flags.json` and change `"defaultVariant": "blurry"` to `"defaultVariant": "clouded"`. Save, then
+re-run the `curl`. The value should flip to `"clouded"` — that's flagd's file watcher noticing the change on disk
+and serving the new variant on the next gRPC evaluation. Nothing redeployed; nothing restarted.
 
 ### 4. Verify Your Solution
 

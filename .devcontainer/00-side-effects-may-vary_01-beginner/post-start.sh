@@ -11,6 +11,14 @@ cat <<EOF
 📂 Challenge directory:
    $CHALLENGE_DIR
 
+🧬 A flagd sidecar is already running next to your workspace
+   - gRPC eval  :8013   (this is what your FlagdProvider will talk to)
+   - management :8014   (Prometheus metrics + /healthz, /readyz)
+   - sync       :8015   (used in the Intermediate IN_PROCESS sidebar)
+   - OFREP      :8016   (HTTP eval API, handy for poking flagd directly)
+   FLAGD_HOST=flagd is exported into this shell, so a default
+   Resolver.RPC config picks the sidecar up automatically.
+
 ▶  Run the lab — one launch config in .vscode/launch.json:
      🧪  Run the Lab
    Open the Run and Debug view (Ctrl/Cmd + Shift + D) and hit ▶.
