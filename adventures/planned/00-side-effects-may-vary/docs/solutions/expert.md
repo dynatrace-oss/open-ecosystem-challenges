@@ -162,10 +162,11 @@ public class ContextSpanHook implements Hook {
 }
 ```
 
-Two notes worth calling out:
+Three notes worth calling out:
 
 - `HookContext.getCtx()` returns the **merged** evaluation context — global + transaction + invocation, in that precedence order. So the hook reads whatever the SDK is about to use, regardless of which layer set the value.
 - `Span.current()` returns the no-op span if there is no active OTel context (e.g. in tests without an instrumented HTTP server). `setAttribute` on the no-op span is a safe no-op, so the hook does not need defensive guards.
+- **`TRACKED` is a fixed allowlist on purpose — do not iterate.** The merged context typically also carries `targetingKey` (often a stable user id) and, in real apps, things like `email`, account ids, or device identifiers. If you replace the allowlist with `for (String key : ec.asMap().keySet())` you ship that PII straight into Tempo / Prometheus, where it is retained for days and is hard to redact after the fact. Pick the minimum set of keys that helps you correlate, document why each is safe for long-term storage, and add new keys deliberately. The OpenTelemetry [security & privacy guidance](https://opentelemetry.io/docs/security/) covers the broader principle.
 
 Restart the lab:
 

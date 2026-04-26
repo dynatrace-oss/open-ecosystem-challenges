@@ -58,6 +58,13 @@ public class OpenFeatureConfig implements WebMvcConfigurer {
         // span, which `feature_flag.variant` the lab handed out. Closes the
         // loop between why an outcome happened and what the dispenser knew at
         // the time.
+        //
+        // ⚠️ Use a fixed allowlist of keys; do NOT iterate over the whole
+        // evaluation context. The merged context routinely carries the
+        // OpenFeature targetingKey (often a user id) and, in real apps, things
+        // like email or account identifiers — span attributes are retained
+        // for days in Tempo/Prometheus and are hard to redact after the fact.
+        // See https://opentelemetry.io/docs/security/ for the broader rule.
     }
 
     @Override

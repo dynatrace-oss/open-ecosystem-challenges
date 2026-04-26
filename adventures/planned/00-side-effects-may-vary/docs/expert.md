@@ -127,6 +127,8 @@ public class ContextSpanHook implements Hook {
 
 Register it next to `TracesHook` / `MetricsHook` in `OpenFeatureConfig`. Now every flag evaluation tags its parent span with the context attributes the lab cares about. In Tempo: **Search → Service: fun-with-flags-java-spring → +Tag → `feature_flag.context.dose=underdose`** lights up exactly the requests where a tech mis-dosed, with the resolved variant on the same span event.
 
+> ⚠️ **Allowlist, don't iterate.** The hook above only copies a fixed set of keys (`race`, `country`, `dose`) onto the span. Resist the temptation to iterate over the whole evaluation context — typical OpenFeature contexts also carry `userId`, `email`, account or device identifiers, and other personal data. Span and metric attributes flow into observability backends and are routinely retained for days; in many regulatory regimes that is a notifiable breach. The OpenTelemetry [security and privacy guidance](https://opentelemetry.io/docs/security/) and [attribute requirement levels](https://opentelemetry.io/docs/specs/semconv/general/attribute-requirement-level/) both call this out: only attributes whose values are safe for **long-term retention by your telemetry stack** belong on telemetry. Pick the minimum set that helps you correlate, document why each one is safe, and add new keys deliberately.
+
 ### `flagd` `fractional` operation + `targetingKey`
 
 `fractional` is flagd's bucketing operation. Given a list of `[variant, percent]` pairs, it deterministically assigns each evaluation to one variant based on a hash of the **targeting key** on the evaluation context. Same key → same bucket → same variant, every request. Different keys spread across the percentages.
