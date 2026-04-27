@@ -6,7 +6,7 @@ CHALLENGE_DIR="$REPO_ROOT/adventures/planned/00-side-effects-may-vary/intermedia
 
 cat <<EOF
 
-✨ Level 2 - 🟡 Intermediate (Dose by cohort)
+✨ Level 2 - 🟡 Intermediate (Outcome by cohort)
 
 📂 Challenge directory:
    $CHALLENGE_DIR

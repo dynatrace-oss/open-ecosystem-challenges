@@ -55,8 +55,8 @@ public class OpenFeatureConfig implements WebMvcConfigurer {
         // active OpenTelemetry span — for example as
         // `feature_flag.context.<key>` — and register it here. Lets you search
         // Tempo for `feature_flag.context.dose=underdose` and see, on the same
-        // span, which `feature_flag.variant` the lab handed out. Closes the
-        // loop between why an outcome happened and what the dispenser knew at
+        // span, which `feature_flag.variant` the lab recorded. Closes the
+        // loop between why an outcome happened and what the chart knew at
         // the time.
         //
         // ⚠️ Use a fixed allowlist of keys; do NOT iterate over the whole

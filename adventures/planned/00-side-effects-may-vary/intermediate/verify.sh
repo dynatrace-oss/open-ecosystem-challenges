@@ -22,7 +22,7 @@ DOCS_URL="https://dynatrace-oss.github.io/open-ecosystem-challenges/00-side-effe
 
 print_header \
   'Challenge 00: Side Effects May Vary' \
-  '🟡 Intermediate: Dose by cohort' \
+  '🟡 Intermediate: Outcome by cohort' \
   'Verification'
 
 # Init test counters

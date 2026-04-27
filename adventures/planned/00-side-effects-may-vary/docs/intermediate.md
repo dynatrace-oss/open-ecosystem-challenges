@@ -1,8 +1,10 @@
-# 🟡 Intermediate: Dose by cohort
+# 🟡 Intermediate: Outcome by cohort
 
-The trial is widening. Subjects from outside the lab's local population are getting the wrong reading, and the lab director has just walked into the lab holding a stack of complaint forms. She wants the audit log to tell her, after the fact, exactly which formulation went to which subject — and she wants the lab to read the chart properly before it doses anyone.
+The trial is widening. Subjects from outside the lab's local population are getting the wrong reading on their chart, and the lab director has just walked into the lab holding a stack of complaint forms. She wants the audit log to tell her, after the fact, exactly which `vision_state` the lab recorded for which subject — and she wants the lab to read the chart properly before it records any more bad readings.
 
-Right now the lab reads `flags.json` and hands out the same variant to every subject walking in. The OpenFeature client never sees what **species** is on the table (each subject brings their own — humans, zyklops, you name it), never sees which **country** this trial is registered in (set once when the lab boots), never sees the **dose** the clinical staff just measured out (varies per evaluation — and let's be honest, some staff do not follow protocol), and there is no audit hook recording who got what. The flag definition in `flags.json` already has all three targeting branches loaded — `race == zyklop`, improper-`dose` for non-zyklops, and `country == de` — but none of those attributes are in the evaluation context yet, so the targeting has nothing to fire on.
+The protocol is the same for every subject; the lab is not varying the trial. What differs is the **observed outcome**, because subjects don't all start from the same place — some have a biology that responds enhancedly to the same serum, some absorb less or more than the protocol's standard dose, and the trial is registered in different jurisdictions with different baselines.
+
+Right now the lab reads `flags.json` and reports the same reading for every subject walking in. The OpenFeature client never sees what **species** is on the table (each subject brings their own — humans, zyklops, you name it), never sees which **country** this trial is registered in (set once when the lab boots), never sees what **dose** the subject actually absorbed (the protocol calls for `"standard"`, but real-world adherence and metabolism vary), and there is no audit hook recording who got what reading. The flag definition in `flags.json` already has all three targeting branches loaded — `race == zyklop`, improper-`dose` for non-zyklops, and `country == de` — but none of those attributes are in the evaluation context yet, so the targeting has nothing to fire on.
 
 Your shift: teach the lab to read each subject's species off the request, attach the trial's **country of registration** (set on the JVM via the `COUNTRY` environment variable) to the global context, pass the **dose** as invocation context at the moment of the flag evaluation, and register an audit hook that records every dose with its variant and reason.
 
@@ -75,7 +77,7 @@ A second slot of evaluation context, set once at startup, that **every** request
 
 A third slot of evaluation context, passed **at the moment** of `client.getXxxDetails(...)` as an `EvaluationContext` argument. Use this for attributes that are known only at the call site — not on the request, not at startup. The classic example is something the controller computes seconds before the call: a real-time reading, a per-evaluation choice the application code is making.
 
-In this lab, the canonical example is the **dose** that's about to be administered. Most of the lab's clinical staff follow protocol and dispense `"standard"` doses, but a fraction underdose or overdose subjects — let's call it 30% underdose, 10% overdose. The dose isn't on the request and isn't a property of the lab; it's a piece of state the controller computes (or accepts via `?dose=`) and feeds straight into the call. The flag's targeting catches `dose ∈ {underdose, overdose}` for non-zyklop subjects and returns `clouded`.
+In this lab, the canonical example is the **dose** the subject actually absorbed. The protocol calls for a `"standard"` dose every time, but real-world adherence and metabolism vary — roughly 30% of subjects come back underdosed, 10% overdosed (missed appointments, fast metabolisers, the usual reasons). The dose isn't on the request and isn't a property of the lab; it's a per-subject reading the controller computes (or accepts via `?dose=`) and feeds straight into the call. The flag's targeting catches `dose ∈ {underdose, overdose}` for non-zyklop subjects and returns `clouded`.
 
 The three context layers merge before evaluation, with **invocation context taking precedence** over transaction, which takes precedence over global, on conflict.
 
@@ -140,7 +142,7 @@ Quick start:
 
 - Fork the repo
 - Create a Codespace
-- Select "Adventure 00 | 🟡 Intermediate (Dose by cohort)"
+- Select "Adventure 00 | 🟡 Intermediate (Outcome by cohort)"
 - Wait ~2-3 minutes for the Java toolchain to install (`Cmd/Ctrl + Shift + P` → `View Creation Log` to view progress)
 
 When the post-create finishes you'll have Java 21, the Maven wrapper, and the broken-state lab ready in `adventures/planned/00-side-effects-may-vary/intermediate/`.

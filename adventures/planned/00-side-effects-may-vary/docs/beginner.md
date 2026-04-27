@@ -1,8 +1,8 @@
 # 🟢 Beginner: Stand up the lab
 
-The lab is on its first shift and it isn't reading the chart. Every subject who walks through the door gets the same hard-coded reading on their record — no matter the formulation the lab director just signed off on. The label coming out of the lab is a literal string baked into the controller, not a formulation pulled from the protocol.
+The lab is on its first shift and it isn't reading the chart. Every subject who walks through the door gets the same hard-coded reading on their record — no matter what the lab director just signed off on. The label coming out of the lab is a literal string baked into the controller, not a reading pulled from the chart.
 
-Your mission: replace that hard-coded label with an OpenFeature client, point that client at the **flagd sidecar** that already runs next to your Codespace, and let the formulation in `flags.json` decide what gets recorded as the subject's `vision_state`. While you're at it, prove the lab can change the formulation **without restarting anything** — edit `flags.json`, save, and the next subject through the door receives the new dose.
+Your mission: replace that hard-coded label with an OpenFeature client, point that client at the **flagd sidecar** that already runs next to your Codespace, and let `flags.json` drive what gets recorded as the subject's `vision_state`. While you're at it, prove the lab can change what it records **without restarting anything** — edit `flags.json`, save, and the next subject through the door has the new reading on their chart.
 
 The Spring Boot lab is already running on `:8080`. A flagd container is already running on `:8013` next to it. The OpenFeature SDK is **not** wired in yet, and `flags.json` is an empty skeleton (`{"flags": {}}`) — flagd has nothing to evaluate. Wiring the lab to flagd, and authoring the first flag, is your job.
 
@@ -13,7 +13,7 @@ This level runs as two containers side-by-side in your Codespace — the Spring 
 - **The lab** — a Spring Boot 4 service on `http://localhost:8080/` with one endpoint, `GET /`. Today it returns a hard-coded `"untreated"` literal from `Trial`.
 - **The chart** — a `flags.json` file in the level folder, mounted **read-only** into the flagd sidecar. The participant edits it through the IDE; flagd's file watcher picks up the change.
 - **The flagd sidecar** — `ghcr.io/open-feature/flagd:latest`, started by the devcontainer compose stack. It serves flag evaluations over **gRPC on `:8013`**, watches `flags.json` on disk, and reloads when it changes.
-- **The dosing protocol** — the OpenFeature Java SDK plus the **flagd contrib provider** in `Resolver.RPC` mode. The provider reads `FLAGD_HOST=flagd` / `FLAGD_PORT=8013` from the environment (the compose file pre-sets them), so there is no host or port to hard-code.
+- **The chart system** — the OpenFeature Java SDK plus the **flagd contrib provider** in `Resolver.RPC` mode. The provider reads `FLAGD_HOST=flagd` / `FLAGD_PORT=8013` from the environment (the compose file pre-sets them), so there is no host or port to hard-code.
 
 ```
                 ┌──────────────────────────────┐
@@ -257,4 +257,4 @@ A clean response from the lab, after the swap test has restored the original `fl
 ```
 
 If you see `"value": "blurry"` (or `"clouded"`) and `"flagKey": "vision_state"`, the lab is reading the chart and
-you're ready for the 🟡 Intermediate level — **Dose by cohort**.
+you're ready for the 🟡 Intermediate level — **Outcome by cohort**.

@@ -1,5 +1,5 @@
 {
-  "name": "Adventure 00 | 🟡 Intermediate (Dose by cohort)",
+  "name": "🧪 Adventure 00 | 🟡 Intermediate (Outcome by cohort)",
   "dockerComposeFile": "docker-compose.yml",
   "service": "workspace",
   "workspaceFolder": "/workspaces/${localWorkspaceFolderBasename}/adventures/planned/00-side-effects-may-vary/intermediate",
