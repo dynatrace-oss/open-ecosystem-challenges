@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: privileged
+  labels:
+    republic.rome/gens: castra-praetoria
+spec:
+  restartPolicy: Never
+  containers:
+    - name: app
+      image: busybox:stable
+      command: ["sleep", "infinity"]
+      securityContext:
+        privileged: true

@@ -38,12 +38,14 @@ if [[ -z "$version" ]]; then
 fi
 
 echo "✨ Installing Open Tofu"
+# shellcheck disable=SC1091
+source "$(dirname "$(realpath "${BASH_SOURCE[0]}")")/../scripts/arch.sh"
 
-curl -LO "https://github.com/opentofu/opentofu/releases/download/${version}/tofu_${version#v}_linux_amd64.zip"
-unzip "tofu_${version#v}_linux_amd64.zip" tofu
+curl -LO "https://github.com/opentofu/opentofu/releases/download/${version}/tofu_${version#v}_linux_${ARCH}.zip"
+unzip "tofu_${version#v}_linux_${ARCH}.zip" tofu
 chmod +x tofu
 sudo mv tofu /usr/local/bin/tofu
-rm -f "tofu_${version#v}_linux_amd64.zip"
+rm -f "tofu_${version#v}_linux_${ARCH}.zip"
 tofu version
 
 echo "✅ Open Tofu is ready"

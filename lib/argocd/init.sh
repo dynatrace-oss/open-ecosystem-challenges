@@ -56,9 +56,11 @@ sed -i "s|argoproj/argo-cd/[^/]*/manifests/install.yaml|argoproj/argo-cd/${versi
 kubectl apply -k "${manifests_tmp}"
 
 echo "✨ Installing Argo CD CLI"
-curl -sSL -o argocd-linux-amd64 "https://github.com/argoproj/argo-cd/releases/download/${version}/argocd-linux-amd64"
-sudo install -m 555 argocd-linux-amd64 /usr/local/bin/argocd
-rm argocd-linux-amd64
+# shellcheck disable=SC1091
+source "$(dirname "$(realpath "${BASH_SOURCE[0]}")")/../scripts/arch.sh"
+curl -sSL -o "argocd-linux-${ARCH}" "https://github.com/argoproj/argo-cd/releases/download/${version}/argocd-linux-${ARCH}"
+sudo install -m 555 "argocd-linux-${ARCH}" /usr/local/bin/argocd
+rm "argocd-linux-${ARCH}"
 
 echo "✨ Waiting for Argo CD server to be ready"
 kubectl rollout status deployment/argocd-server -n argocd --timeout=300s

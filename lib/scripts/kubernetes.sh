@@ -244,5 +244,42 @@ check_resource_version() {
   fi
 }
 
+# Check that a manifest is blocked at admission (dry-run=server expects failure)
+# Reads manifest YAML from stdin.
+# Usage: check_admission_blocked "display name" "hint" <<EOF ... EOF
+check_admission_blocked() {
+  local display_name=$1
+  local hint=$2
 
+  print_test_section "Checking $display_name is blocked at admission..."
 
+  if kubectl apply --dry-run=server -f - &>/dev/null; then
+    print_error_indent "$display_name was admitted — policy not enforcing"
+    print_hint "$hint"
+    TESTS_FAILED=$((TESTS_FAILED + 1))
+    FAILED_CHECKS+=("admission_blocked:$display_name")
+  else
+    print_success_indent "$display_name was correctly blocked at admission"
+    TESTS_PASSED=$((TESTS_PASSED + 1))
+  fi
+}
+
+# Check that a manifest is admitted (dry-run=server expects success)
+# Reads manifest YAML from stdin.
+# Usage: check_admission_allowed "display name" "hint" <<EOF ... EOF
+check_admission_allowed() {
+  local display_name=$1
+  local hint=$2
+
+  print_test_section "Checking $display_name is admitted..."
+
+  if kubectl apply --dry-run=server -f - &>/dev/null; then
+    print_success_indent "$display_name was correctly admitted"
+    TESTS_PASSED=$((TESTS_PASSED + 1))
+  else
+    print_error_indent "$display_name was incorrectly blocked at admission"
+    print_hint "$hint"
+    TESTS_FAILED=$((TESTS_FAILED + 1))
+    FAILED_CHECKS+=("admission_allowed:$display_name")
+  fi
+}

@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: compliant
+  labels:
+    republic.rome/gens: forum-romanum
+spec:
+  restartPolicy: Never
+  containers:
+    - name: app
+      image: busybox:stable
+      command: ["sleep", "infinity"]
+      securityContext:
+        privileged: false

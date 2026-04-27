@@ -1,0 +1,25 @@
+{
+  "name": "⚖️ Adventure 00 | 🟢 Beginner (The Twelve Tables)",
+  "image": "mcr.microsoft.com/devcontainers/base:bullseye",
+  "workspaceFolder": "/workspaces/${localWorkspaceFolderBasename}/adventures/planned/00-lex-imperfecta/beginner",
+  "features": {
+    "ghcr.io/devcontainers/features/docker-in-docker:2": {}
+  },
+  "postCreateCommand": "bash /workspaces/${localWorkspaceFolderBasename}/.devcontainer/00-lex-imperfecta_01-beginner/post-create.sh",
+  "postStartCommand": "bash /workspaces/${localWorkspaceFolderBasename}/.devcontainer/00-lex-imperfecta_01-beginner/post-start.sh",
+  "customizations": {
+    "codespaces": {
+      "openFiles": [
+        "adventures/planned/00-lex-imperfecta/README.md"
+      ],
+      "permissions": {
+        "codespaces": "write"
+      }
+    }
+  },
+  "forwardPorts": [],
+  "portsAttributes": {},
+  "otherPortsAttributes": {
+    "onAutoForward": "ignore"
+  }
+}
