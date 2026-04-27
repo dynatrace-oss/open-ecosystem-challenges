@@ -38,6 +38,17 @@ The metrics half, however, is dead. Two reasons:
    `MetricsHook`. Even if the meter provider could export, no one is
    recording flag evaluations as metrics.
 
+One thing that **is** already wired and matters for this level: the
+`SpeciesInterceptor` carried over from Intermediate. It runs on every
+inbound HTTP request, reads `?userId=…` from the query string, and
+constructs `new ImmutableContext(userId, attributes)` — by SDK convention,
+the first `String` argument **is** the OpenFeature `targetingKey`. That is
+what makes the `vision_amplifier_v2` fractional rollout actually bucket per
+subject; without it, every evaluation would hash the same way and the
+percentages would do nothing. You don't have to touch this file in Expert,
+but it's the reason the rollback in Step 6 takes effect immediately when
+the loadgen sends a fresh `userId` per request.
+
 ## 🛠 Step 3: Wire the meter provider
 
 Open `src/main/java/dev/openfeature/demo/java/demo/OpenTelemetryConfig.java`.

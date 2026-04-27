@@ -69,10 +69,10 @@ Four containers and one Spring Boot process, all on a shared Docker network.
       │ (RPC mode)                                           │
 ┌─────▼────────────────┐                           ┌─────────┴──────────────┐
 │  flagd               │ ◀──── poll loadgen flag ──│  k6 loadgen            │
-│  :8013 (gRPC + HTTP  │                           │  HTTP GET /            │
-│         eval gateway)│                           │  with userId param     │
-│  :8014 management /  │                           │                        │
-│        metrics       │                           │                        │
+│  :8013 (gRPC + HTTP  │                           │  HTTP GET /?userId=…   │
+│         eval gateway)│                           │  (becomes targetingKey │
+│  :8014 management /  │                           │   via SpeciesIntercep- │
+│        metrics       │                           │   tor on the lab)      │
 │  :8015 sync stream   │                           │                        │
 │  :8016 OFREP         │                           │                        │
 │  flags.json mounted  │                           │                        │
@@ -84,6 +84,7 @@ Four containers and one Spring Boot process, all on a shared Docker network.
 By the end of this level, you should have:
 
 - The OpenTelemetry **meter provider** wired and the OpenFeature **`MetricsHook`** registered
+- The **`SpeciesInterceptor`** (carried over from Intermediate) reading `?userId=` from the request and setting it as the OpenFeature **`targetingKey`** on the evaluation context, so the `vision_amplifier_v2` fractional rollout buckets per subject rather than landing every request in the same bucket
 - A **`ContextSpanHook`** of your own — a small `Hook` that copies the merged evaluation context (`species`, `country`, `dose`) onto the active span as `feature_flag.context.<key>` — registered alongside `TracesHook`/`MetricsHook`
 - **At least one trace** for service `fun-with-flags-java-spring` visible in Tempo
 - Spans tagged with **`feature_flag.context.dose=underdose`** searchable in Tempo and lining up with `feature_flag.variant=clouded` on the same span
@@ -96,6 +97,8 @@ By the end of this level, you should have:
 If you came in fresh on OpenTelemetry SDK plumbing or flagd's fractional rule, read this section first.
 
 ### OpenTelemetry **TracerProvider** vs **MeterProvider**
+
+Spans are per-request timing (one trace per HTTP call, with nested events), counters are aggregate population stats (rate of evaluations across all requests, distribution of variants). In this lab the trace half is wired and Tempo already shows spans; the metrics half is dead and the dashboard is dark — that's the gap you close.
 
 OTel ships two parallel pipelines, one for **traces** (spans, distributed timing) and one for **metrics** (counters, histograms). Each has its own provider, its own SDK, its own exporter. In this level the `TracerProvider` is already wired (spans are flowing into Tempo). The `MeterProvider` is not — that is your fix. Both providers register globally via `GlobalOpenTelemetry`, so once you wire the meter, the OpenFeature `MetricsHook` finds it without any further plumbing.
 
@@ -112,32 +115,31 @@ Both hooks need a global `OpenTelemetry` instance. The `TracesHook` works once y
 
 The `AuditHook` carried over from Intermediate already records the same context attributes (species / country / dose) into a durable `[AUDIT]` log line — that is the safety officer's tool, useful weeks later for forensic follow-up. What it does not give you is **real-time correlation in the dashboard**: log lines do not show up alongside `feature_flag.variant` on a Tempo span. So `TracesHook` is great at recording **what** happened (the variant, the reason), `AuditHook` records the audit-archive view, and there is still a gap — the evaluation context attributes that drove the decision are not on the span. The two hooks stay; you add a third for the on-call's view.
 
-The OpenFeature `Hook` interface is the right place to fix that, in three lines:
+The OpenFeature `Hook` interface is the right place to fix that. The shape is roughly:
 
-```java
-public class ContextSpanHook implements Hook {
-    @Override
-    public Optional<EvaluationContext> before(HookContext ctx, Map hints) {
-        Span span = Span.current();           // active HTTP request span
-        EvaluationContext ec = ctx.getCtx();  // global + transaction + invocation, merged
-        for (String key : List.of("species", "country", "dose")) {
-            Value v = ec.getValue(key);
-            if (v != null) span.setAttribute("feature_flag.context." + key, v.asString());
-        }
-        return Hook.super.before(ctx, hints);
-    }
+```text
+before(hookCtx) {
+    span = active OTel span
+    for each allowlisted key in merged eval context:
+        span.setAttribute("feature_flag.context." + key, value)
 }
 ```
 
+The `before` hook receives a `HookContext` whose `getCtx()` returns the **merged** evaluation context (global + transaction + invocation), which is exactly what drove the flag's resolution — so the attributes you copy off it line up with what the variant decision actually saw. Span attributes go on `Span.current()` because that is the active HTTP request span; the OpenFeature hook fires inside that span's scope.
+
 Register it next to `TracesHook` / `MetricsHook` in `OpenFeatureConfig`. Now every flag evaluation tags its parent span with the context attributes the lab cares about. In Tempo: **Search → Service: fun-with-flags-java-spring → +Tag → `feature_flag.context.dose=underdose`** lights up exactly the requests where a tech mis-dosed, with the resolved variant on the same span event.
+
+The full implementation, including imports and a couple of subtle correctness notes, is in [solutions/expert.md](./solutions/expert.md).
 
 > ⚠️ **Allowlist, don't iterate.** The hook above only copies a fixed set of keys (`species`, `country`, `dose`) onto the span. Resist the temptation to iterate over the whole evaluation context — typical OpenFeature contexts also carry `userId`, `email`, account or device identifiers, and other personal data. Span and metric attributes flow into observability backends and are routinely retained for days; in many regulatory regimes that is a notifiable breach. The OpenTelemetry [security and privacy guidance](https://opentelemetry.io/docs/security/) and [attribute requirement levels](https://opentelemetry.io/docs/specs/semconv/general/attribute-requirement-level/) both call this out: only attributes whose values are safe for **long-term retention by your telemetry stack** belong on telemetry. Pick the minimum set that helps you correlate, document why each one is safe, and add new keys deliberately.
 
 ### `flagd` `fractional` operation + `targetingKey`
 
-`fractional` is flagd's bucketing operation. Given a list of `[variant, percent]` pairs, it deterministically assigns each evaluation to one variant based on a hash of the **targeting key** on the evaluation context. Same key → same bucket → same variant, every request. Different keys spread across the percentages.
+`fractional` is flagd's bucketing operation. Given a list of `[variant, percent]` pairs, it deterministically assigns each evaluation to one variant based on a hash of the **targeting key** on the evaluation context. Same key → same bucket → same variant, every request. Different keys spread across the percentages. **If no targeting key is set, every evaluation hashes the same way and the rollout collapses — every request lands in the same bucket and the percentages do nothing.**
 
-In this level the lab's middleware reads `?userId=...` and sets it as the OpenFeature `targetingKey` so the rollout buckets are stable per subject. Look at the loadgen script if you want to see the user-ID generation; the dashboard's variant-distribution panel reflects the fractional split directly.
+The piece that wires this up is the **`SpeciesInterceptor`** carried over from the Intermediate level. It runs on every inbound HTTP request, reads `?userId=...` from the query string, and constructs an `ImmutableContext(userId, attributes)` — by SDK convention, the first `String` argument to `ImmutableContext` **is** the OpenFeature `targetingKey`. That context is then set as the transaction context for the request, so every flag evaluation downstream of the interceptor sees a stable per-subject targeting key and `fractional` buckets correctly.
+
+The k6 loadgen demonstrates this end-to-end: it generates a fresh random `userId` per request, which means the interceptor produces a different targeting key per request, which means the fractional rollout spreads across the percentages exactly as configured. The dashboard's variant-distribution panel reflects that split directly.
 
 ### Why a flag flip beats a redeploy
 
@@ -304,9 +306,12 @@ inverted. The flag definition currently reads:
 ```
 
 Edit `flags.json` again — flip the percentages so `off` gets `100` and `on`
-gets `0`. Save. Within one or two seconds flagd reloads and the loadgen,
-which generates a fresh `userId` per request, immediately moves to the safe
-bucket. Watch the latency p99 panel collapse back to baseline and the 5xx
+gets `0`. Save. Within one or two seconds flagd reloads. Because the
+`SpeciesInterceptor` is wiring `?userId=` through to the OpenFeature
+`targetingKey` on every request, and the loadgen generates a fresh `userId`
+per request, the fractional rollout responds immediately — every subject
+re-buckets against the new percentages and the population moves to the safe
+variant. Watch the latency p99 panel collapse back to baseline and the 5xx
 rate fall to zero.
 
 **No deploy. No rebuild. No restart of the lab.**
