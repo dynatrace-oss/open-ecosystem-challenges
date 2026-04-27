@@ -1,4 +1,4 @@
-# 🟡 Intermediate Solution Walkthrough: Dose by cohort
+# 🟡 Intermediate Solution Walkthrough: Outcome by cohort
 
 This walkthrough shows the target shape of the lab after the level is solved. We'll build it the way a clinical engineer would — read the objective, then drop in each piece in the order the OpenFeature SDK expects it.
 
@@ -6,13 +6,14 @@ This walkthrough shows the target shape of the lab after the level is solved. We
 
 ## 📋 Step 1: Recap the Objective
 
-You need three pieces of code wired together:
+You need four pieces of code wired together:
 
 1. A `RaceInterceptor` that captures the `?race=` query parameter into the OpenFeature **transaction context** for the duration of the request.
-2. An updated `OpenFeatureConfig` that registers the interceptor, reads `COUNTRY` from the environment and sets it on the **global** evaluation context, and registers the audit hook.
-3. A `AuditHook` that logs every flag evaluation.
+2. An `AuditHook` that records every flag evaluation with the cohort attributes that drove it.
+3. An updated `OpenFeatureConfig` that registers the interceptor, reads `COUNTRY` from the environment and sets it on the **global** evaluation context, and registers the audit hook.
+4. An updated `Trial` controller that accepts `?dose=` and passes a `dose` attribute as **invocation context** at the call site of `client.getStringDetails(...)`.
 
-The flag definition in `flags.json` is already targeting-rich — both the `race == zyklop` branch and the `country == de` branch are in place.
+The flag definition in `flags.json` is already targeting-rich — `race == zyklop`, the improper-`dose` branch, and the `country == de` branch are all in place.
 
 ## 🧩 Step 2: The `RaceInterceptor`
 
@@ -65,7 +66,7 @@ A few details worth calling out:
 
 ## 🧩 Step 3: The `AuditHook`
 
-Create `src/main/java/dev/openfeature/demo/java/demo/AuditHook.java`. The lab director wants an audit trail: every evaluation logged with the cohort attributes that drove the outcome, and a warning when a subject ends up `clouded` (improper dosing, the safety officer needs to follow up):
+Create `src/main/java/dev/openfeature/demo/java/demo/AuditHook.java`. The lab director wants an audit trail: every evaluation logged with the cohort attributes that drove the outcome, and a warning when a subject's reading comes back `clouded` (improper dosing, the safety officer needs to follow up):
 
 ```java
 package dev.openfeature.demo.java.demo;
@@ -147,8 +148,7 @@ public class OpenFeatureConfig implements WebMvcConfigurer {
     public void initProvider() {
         OpenFeatureAPI api = OpenFeatureAPI.getInstance();
         FlagdOptions flagdOptions = FlagdOptions.builder()
-                .resolverType(Config.Resolver.FILE)
-                .offlineFlagSourcePath("./flags.json")
+                .resolverType(Config.Resolver.RPC)
                 .build();
 
         api.setProviderAndWait(new FlagdProvider(flagdOptions));
@@ -175,10 +175,65 @@ public class OpenFeatureConfig implements WebMvcConfigurer {
 What changed compared to the broken-state file:
 
 - The class now `implements WebMvcConfigurer` and overrides `addInterceptors` to register `RaceInterceptor`. Spring picks this up automatically because the class is a `@Configuration`.
+- The stale `offlineFlagSourcePath("./flags.json")` line on `FlagdOptions` is gone. With `Resolver.RPC` the SDK ignores it anyway — the flagd sibling reads `flags.json` itself; the SDK only talks to flagd over gRPC. Drop it for clarity.
 - After `setProviderAndWait`, we read `System.getenv("COUNTRY")`, build a one-attribute `ImmutableContext` with `country` set to that value, and call `api.setEvaluationContext(...)`. This context merges into every evaluation regardless of request.
 - We call `api.addHooks(new AuditHook())` to register the audit hook on every evaluation.
 
-## ✅ Step 5: Verify
+## 🧩 Step 5: Update `Trial` to pass `dose` as invocation context
+
+This is the third (and last) of the three eval-context layers — and it's the one that has to live at the **call site**, not in a Spring filter or a `@PostConstruct`. The dose is observational: most subjects absorb the standard dose, but a measurable fraction end up underdosed or overdosed (missed doses, fast metabolisers, the usual reasons), and that's known only at the moment the lab takes the reading. Replace `src/main/java/dev/openfeature/demo/java/demo/Trial.java` with:
+
+```java
+package dev.openfeature.demo.java.demo;
+
+import dev.openfeature.sdk.Client;
+import dev.openfeature.sdk.FlagEvaluationDetails;
+import dev.openfeature.sdk.ImmutableContext;
+import dev.openfeature.sdk.OpenFeatureAPI;
+import dev.openfeature.sdk.Value;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.util.HashMap;
+import java.util.concurrent.ThreadLocalRandom;
+
+@RestController
+public class Trial {
+
+    @GetMapping("/")
+    public FlagEvaluationDetails<String> observeSubject(@RequestParam(required = false) String dose) {
+        Client client = OpenFeatureAPI.getInstance().getClient();
+
+        // The dose this subject actually absorbed. Caller can pin it via ?dose=
+        // (handy for testing); otherwise we sample one from the typical
+        // adherence distribution we see in this lab.
+        String resolvedDose = (dose != null) ? dose : pickDose();
+        HashMap<String, Value> invocationCtx = new HashMap<>();
+        invocationCtx.put("dose", new Value(resolvedDose));
+
+        return client.getStringDetails(
+                "vision_state",
+                "untreated",
+                new ImmutableContext(invocationCtx));
+    }
+
+    private static String pickDose() {
+        double r = ThreadLocalRandom.current().nextDouble();
+        if (r < 0.60) return "standard";
+        if (r < 0.90) return "underdose";
+        return "overdose";
+    }
+}
+```
+
+Three things worth pinning down:
+
+- The `dose` attribute is **observational, not prescriptive**. The lab's protocol calls for a `"standard"` dose every time; what varies per subject is what their body actually ended up with. The targeting branch in `flags.json` reads "if the dose came back underdose or overdose for a non-zyklop, the reading is `clouded`."
+- `getStringDetails(...)` takes the invocation `EvaluationContext` as the **third argument**. The SDK merges it on top of the global context (`country`) and the transaction context (`race` from `RaceInterceptor`); on conflict, invocation wins. None of those layers conflict in this level — they each carry a different attribute name.
+- Returning `FlagEvaluationDetails<String>` (rather than just `details.getValue()`) keeps the response body verbose: flag key, value, variant, reason. The verifier and your own debugging both lean on those fields.
+
+## ✅ Step 6: Verify
 
 Boot the lab. The level ships two convenience scripts that pre-set `COUNTRY` and pipe to `app.log`:
 
@@ -191,23 +246,32 @@ Boot the lab. The level ships two convenience scripts that pre-set `COUNTRY` and
 Hit it from another terminal:
 
 ```bash
-# Per-subject targeting wins over country
+# Per-subject targeting (transaction context) wins over country
 curl -s 'http://localhost:8080/?race=zyklop' | jq .value
 # => "enhanced"
 
-# No race on the request, country=de from the env — country branch fires
-curl -s 'http://localhost:8080/' | jq .value
-# => "sharp"     (when running ./run-germany.sh)
+# No race, country=de from the env — country branch (global ctx) fires
+curl -s 'http://localhost:8080/?dose=standard' | jq .value
+# => "sharp"     (when running ./run-germany.sh; the explicit ?dose=standard
+#                 keeps the random sampler from rolling underdose/overdose)
 # => "blurry"    (when running ./run-austria.sh — neither branch fires)
+
+# Improper dose (invocation context) overrides the country branch for non-zyklops
+curl -s 'http://localhost:8080/?dose=underdose' | jq .value
+# => "clouded"
+
+# Zyklop biology beats bad dosing — race-zyklop is evaluated before improper-dose
+curl -s 'http://localhost:8080/?race=zyklop&dose=underdose' | jq .value
+# => "enhanced"
 ```
 
 Then check the audit trail:
 
 ```bash
-grep -E "Before hook|After hook" app.log
+grep '\[AUDIT\]' app.log | head
 ```
 
-You should see two lines per `curl` call.
+You should see one `[AUDIT] flag=vision_state variant=… reason=… race=… country=… dose=…` line per evaluation, and `WARN`-level lines for any `clouded` outcome with the "improper dosing or off-protocol cohort, follow-up required" suffix.
 
 Run the verification script:
 
@@ -215,12 +279,13 @@ Run the verification script:
 adventures/planned/00-side-effects-may-vary/intermediate/verify.sh
 ```
 
-If everything passes, the cohorts are correctly dosed and the audit log is recording.
+If everything passes, every cohort lands on the right reading and the audit log is recording the cohort attributes that drove each one.
 
 ## 🧠 Why This Layout Works
 
 - **Transaction context** is the right home for the subject's race because it's per-request and must not survive into the next request. The `ThreadLocalTransactionContextPropagator` is what makes the SDK pick up that per-thread state on every evaluation.
 - **Global evaluation context** is the right home for the trial's country because it's a property of the lab instance itself, not the subject. Setting it once at boot is correct, and reading it from `COUNTRY` in the environment lets the same image serve different trials without rebuilding.
+- **Invocation context** is the right home for the dose because it's known only at the moment the lab takes the reading — not on the request, not at startup. Passing it at the call site keeps the controller in charge of attributes whose value the controller is the only one to know.
 - **Hooks** are registered globally on the API, so every flag evaluation everywhere in the app picks them up — no need to thread the audit logger through every controller.
 
-That separation is the whole reason OpenFeature ships a vendor-neutral context model. The same code reads cleanly whether the provider is flagd in FILE mode (this level), flagd in RPC mode against a remote container (the Expert level), or anything else that implements the SDK's provider interface.
+That separation is the whole reason OpenFeature ships a vendor-neutral context model. The same code reads cleanly whether the provider is flagd in `Resolver.RPC` mode (this level), flagd in `Resolver.IN_PROCESS` mode (the sidebar), or anything else that implements the SDK's provider interface.

@@ -1,7 +1,8 @@
 # 🔴 Expert Solution Walkthrough: Phase 3 — read the chart
 
-Three sub-tasks, in order: wire the meter provider, register `MetricsHook`,
-roll the bad flag back. We'll do them exactly that way.
+Four sub-tasks, in order: wire the meter provider, register `MetricsHook`,
+write and register a `ContextSpanHook` of your own, roll the bad flag back.
+We'll do them exactly that way.
 
 > ⚠️ **Spoiler Alert:** This walkthrough contains the full solution. Try
 > solving it on your own first.
@@ -10,8 +11,11 @@ roll the bad flag back. We'll do them exactly that way.
 
 > By the end of this level, you should have:
 >
-> - The OpenTelemetry meter provider wired and the OpenFeature MetricsHook registered
+> - The OpenTelemetry meter provider wired and the OpenFeature `MetricsHook` registered
+> - A `ContextSpanHook` of your own that copies the merged evaluation context
+>   (`race`, `country`, `dose`) onto the active span as `feature_flag.context.<key>`
 > - At least one trace for service `fun-with-flags-java-spring` visible in Tempo
+> - Spans tagged with `feature_flag.context.dose=underdose` searchable in Tempo
 > - The `feature_flag_evaluation_requests_total` counter non-zero in Prometheus
 > - The `vision_amplifier_v2` fractional rollout flipped back to 100% off / 0% on
 > - HTTP 5xx rate over the last minute below 1%
@@ -238,8 +242,12 @@ Run the verifier:
 adventures/planned/00-side-effects-may-vary/expert/verify.sh
 ```
 
-All seven checks should pass. The 5xx rate check tolerates a brief tail of
-errors from before the rollback, but if you wait a minute it settles to zero.
+All eight checks should pass (lab reachable, flagd reachable, LGTM
+reachable, `vision_amplifier_v2` rolled back, Prometheus has the metric
+counter, Tempo has traces, Tempo spans carry the `feature_flag.context.*`
+attribute, 5xx rate below threshold). The 5xx rate check tolerates a brief
+tail of errors from before the rollback, but if you wait a minute it
+settles to zero.
 
 ## 🎓 What this exercise demonstrates
 
