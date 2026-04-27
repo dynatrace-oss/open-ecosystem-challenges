@@ -1,0 +1,8 @@
+target/
+
+# The repo root .gitignore excludes .vscode/ globally. Re-include the
+# launch + task configs that ship as part of this scenario — they are not
+# editor preferences, they are the F5 / Run-and-Debug entry points the
+# participant uses to start the lab.
+!*/.vscode/
+!*/.vscode/**

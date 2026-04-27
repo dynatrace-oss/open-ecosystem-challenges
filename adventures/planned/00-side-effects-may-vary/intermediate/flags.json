@@ -1,0 +1,24 @@
+{
+  "flags": {
+    "vision_state": {
+      "state": "ENABLED",
+      "variants": {
+        "enhanced": "enhanced",
+        "sharp": "sharp",
+        "blurry": "blurry",
+        "clouded": "clouded"
+      },
+      "defaultVariant": "blurry",
+      "targeting": {
+        "if": [
+          { "===": [{ "var": "species" }, "zyklop"] },
+          "enhanced",
+          { "in": [{ "var": "dose" }, ["underdose", "overdose"]] },
+          "clouded",
+          { "===": [{ "var": "country" }, "de"] },
+          "sharp"
+        ]
+      }
+    }
+  }
+}

@@ -1,0 +1,14 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "type": "java",
+      "name": "🧪 Run the Phase 3 Lab",
+      "request": "launch",
+      "mainClass": "dev.openfeature.demo.java.demo.Laboratory",
+      "projectName": "demo",
+      "console": "integratedTerminal",
+      "cwd": "${workspaceFolder}"
+    }
+  ]
+}
