@@ -84,7 +84,7 @@ Four containers and one Spring Boot process, all on a shared Docker network.
 By the end of this level, you should have:
 
 - The OpenTelemetry **meter provider** wired and the OpenFeature **`MetricsHook`** registered
-- A **`ContextSpanHook`** of your own — a small `Hook` that copies the merged evaluation context (`race`, `country`, `dose`) onto the active span as `feature_flag.context.<key>` — registered alongside `TracesHook`/`MetricsHook`
+- A **`ContextSpanHook`** of your own — a small `Hook` that copies the merged evaluation context (`species`, `country`, `dose`) onto the active span as `feature_flag.context.<key>` — registered alongside `TracesHook`/`MetricsHook`
 - **At least one trace** for service `fun-with-flags-java-spring` visible in Tempo
 - Spans tagged with **`feature_flag.context.dose=underdose`** searchable in Tempo and lining up with `feature_flag.variant=clouded` on the same span
 - The **`feature_flag_evaluation_requests_total`** counter non-zero in Prometheus
@@ -110,7 +110,7 @@ Both hooks need a global `OpenTelemetry` instance. The `TracesHook` works once y
 
 ### Authoring your own hook to enrich spans with context
 
-The `AuditHook` carried over from Intermediate already records the same context attributes (race / country / dose) into a durable `[AUDIT]` log line — that is the safety officer's tool, useful weeks later for forensic follow-up. What it does not give you is **real-time correlation in the dashboard**: log lines do not show up alongside `feature_flag.variant` on a Tempo span. So `TracesHook` is great at recording **what** happened (the variant, the reason), `AuditHook` records the audit-archive view, and there is still a gap — the evaluation context attributes that drove the decision are not on the span. The two hooks stay; you add a third for the on-call's view.
+The `AuditHook` carried over from Intermediate already records the same context attributes (species / country / dose) into a durable `[AUDIT]` log line — that is the safety officer's tool, useful weeks later for forensic follow-up. What it does not give you is **real-time correlation in the dashboard**: log lines do not show up alongside `feature_flag.variant` on a Tempo span. So `TracesHook` is great at recording **what** happened (the variant, the reason), `AuditHook` records the audit-archive view, and there is still a gap — the evaluation context attributes that drove the decision are not on the span. The two hooks stay; you add a third for the on-call's view.
 
 The OpenFeature `Hook` interface is the right place to fix that, in three lines:
 
@@ -120,7 +120,7 @@ public class ContextSpanHook implements Hook {
     public Optional<EvaluationContext> before(HookContext ctx, Map hints) {
         Span span = Span.current();           // active HTTP request span
         EvaluationContext ec = ctx.getCtx();  // global + transaction + invocation, merged
-        for (String key : List.of("race", "country", "dose")) {
+        for (String key : List.of("species", "country", "dose")) {
             Value v = ec.getValue(key);
             if (v != null) span.setAttribute("feature_flag.context." + key, v.asString());
         }
@@ -131,7 +131,7 @@ public class ContextSpanHook implements Hook {
 
 Register it next to `TracesHook` / `MetricsHook` in `OpenFeatureConfig`. Now every flag evaluation tags its parent span with the context attributes the lab cares about. In Tempo: **Search → Service: fun-with-flags-java-spring → +Tag → `feature_flag.context.dose=underdose`** lights up exactly the requests where a tech mis-dosed, with the resolved variant on the same span event.
 
-> ⚠️ **Allowlist, don't iterate.** The hook above only copies a fixed set of keys (`race`, `country`, `dose`) onto the span. Resist the temptation to iterate over the whole evaluation context — typical OpenFeature contexts also carry `userId`, `email`, account or device identifiers, and other personal data. Span and metric attributes flow into observability backends and are routinely retained for days; in many regulatory regimes that is a notifiable breach. The OpenTelemetry [security and privacy guidance](https://opentelemetry.io/docs/security/) and [attribute requirement levels](https://opentelemetry.io/docs/specs/semconv/general/attribute-requirement-level/) both call this out: only attributes whose values are safe for **long-term retention by your telemetry stack** belong on telemetry. Pick the minimum set that helps you correlate, document why each one is safe, and add new keys deliberately.
+> ⚠️ **Allowlist, don't iterate.** The hook above only copies a fixed set of keys (`species`, `country`, `dose`) onto the span. Resist the temptation to iterate over the whole evaluation context — typical OpenFeature contexts also carry `userId`, `email`, account or device identifiers, and other personal data. Span and metric attributes flow into observability backends and are routinely retained for days; in many regulatory regimes that is a notifiable breach. The OpenTelemetry [security and privacy guidance](https://opentelemetry.io/docs/security/) and [attribute requirement levels](https://opentelemetry.io/docs/specs/semconv/general/attribute-requirement-level/) both call this out: only attributes whose values are safe for **long-term retention by your telemetry stack** belong on telemetry. Pick the minimum set that helps you correlate, document why each one is safe, and add new keys deliberately.
 
 ### `flagd` `fractional` operation + `targetingKey`
 

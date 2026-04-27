@@ -51,7 +51,7 @@ public class OpenFeatureConfig implements WebMvcConfigurer {
         // it the Grafana feature-flag dashboard cannot draw its panels.
         //
         // TODO Phase 3 task #2: write a small ContextSpanHook that copies the
-        // merged evaluation context attributes (race, country, dose) onto the
+        // merged evaluation context attributes (species, country, dose) onto the
         // active OpenTelemetry span — for example as
         // `feature_flag.context.<key>` — and register it here. Lets you search
         // Tempo for `feature_flag.context.dose=underdose` and see, on the same
@@ -69,6 +69,6 @@ public class OpenFeatureConfig implements WebMvcConfigurer {
 
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
-        registry.addInterceptor(new RaceInterceptor());
+        registry.addInterceptor(new SpeciesInterceptor());
     }
 }

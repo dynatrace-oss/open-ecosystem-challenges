@@ -13,7 +13,7 @@ We'll do them exactly that way.
 >
 > - The OpenTelemetry meter provider wired and the OpenFeature `MetricsHook` registered
 > - A `ContextSpanHook` of your own that copies the merged evaluation context
->   (`race`, `country`, `dose`) onto the active span as `feature_flag.context.<key>`
+>   (`species`, `country`, `dose`) onto the active span as `feature_flag.context.<key>`
 > - At least one trace for service `fun-with-flags-java-spring` visible in Tempo
 > - Spans tagged with `feature_flag.context.dose=underdose` searchable in Tempo
 > - The `feature_flag_evaluation_requests_total` counter non-zero in Prometheus
@@ -149,7 +149,7 @@ import java.util.Optional;
 
 public class ContextSpanHook implements Hook {
 
-    private static final List<String> TRACKED = List.of("race", "country", "dose");
+    private static final List<String> TRACKED = List.of("species", "country", "dose");
 
     @Override
     public Optional<EvaluationContext> before(HookContext ctx, Map hints) {

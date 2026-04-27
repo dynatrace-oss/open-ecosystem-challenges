@@ -26,7 +26,7 @@ public class AuditHook implements Hook {
     private static final Logger LOG = LoggerFactory.getLogger(AuditHook.class);
 
     /** Allowlist of context attributes safe to drop into the audit log. */
-    private static final List<String> AUDITED = List.of("race", "country", "dose");
+    private static final List<String> AUDITED = List.of("species", "country", "dose");
 
     @Override
     public void after(HookContext ctx, FlagEvaluationDetails details, Map hints) {

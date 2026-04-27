@@ -1,4 +1,4 @@
-// k6 script that hits the demo's GET / with random race values, but only
+// k6 script that hits the demo's GET / with random species values, but only
 // when the OpenFeature flag `loadgen_active` is true. Flip the flag in the
 // running flagd's flags.json (defaultVariant: "off" → "on") and the script
 // starts hammering within seconds. Flip it back and it goes idle.
@@ -22,7 +22,7 @@ const FLAGD_URL = __ENV.FLAGD_URL || 'http://host.docker.internal:8013';
 // Pool of subject species. Empty string means "no query parameter" — exercises
 // the country-fallback or default branch. The mix is deliberately uneven so the
 // variant distribution panel in Grafana looks like real traffic, not a flat split.
-const RACES = ['zyklop', 'zyklop', 'human', 'human', 'human', 'orc', 'elf', 'goblin', ''];
+const SPECIES = ['zyklop', 'zyklop', 'human', 'human', 'human', 'orc', 'elf', 'goblin', ''];
 
 // Generate a random user id per request. The Phase 3 `vision_amplifier_v2` flag
 // uses a fractional rollout that buckets on the OpenFeature targetingKey, so
@@ -53,11 +53,11 @@ export default function () {
     return;
   }
 
-  const race = RACES[Math.floor(Math.random() * RACES.length)];
+  const species = SPECIES[Math.floor(Math.random() * SPECIES.length)];
   const userId = randomUserId();
   const params = [`userId=${userId}`];
-  if (race) params.push(`race=${race}`);
+  if (species) params.push(`species=${species}`);
   const url = `${BASE_URL}/?${params.join('&')}`;
-  http.get(url, { tags: { race: race || 'default' } });
+  http.get(url, { tags: { species: species || 'default' } });
   sleep(0.1);
 }

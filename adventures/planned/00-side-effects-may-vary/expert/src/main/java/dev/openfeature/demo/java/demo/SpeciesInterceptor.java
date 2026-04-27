@@ -11,20 +11,20 @@ import org.springframework.web.servlet.HandlerInterceptor;
 import java.util.HashMap;
 
 /**
- * Per-request OpenFeature transaction context. Reads {@code race} (drives the
+ * Per-request OpenFeature transaction context. Reads {@code species} (drives the
  * species targeting branch on {@code vision_state}) and {@code userId} (used as
  * the OpenFeature targetingKey, so the fractional rollout on
  * {@code vision_amplifier_v2} is sticky per caller).
  */
-public class RaceInterceptor implements HandlerInterceptor {
+public class SpeciesInterceptor implements HandlerInterceptor {
 
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
-        String race = request.getParameter("race");
+        String species = request.getParameter("species");
         String userId = request.getParameter("userId");
         HashMap<String, Value> attributes = new HashMap<>();
-        if (race != null) {
-            attributes.put("race", new Value(race));
+        if (species != null) {
+            attributes.put("species", new Value(species));
         }
         ImmutableContext evaluationContext = userId != null
                 ? new ImmutableContext(userId, attributes)

@@ -8,16 +8,16 @@ This walkthrough shows the target shape of the lab after the level is solved. We
 
 You need four pieces of code wired together:
 
-1. A `RaceInterceptor` that captures the `?race=` query parameter into the OpenFeature **transaction context** for the duration of the request.
+1. A `SpeciesInterceptor` that captures the `?species=` query parameter into the OpenFeature **transaction context** for the duration of the request.
 2. An `AuditHook` that records every flag evaluation with the cohort attributes that drove it.
 3. An updated `OpenFeatureConfig` that registers the interceptor, reads `COUNTRY` from the environment and sets it on the **global** evaluation context, and registers the audit hook.
 4. An updated `Trial` controller that accepts `?dose=` and passes a `dose` attribute as **invocation context** at the call site of `client.getStringDetails(...)`.
 
-The flag definition in `flags.json` is already targeting-rich — `race == zyklop`, the improper-`dose` branch, and the `country == de` branch are all in place.
+The flag definition in `flags.json` is already targeting-rich — `species == zyklop`, the improper-`dose` branch, and the `country == de` branch are all in place.
 
-## 🧩 Step 2: The `RaceInterceptor`
+## 🧩 Step 2: The `SpeciesInterceptor`
 
-Create `src/main/java/dev/openfeature/demo/java/demo/RaceInterceptor.java`:
+Create `src/main/java/dev/openfeature/demo/java/demo/SpeciesInterceptor.java`:
 
 ```java
 package dev.openfeature.demo.java.demo;
@@ -32,14 +32,14 @@ import org.springframework.web.servlet.HandlerInterceptor;
 
 import java.util.HashMap;
 
-public class RaceInterceptor implements HandlerInterceptor {
+public class SpeciesInterceptor implements HandlerInterceptor {
 
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
-        String race = request.getParameter("race");
-        if (race != null) {
+        String species = request.getParameter("species");
+        if (species != null) {
             HashMap<String, Value> attributes = new HashMap<>();
-            attributes.put("race", new Value(race));
+            attributes.put("species", new Value(species));
             ImmutableContext evaluationContext = new ImmutableContext(attributes);
             OpenFeatureAPI.getInstance().setTransactionContext(evaluationContext);
         }
@@ -61,8 +61,8 @@ public class RaceInterceptor implements HandlerInterceptor {
 A few details worth calling out:
 
 - The static initialiser registers a `ThreadLocalTransactionContextPropagator` on the API. Without it the SDK has no way to carry per-request context across the call into the controller — the transaction context would silently be empty.
-- `afterCompletion` clears the context. Servlet container threads are pooled, so leaving the previous request's `race` on the thread would leak it into the *next* request unlucky enough to land on the same thread.
-- `preHandle` only sets the context if `race` is present. A `null` `race` query parameter must not poison the context — the country-targeting branch needs a clean slate when no per-request race is given.
+- `afterCompletion` clears the context. Servlet container threads are pooled, so leaving the previous request's `species` on the thread would leak it into the *next* request unlucky enough to land on the same thread.
+- `preHandle` only sets the context if `species` is present. A `null` `species` query parameter must not poison the context — the country-targeting branch needs a clean slate when no per-request species is given.
 
 ## 🧩 Step 3: The `AuditHook`
 
@@ -86,7 +86,7 @@ public class AuditHook implements Hook {
     private static final Logger LOG = LoggerFactory.getLogger(AuditHook.class);
 
     /** Allowlist of context attributes that are safe to drop into the audit log. */
-    private static final List<String> AUDITED = List.of("race", "country", "dose");
+    private static final List<String> AUDITED = List.of("species", "country", "dose");
 
     @Override
     public void after(HookContext ctx, FlagEvaluationDetails details, Map hints) {
@@ -115,7 +115,7 @@ public class AuditHook implements Hook {
 
 Two things worth pinning down:
 
-- The hook reads from `HookContext.getCtx()` — the **merged** context the SDK was about to evaluate against. So whether the attribute came from the global eval context (`country`), the transaction context (`race` via `RaceInterceptor`), or the invocation context (`dose` from the controller call site), the audit line sees it.
+- The hook reads from `HookContext.getCtx()` — the **merged** context the SDK was about to evaluate against. So whether the attribute came from the global eval context (`country`), the transaction context (`species` via `SpeciesInterceptor`), or the invocation context (`dose` from the controller call site), the audit line sees it.
 - `AUDITED` is a **fixed allowlist** on purpose. Audit logs are usually retained longer than application logs and are often shipped to a SIEM. Don't iterate over the whole context — `targetingKey` and other PII routinely sit there in real apps. Same discipline that the Expert level's OTel hook needs, just with weaker retention. The OpenTelemetry [security & privacy guidance](https://opentelemetry.io/docs/security/) says it best.
 
 What you trade up to in the Expert level: the same `Hook` shape but the output goes onto OpenTelemetry spans instead of a log file, so the dashboard can correlate variants with context attrs in real time.
@@ -167,14 +167,14 @@ public class OpenFeatureConfig implements WebMvcConfigurer {
 
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
-        registry.addInterceptor(new RaceInterceptor());
+        registry.addInterceptor(new SpeciesInterceptor());
     }
 }
 ```
 
 What changed compared to the broken-state file:
 
-- The class now `implements WebMvcConfigurer` and overrides `addInterceptors` to register `RaceInterceptor`. Spring picks this up automatically because the class is a `@Configuration`.
+- The class now `implements WebMvcConfigurer` and overrides `addInterceptors` to register `SpeciesInterceptor`. Spring picks this up automatically because the class is a `@Configuration`.
 - The stale `offlineFlagSourcePath("./flags.json")` line on `FlagdOptions` is gone. With `Resolver.RPC` the SDK ignores it anyway — the flagd sibling reads `flags.json` itself; the SDK only talks to flagd over gRPC. Drop it for clarity.
 - After `setProviderAndWait`, we read `System.getenv("COUNTRY")`, build a one-attribute `ImmutableContext` with `country` set to that value, and call `api.setEvaluationContext(...)`. This context merges into every evaluation regardless of request.
 - We call `api.addHooks(new AuditHook())` to register the audit hook on every evaluation.
@@ -230,7 +230,7 @@ public class Trial {
 Three things worth pinning down:
 
 - The `dose` attribute is **observational, not prescriptive**. The lab's protocol calls for a `"standard"` dose every time; what varies per subject is what their body actually ended up with. The targeting branch in `flags.json` reads "if the dose came back underdose or overdose for a non-zyklop, the reading is `clouded`."
-- `getStringDetails(...)` takes the invocation `EvaluationContext` as the **third argument**. The SDK merges it on top of the global context (`country`) and the transaction context (`race` from `RaceInterceptor`); on conflict, invocation wins. None of those layers conflict in this level — they each carry a different attribute name.
+- `getStringDetails(...)` takes the invocation `EvaluationContext` as the **third argument**. The SDK merges it on top of the global context (`country`) and the transaction context (`species` from `SpeciesInterceptor`); on conflict, invocation wins. None of those layers conflict in this level — they each carry a different attribute name.
 - Returning `FlagEvaluationDetails<String>` (rather than just `details.getValue()`) keeps the response body verbose: flag key, value, variant, reason. The verifier and your own debugging both lean on those fields.
 
 ## ✅ Step 6: Verify
@@ -247,10 +247,10 @@ Hit it from another terminal:
 
 ```bash
 # Per-subject targeting (transaction context) wins over country
-curl -s 'http://localhost:8080/?race=zyklop' | jq .value
+curl -s 'http://localhost:8080/?species=zyklop' | jq .value
 # => "enhanced"
 
-# No race, country=de from the env — country branch (global ctx) fires
+# No species, country=de from the env — country branch (global ctx) fires
 curl -s 'http://localhost:8080/?dose=standard' | jq .value
 # => "sharp"     (when running ./run-germany.sh; the explicit ?dose=standard
 #                 keeps the random sampler from rolling underdose/overdose)
@@ -260,8 +260,8 @@ curl -s 'http://localhost:8080/?dose=standard' | jq .value
 curl -s 'http://localhost:8080/?dose=underdose' | jq .value
 # => "clouded"
 
-# Zyklop biology beats bad dosing — race-zyklop is evaluated before improper-dose
-curl -s 'http://localhost:8080/?race=zyklop&dose=underdose' | jq .value
+# Zyklop biology beats bad dosing — species-zyklop is evaluated before improper-dose
+curl -s 'http://localhost:8080/?species=zyklop&dose=underdose' | jq .value
 # => "enhanced"
 ```
 
@@ -271,7 +271,7 @@ Then check the audit trail:
 grep '\[AUDIT\]' app.log | head
 ```
 
-You should see one `[AUDIT] flag=vision_state variant=… reason=… race=… country=… dose=…` line per evaluation, and `WARN`-level lines for any `clouded` outcome with the "improper dosing or off-protocol cohort, follow-up required" suffix.
+You should see one `[AUDIT] flag=vision_state variant=… reason=… species=… country=… dose=…` line per evaluation, and `WARN`-level lines for any `clouded` outcome with the "improper dosing or off-protocol cohort, follow-up required" suffix.
 
 Run the verification script:
 
@@ -283,7 +283,7 @@ If everything passes, every cohort lands on the right reading and the audit log 
 
 ## 🧠 Why This Layout Works
 
-- **Transaction context** is the right home for the subject's race because it's per-request and must not survive into the next request. The `ThreadLocalTransactionContextPropagator` is what makes the SDK pick up that per-thread state on every evaluation.
+- **Transaction context** is the right home for the subject's species because it's per-request and must not survive into the next request. The `ThreadLocalTransactionContextPropagator` is what makes the SDK pick up that per-thread state on every evaluation.
 - **Global evaluation context** is the right home for the trial's country because it's a property of the lab instance itself, not the subject. Setting it once at boot is correct, and reading it from `COUNTRY` in the environment lets the same image serve different trials without rebuilding.
 - **Invocation context** is the right home for the dose because it's known only at the moment the lab takes the reading — not on the request, not at startup. Passing it at the call site keeps the controller in charge of attributes whose value the controller is the only one to know.
 - **Hooks** are registered globally on the API, so every flag evaluation everywhere in the app picks them up — no need to thread the audit logger through every controller.

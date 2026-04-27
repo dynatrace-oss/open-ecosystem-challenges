@@ -27,7 +27,7 @@ cat <<EOF
      ./run-austria.sh   # COUNTRY=at + tee app.log
 
 👉 In another terminal, exercise the cohorts:
-     curl 'http://localhost:8080/?race=zyklop'   # per-subject targeting
+     curl 'http://localhost:8080/?species=zyklop'   # per-subject targeting
      curl 'http://localhost:8080/'               # falls through to country branch
 
 ✅ Run the verification when you're ready:

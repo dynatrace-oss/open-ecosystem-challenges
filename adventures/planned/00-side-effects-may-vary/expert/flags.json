@@ -11,7 +11,7 @@
       "defaultVariant": "blurry",
       "targeting": {
         "if": [
-          { "===": [{ "var": "race" }, "zyklop"] },
+          { "===": [{ "var": "species" }, "zyklop"] },
           "enhanced",
           { "in": [{ "var": "dose" }, ["underdose", "overdose"]] },
           "clouded",

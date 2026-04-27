@@ -8,14 +8,14 @@ source "$SCRIPT_DIR/../../../../lib/scripts/loader.sh"
 
 OBJECTIVE="By the end of this level, you should have:
 
-- A RaceInterceptor that captures ?race= into the OpenFeature transaction context
+- A SpeciesInterceptor that captures ?species= into the OpenFeature transaction context
 - A global evaluation context carrying country (from the COUNTRY env var)
 - An AuditHook that logs every flag evaluation
 - Trial passes a 'dose' attribute as invocation context at the call site
-- curl /?race=zyklop returns 'enhanced'
+- curl /?species=zyklop returns 'enhanced'
 - curl /?dose=standard returns 'sharp' (with COUNTRY=de) and never the fallback 'untreated'
 - curl /?dose=underdose returns 'clouded' (improper dosing for non-zyklops)
-- curl /?race=zyklop&dose=underdose returns 'enhanced' (race priority survives bad dose)
+- curl /?species=zyklop&dose=underdose returns 'enhanced' (species priority survives bad dose)
 - The application log contains audit lines emitted by AuditHook"
 
 DOCS_URL="https://dynatrace-oss.github.io/open-ecosystem-challenges/00-side-effects-may-vary/intermediate"
@@ -66,20 +66,20 @@ fi
 print_new_line
 
 # -----------------------------------------------------------------------------
-# 2. Per-subject targeting: ?race=zyklop must return "enhanced"
+# 2. Per-subject targeting: ?species=zyklop must return "enhanced"
 # -----------------------------------------------------------------------------
 print_test_section "Checking the zyklop subject gets 'enhanced'..."
-ZYKLOP_VALUE="$(curl -s --max-time 5 'http://localhost:8080/?race=zyklop' 2>/dev/null \
+ZYKLOP_VALUE="$(curl -s --max-time 5 'http://localhost:8080/?species=zyklop' 2>/dev/null \
   | jq -r '.value // empty' 2>/dev/null || echo "")"
 
 if [[ "$ZYKLOP_VALUE" == "enhanced" ]]; then
-  print_success_indent "GET /?race=zyklop returned 'enhanced'"
+  print_success_indent "GET /?species=zyklop returned 'enhanced'"
   TESTS_PASSED=$((TESTS_PASSED + 1))
 else
-  print_error_indent "GET /?race=zyklop returned: '$ZYKLOP_VALUE' (expected 'enhanced')"
-  print_hint "Did you wire RaceInterceptor and register a ThreadLocalTransactionContextPropagator?"
+  print_error_indent "GET /?species=zyklop returned: '$ZYKLOP_VALUE' (expected 'enhanced')"
+  print_hint "Did you wire SpeciesInterceptor and register a ThreadLocalTransactionContextPropagator?"
   TESTS_FAILED=$((TESTS_FAILED + 1))
-  FAILED_CHECKS+=("race_targeting")
+  FAILED_CHECKS+=("species_targeting")
 fi
 print_new_line
 
@@ -135,20 +135,20 @@ print_new_line
 # -----------------------------------------------------------------------------
 # 5. Zyklop biology overrides bad dosing: even with ?dose=underdose, a zyklop
 #    subject should still resolve to "enhanced" because the targeting puts
-#    race-zyklop ahead of the improper-dose branch.
+#    species-zyklop ahead of the improper-dose branch.
 # -----------------------------------------------------------------------------
 print_test_section "Checking zyklop biology survives an improper dose..."
-ZYKLOP_BAD_DOSE="$(curl -s --max-time 5 'http://localhost:8080/?race=zyklop&dose=underdose' 2>/dev/null \
+ZYKLOP_BAD_DOSE="$(curl -s --max-time 5 'http://localhost:8080/?species=zyklop&dose=underdose' 2>/dev/null \
   | jq -r '.value // empty' 2>/dev/null || echo "")"
 
 if [[ "$ZYKLOP_BAD_DOSE" == "enhanced" ]]; then
-  print_success_indent "Zyklop + underdose returned 'enhanced' — race priority is correct"
+  print_success_indent "Zyklop + underdose returned 'enhanced' — species priority is correct"
   TESTS_PASSED=$((TESTS_PASSED + 1))
 else
   print_error_indent "Zyklop + underdose returned: '$ZYKLOP_BAD_DOSE' (expected 'enhanced')"
-  print_hint "Targeting order in flags.json should evaluate race=zyklop before the improper-dose branch."
+  print_hint "Targeting order in flags.json should evaluate species=zyklop before the improper-dose branch."
   TESTS_FAILED=$((TESTS_FAILED + 1))
-  FAILED_CHECKS+=("priority_race_over_dose")
+  FAILED_CHECKS+=("priority_species_over_dose")
 fi
 print_new_line
 
