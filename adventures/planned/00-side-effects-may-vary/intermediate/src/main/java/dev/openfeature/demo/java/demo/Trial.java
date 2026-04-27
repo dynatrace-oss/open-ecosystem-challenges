@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class Trial {
 
     @GetMapping("/")
-    public FlagEvaluationDetails<String> helloWorld() {
+    public FlagEvaluationDetails<String> observeSubject() {
         Client client = OpenFeatureAPI.getInstance().getClient();
         return client.getStringDetails("vision_state", "untreated");
     }

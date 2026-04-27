@@ -15,7 +15,6 @@ public class OpenFeatureConfig {
         OpenFeatureAPI api = OpenFeatureAPI.getInstance();
         FlagdOptions flagdOptions = FlagdOptions.builder()
                 .resolverType(Config.Resolver.RPC)
-                .offlineFlagSourcePath("./flags.json")
                 .build();
 
         api.setProviderAndWait(new FlagdProvider(flagdOptions));
