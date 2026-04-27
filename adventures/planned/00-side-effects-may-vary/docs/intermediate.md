@@ -54,61 +54,16 @@ By the end of this level, you should have:
 - The response is never the literal fallback `"untreated"`
 - The application log shows at least one line emitted by your `AuditHook` per request
 
-> 📋 **Run with `tee app.log`.** The verifier (and your own debugging) reads the `[AUDIT]` lines from a file `app.log` next to `pom.xml`, so the lab needs to be started in a way that writes its stdout to that file. The two convenience scripts below (`./run-germany.sh` / `./run-austria.sh`) do this for you; if you run `./mvnw spring-boot:run` directly, pipe through `| tee app.log` or the verifier will fail with no audit log to grep.
+> 📋 **Run with `tee app.log`.** The verifier greps `[AUDIT]` lines from `app.log` next to `pom.xml`. The `./run-germany.sh` / `./run-austria.sh` scripts handle this for you; if you run `./mvnw spring-boot:run` directly, pipe through `| tee app.log` or the verifier has nothing to grep.
 
 ## 📚 Concepts you'll touch
 
-If any of these are unfamiliar, read this section before opening the code — the puzzle will make a lot more sense afterwards.
+- **Spring `HandlerInterceptor`** — per-request hook that runs `preHandle` before your controller and `afterCompletion` after the response. See [Spring's `HandlerInterceptor` Javadoc](https://docs.spring.io/spring-framework/docs/current/javadoc-api/org/springframework/web/servlet/HandlerInterceptor.html).
+- **Three OpenFeature context layers** — *global* (set once at startup, every request sees it), *transaction* (request-scoped, cleared at `afterCompletion`), *invocation* (passed at the call site). They merge before evaluation; **invocation > transaction > global** on conflict.
+- **`Hook`** — interceptor for flag evaluations. `before`/`after`/`error`/`finallyAfter` fire around every `client.getXxxDetails(...)`. `HookContext.getCtx()` exposes the **merged** context — that's what makes an audit trail useful instead of a "got here" log line.
+- **`ThreadLocalTransactionContextPropagator`** — the propagator that makes transaction context survive across SDK calls in a thread-per-request servlet app. Register once on `OpenFeatureAPI` at startup.
 
-### Spring `HandlerInterceptor`
-
-A Spring MVC component that sits between the servlet container and your `@RestController`. The framework calls four hooks per request, in order:
-
-1. `preHandle(...)` — runs **before** the controller. Return `true` to let the request through. This is where you read query parameters and stash anything per-request.
-2. The controller method runs.
-3. `postHandle(...)` — runs after the controller, before the response is written.
-4. `afterCompletion(...)` — runs after the response, even on exceptions. **Use this to clear thread-local state.**
-
-You register an interceptor by adding it to a `WebMvcConfigurer`'s `addInterceptors(InterceptorRegistry)` method.
-
-### OpenFeature **transaction context**
-
-A request-scoped slot of evaluation context. You set it once at the start of the request; every flag evaluation in that request sees it; you clear it at the end. The OpenFeature SDK does not know what "a request" is — that knowledge is wrapped in a **transaction context propagator**. For a thread-per-request servlet app, `ThreadLocalTransactionContextPropagator` is the right one — register it once on `OpenFeatureAPI` at startup, and `api.setTransactionContext(...)` then stores into a `ThreadLocal` so the controller (running on the same thread) can read it back without a parameter.
-
-The subject's `species` is the canonical request-scoped attribute: it changes from one subject to the next.
-
-### OpenFeature **global evaluation context**
-
-A second slot of evaluation context, set once at startup, that **every** request sees. Use this for attributes that don't change per-request: the trial's country of registration, the deployment region, the build number. The targeting in `flags.json` already has a `country == de` branch waiting on it — your job is to read `System.getenv("COUNTRY")` at startup and put it on the global context.
-
-### OpenFeature **invocation context** (the call-site one)
-
-A third slot of evaluation context, passed **at the moment** of `client.getXxxDetails(...)` as an `EvaluationContext` argument. Use this for attributes that are known only at the call site — not on the request, not at startup. The classic example is something the controller computes seconds before the call: a real-time reading, a per-evaluation choice the application code is making.
-
-In this lab, the canonical example is the **dose** the subject actually absorbed. The protocol calls for a `"standard"` dose every time, but real-world adherence and metabolism vary — roughly 30% of subjects come back underdosed, 10% overdosed (missed appointments, fast metabolisers, the usual reasons). The dose isn't on the request and isn't a property of the lab; it's a per-subject reading the controller computes (or accepts via `?dose=`) and feeds straight into the call. The flag's targeting catches `dose ∈ {underdose, overdose}` for non-zyklop subjects and returns `clouded`.
-
-The three context layers merge before evaluation, with **invocation context taking precedence** over transaction, which takes precedence over global, on conflict.
-
-### OpenFeature `Hook`
-
-An interceptor for **flag evaluations** (not HTTP requests). Implements four lifecycle phases — `before`, `after`, `error`, `finallyAfter` — fired around every `client.getXxxDetails(...)` call. Register once with `api.addHooks(...)` and it applies to every evaluation. Same shape as a Spring HandlerInterceptor but at the OpenFeature layer instead of the HTTP layer.
-
-What makes a hook *valuable* (rather than just a "got here" log line) is that `HookContext.getCtx()` exposes the **merged** evaluation context the SDK was about to evaluate against — global + transaction + invocation, all three layers. So a hook can write a real audit trail: which flag resolved to which variant, for a subject of which `species`, in which trial `country`, with which `dose`. In this level your hook does exactly that; in the Expert level the same shape pushes the same attributes onto OpenTelemetry spans instead of log lines.
-
-### `flagd` targeting
-
-The targeting rule in `flags.json` is a small expression tree, evaluated top-to-bottom:
-
-```jsonc
-"if": [
-  { "===": [{"var":"species"},    "zyklop"] },                  "enhanced",
-  { "in":  [{"var":"dose"},    ["underdose", "overdose"]] }, "clouded",
-  { "===": [{"var":"country"}, "de"] },                       "sharp"
-]
-// fall-through to defaultVariant: "blurry"
-```
-
-The first arm checks `species == zyklop`; zyklops are robust enough that improper dosing doesn't faze them, so this is checked first and wins outright. The second arm catches `dose ∈ {underdose, overdose}` for everyone else — improper dosing causes `clouded` readings. Then `country == de` for proper-dose non-zyklop subjects in the German trial. If none match, `defaultVariant: "blurry"` wins. Your job is to make sure the attributes the rules reference are *on* the evaluation context — not to write the rule.
+For an end-to-end summary of how the three layers fit together once the level is solved, see [solutions/intermediate.md → Why This Layout Works](./solutions/intermediate.md#-why-this-layout-works).
 
 ## 🧠 What You'll Learn
 
@@ -125,13 +80,7 @@ Your Codespace comes pre-configured with the following tools:
 - `curl` and `jq` for poking at the lab
 - `tail -f` for watching the application log live
 
-The flagd sibling that the Beginner level introduced is still running here — the broken-state `OpenFeatureConfig` already targets it via `Resolver.RPC` (`flagd:8013` from the workspace, `localhost:8013` from your host). Once the level is solved, an optional sidebar: switch the resolver mode without changing the call sites — same flag definitions, different wire path.
-
-- `Resolver.RPC` (the default in this level) — every evaluation makes one gRPC round-trip to flagd. Easiest to reason about; this is what you start with.
-- `Resolver.IN_PROCESS` + `host("flagd")` + `port(8015)` — flag *definitions* stream into the JVM via flagd's sync API on port 8015, and evaluations happen locally. No per-call hop, and the flag definitions still come from a single source of truth. This is the most common shape in real production deployments.
-- `Resolver.FILE` + `offlineFlagSourcePath("./flags.json")` — bypass flagd entirely; the SDK parses `flags.json` itself. Useful for unit tests where you don't want a sidecar.
-
-All three are good bridges to the Expert level.
+The flagd sibling that the Beginner level introduced is still running here — the broken-state `OpenFeatureConfig` already targets it via `Resolver.RPC` (`flagd:8013` from the workspace, `localhost:8013` from your host).
 
 ## ⏰ Deadline
 
@@ -223,25 +172,12 @@ The order matters less than you'd think — Spring will pick up `OpenFeatureConf
 
 ### 4. Run the Lab
 
-`verify.sh` greps the lab's stdout for the `AuditHook` log lines, so the run needs to write to a file `app.log` next to `pom.xml`. **The trial's country of registration is set via the `COUNTRY` environment variable.** The level ships two convenience scripts in the project root that handle the env var and the `tee app.log` for you:
-
 ```bash
 cd adventures/planned/00-side-effects-may-vary/intermediate
 ./run-germany.sh   # COUNTRY=de — exercises the country-targeting branch
-./run-austria.sh   # COUNTRY=at — country branch does NOT fire; default applies
 ```
 
-Roll your own country at any time with `COUNTRY=<code> ./mvnw spring-boot:run | tee app.log`.
-
-The devcontainer also exports `COUNTRY=de` by default in the workspace environment, so a plain `./mvnw spring-boot:run` (or **F5** / **Run** in the Spring Boot Dashboard) already runs the German trial.
-
-For one-click switching from the IDE, the level ships three named **Run and Debug** configurations in `.vscode/launch.json`:
-
-- 🇩🇪 **Run the Lab — Germany (COUNTRY=de)**
-- 🇦🇹 **Run the Lab — Austria (COUNTRY=at)**
-- 🌍 **Run the Lab — No country**
-
-Open the **Run and Debug** view (`Ctrl/Cmd + Shift + D`), pick one from the dropdown, and hit ▶. Switching country is a click; no terminal needed.
+`./run-austria.sh` (`COUNTRY=at`) ships alongside it for the no-targeting case. Three named launch configs in `.vscode/launch.json` (Germany / Austria / No country) give you one-click cohort switching from the **Run and Debug** view.
 
 ### 5. Verify Each Cohort by Hand
 

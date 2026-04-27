@@ -243,27 +243,7 @@ Boot the lab. The level ships two convenience scripts that pre-set `COUNTRY` and
 ./run-austria.sh   # COUNTRY=at
 ```
 
-Hit it from another terminal:
-
-```bash
-# Per-subject targeting (transaction context) wins over country
-curl -s 'http://localhost:8080/?species=zyklop' | jq .value
-# => "enhanced"
-
-# No species, country=de from the env — country branch (global ctx) fires
-curl -s 'http://localhost:8080/?dose=standard' | jq .value
-# => "sharp"     (when running ./run-germany.sh; the explicit ?dose=standard
-#                 keeps the random sampler from rolling underdose/overdose)
-# => "blurry"    (when running ./run-austria.sh — neither branch fires)
-
-# Improper dose (invocation context) overrides the country branch for non-zyklops
-curl -s 'http://localhost:8080/?dose=underdose' | jq .value
-# => "clouded"
-
-# Zyklop biology beats bad dosing — species-zyklop is evaluated before improper-dose
-curl -s 'http://localhost:8080/?species=zyklop&dose=underdose' | jq .value
-# => "enhanced"
-```
+Once you've made the changes above, the four curl cases in [the participant doc's verify-by-hand section](../intermediate.md#5-verify-each-cohort-by-hand) should now resolve as documented — with explicit log lines from your `AuditHook`.
 
 Then check the audit trail:
 

@@ -15,25 +15,6 @@ This level runs as two containers side-by-side in your Codespace — the Spring 
 - **The flagd sidecar** — `ghcr.io/open-feature/flagd:latest`, started by the devcontainer compose stack. It serves flag evaluations over **gRPC on `:8013`**, watches `flags.json` on disk, and reloads when it changes.
 - **The chart system** — the OpenFeature Java SDK plus the **flagd contrib provider** in `Resolver.RPC` mode. The provider reads `FLAGD_HOST=flagd` / `FLAGD_PORT=8013` from the environment (the compose file pre-sets them), so there is no host or port to hard-code.
 
-```
-                ┌──────────────────────────────┐
-   GET /        │   Laboratory (Spring Boot)   │
- ────────►      │     Trial                    │
-                │       └─ OF Client           │
-                │           └─ FlagdProvider (RPC)
-                └────────────────┬─────────────┘
-                                 │  gRPC :8013
-                                 ▼
-                ┌──────────────────────────────┐
-                │   flagd  (sidecar)           │
-                └────────────────┬─────────────┘
-                                 │  reads + watches
-                                 ▼
-                            flags.json
-```
-
-> 💡 **Why a sidecar instead of file mode in-process?** The flagd provider can also read `flags.json` directly inside the JVM (`Resolver.FILE`), and that is fine for tests. In real deployments, however, flagd typically runs as a separate process: it's language-agnostic (one flag service serves Java, Go, Python, Node services in the same cluster) and it concentrates the watch / reload / authentication concerns in one place. Starting the adventure with the sidecar shape means everything you learn in Beginner carries straight into Intermediate and Expert without re-plumbing.
-
 ## 🎯 Objective
 
 By the end of this level, you should:
@@ -56,7 +37,7 @@ Your Codespace comes pre-configured with the following tools to help you solve t
 - [`./mvnw`](https://maven.apache.org/wrapper/): The Maven wrapper checked in next to `pom.xml`. Builds and runs the Spring Boot lab.
 - [`curl`](https://curl.se/): Hits `http://localhost:8080/` and shows you what reading the lab is recording.
 - [`jq`](https://jqlang.org/): Pretty-prints and filters the JSON evaluation details that come back from the SDK.
-- A **flagd sidecar** — already running in the devcontainer's compose stack. It listens on `:8013` (gRPC eval), `:8014` (management — Prometheus metrics + health), `:8015` (gRPC sync stream — used by IN_PROCESS mode), `:8016` (OFREP HTTP eval API). For this level you only talk to `:8013`.
+- A **flagd sidecar** — already running in the devcontainer's compose stack. The flagd sidecar is on `:8013`; the other ports aren't used here.
 
 ## ⏰ Deadline
 
@@ -99,8 +80,6 @@ Open the **Ports** tab in the bottom panel. You should see:
 - **8080 — Lab (Spring Boot).** Click the forwarded address. You should see the current hard-coded response: `untreated`.
 - **8013 — flagd gRPC.** This is the flagd sidecar. Nothing to click yet, but knowing it's there is the point: the lab
   is going to talk to this in step 3.
-- **8014 — management/metrics, 8015 — sync stream, 8016 — OFREP HTTP.** Auxiliary endpoints; you don't need them for
-  the Beginner level.
 
 ### 3. Implement the Objective
 
@@ -137,12 +116,6 @@ in **RPC mode**, and registers it on the global `OpenFeatureAPI` instance.
 The lab's protocol is: build `FlagdOptions` with `Resolver.RPC` (no host or port — the provider reads `FLAGD_HOST`
 and `FLAGD_PORT` from the environment, and the devcontainer pre-sets them to `flagd:8013`), then call
 `api.setProviderAndWait(new FlagdProvider(options))` from a `@PostConstruct` method.
-
-> ℹ️ The flagd provider supports three resolver modes: **`RPC`** (gRPC round-trip per evaluation; the simplest wire
-> shape), **`IN_PROCESS`** (a gRPC sync stream pushes the flag set into the SDK so evaluations stay local — this is
-> the most common shape in real production deployments, and Intermediate has a sidebar on flipping to it against
-> the same flagd sibling), and **`FILE`** (read flags.json directly from disk, no flagd container at all). We use
-> RPC here because the wire model is the easiest to reason about for a first contact with OpenFeature.
 
 #### c. Author the `vision_state` flag in `flags.json`
 
@@ -242,8 +215,6 @@ A passing run looks roughly like this:
 It looks like you successfully completed this level! 🌟
 ```
 
-A clean response from the lab, after the swap test has restored the original `flags.json`:
-
 ```json
 {
   "flagKey": "vision_state",
@@ -256,5 +227,4 @@ A clean response from the lab, after the swap test has restored the original `fl
 }
 ```
 
-If you see `"value": "blurry"` (or `"clouded"`) and `"flagKey": "vision_state"`, the lab is reading the chart and
-you're ready for the 🟡 Intermediate level — **Outcome by cohort**.
+If you see `"value": "blurry"` (or `"clouded"`) and `"flagKey": "vision_state"`, you're ready for the 🟡 Intermediate level — **Outcome by cohort**.

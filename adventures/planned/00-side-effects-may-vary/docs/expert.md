@@ -131,7 +131,7 @@ Register it next to `TracesHook` / `MetricsHook` in `OpenFeatureConfig`. Now eve
 
 The full implementation, including imports and a couple of subtle correctness notes, is in [solutions/expert.md](./solutions/expert.md).
 
-> ⚠️ **Allowlist, don't iterate.** The hook above only copies a fixed set of keys (`species`, `country`, `dose`) onto the span. Resist the temptation to iterate over the whole evaluation context — typical OpenFeature contexts also carry `userId`, `email`, account or device identifiers, and other personal data. Span and metric attributes flow into observability backends and are routinely retained for days; in many regulatory regimes that is a notifiable breach. The OpenTelemetry [security and privacy guidance](https://opentelemetry.io/docs/security/) and [attribute requirement levels](https://opentelemetry.io/docs/specs/semconv/general/attribute-requirement-level/) both call this out: only attributes whose values are safe for **long-term retention by your telemetry stack** belong on telemetry. Pick the minimum set that helps you correlate, document why each one is safe, and add new keys deliberately.
+> ⚠️ **Allowlist, don't iterate.** Use a fixed allowlist for the same reason the `AuditHook` does — see [Intermediate's PII note](./intermediate.md#3c-an-audithook) and the [OpenTelemetry security guidance](https://opentelemetry.io/docs/security/).
 
 ### `flagd` `fractional` operation + `targetingKey`
 
@@ -140,10 +140,6 @@ The full implementation, including imports and a couple of subtle correctness no
 The piece that wires this up is the **`SpeciesInterceptor`** carried over from the Intermediate level. It runs on every inbound HTTP request, reads `?userId=...` from the query string, and constructs an `ImmutableContext(userId, attributes)` — by SDK convention, the first `String` argument to `ImmutableContext` **is** the OpenFeature `targetingKey`. That context is then set as the transaction context for the request, so every flag evaluation downstream of the interceptor sees a stable per-subject targeting key and `fractional` buckets correctly.
 
 The k6 loadgen demonstrates this end-to-end: it generates a fresh random `userId` per request, which means the interceptor produces a different targeting key per request, which means the fractional rollout spreads across the percentages exactly as configured. The dashboard's variant-distribution panel reflects that split directly.
-
-### Why a flag flip beats a redeploy
-
-When `vision_amplifier_v2` is set to "100 percent on" and stabilisation goes sideways, two operational levers exist: the deploy pipeline (revert the bad code path, rebuild, push, roll out — minutes to hours) or the flag (`flags.json` edit — seconds, no redeploy). The whole point of the level is to feel the second lever in your hands.
 
 ## 🧠 What You'll Learn
 
@@ -224,24 +220,9 @@ Tempo's own HTTP API. The `verify.sh` script uses
 `http://localhost:3200/api/search?tags=service.name=fun-with-flags-java-spring`
 to assert traces are flowing.
 
-#### flagd (Ports `8013` / `8014` / `8015` / `8016`)
+#### flagd
 
-- **`8013`** — gRPC eval (what the SDK uses in `Resolver.RPC` mode). flagd multiplexes
-  HTTP/1.1 and gRPC on this port via cmux, so the same gRPC-Gateway routes are
-  reachable over plain JSON-over-HTTP — convenient for CLI checks. Example:
-
-  ```bash
-  curl -s -X POST http://localhost:8013/flagd.evaluation.v1.Service/ResolveBoolean \
-    -H 'Content-Type: application/json' \
-    -d '{"flagKey":"vision_amplifier_v2","context":{"targetingKey":"subject-1"}}' | jq
-  ```
-
-- **`8014`** — management port. Prometheus `/metrics` for flagd itself plus `/healthz`,
-  `/readyz`. Not an evaluation endpoint.
-- **`8015`** — sync stream (gRPC). Used by flagd providers running in `Resolver.IN_PROCESS`
-  mode to receive flag definitions as they change.
-- **`8016`** — OFREP HTTP eval API. The vendor-neutral evaluation protocol; the path is
-  `/ofrep/v1/evaluate/flags/{flag_key}` and works against any OFREP-compliant flag service.
+flagd is on `:8013` (gRPC eval) — same as Beginner; the other ports (`8014` management/metrics, `8015` sync, `8016` OFREP) aren't used in this level.
 
 #### OTLP receivers (Ports `4317` / `4318`)
 
@@ -287,13 +268,7 @@ changes within a second. The k6 loadgen container has been polling
 `loadgen_active` every two seconds — it will notice and start hammering
 `http://workspace:8080/` with five virtual users (the workspace service name resolves inside the compose network).
 
-Now open the dashboard. Within ten to fifteen seconds you should see:
-
-- An **evaluations-per-second** panel filling up
-- A **variant distribution** pie that is heavily skewed — `vision_amplifier_v2`
-  is at **100% on**, which is exactly the misbehaving Phase 3 rollout
-- HTTP latency p99 sitting around **200–250ms**, far above the baseline
-- An HTTP 5xx rate around **10%**, exactly what the audit log was complaining about
+Now open the dashboard. When the loadgen turns on you should see latency creep up around 200ms and 5xx rate around 10%; if those don't move, the loadgen flag isn't actually live yet.
 
 That's the diagnosis: the fractional rollout for `vision_amplifier_v2` is
 inverted. The flag definition currently reads:
