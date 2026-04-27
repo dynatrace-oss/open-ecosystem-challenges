@@ -70,11 +70,11 @@ Four containers and one Spring Boot process, all on a shared Docker network.
 ┌─────▼────────────────┐                           ┌─────────┴──────────────┐
 │  flagd               │ ◀──── poll loadgen flag ──│  k6 loadgen            │
 │  :8013 (gRPC + HTTP  │                           │  HTTP GET /?userId=…   │
-│         eval gateway)│                           │  (becomes targetingKey │
-│  :8014 management /  │                           │   via SpeciesIntercep- │
-│        metrics       │                           │   tor on the lab)      │
-│  :8015 sync stream   │                           │                        │
-│  :8016 OFREP         │                           │                        │
+│         eval gateway)│                           │  (the lab interceptor  │
+│  :8014 management /  │                           │   sets userId as the   │
+│        metrics       │                           │   targetingKey, which  │
+│  :8015 sync stream   │                           │   is what fractional   │
+│  :8016 OFREP         │                           │   rollouts bucket on)  │
 │  flags.json mounted  │                           │                        │
 └──────────────────────┘                           └────────────────────────┘
 ```
@@ -84,7 +84,7 @@ Four containers and one Spring Boot process, all on a shared Docker network.
 By the end of this level, you should have:
 
 - The OpenTelemetry **meter provider** wired and the OpenFeature **`MetricsHook`** registered
-- The **`SpeciesInterceptor`** (carried over from Intermediate) reading `?userId=` from the request and setting it as the OpenFeature **`targetingKey`** on the evaluation context, so the `vision_amplifier_v2` fractional rollout buckets per subject rather than landing every request in the same bucket
+- Verified: the **`SpeciesInterceptor`** carried over from Intermediate is wiring `?userId=` as the OpenFeature **`targetingKey`** on every request, so the `vision_amplifier_v2` fractional rollout buckets per subject rather than landing every request in the same bucket *(you don't write this — verify it via the dashboard's variant-distribution panel after step 5)*
 - A **`ContextSpanHook`** of your own — a small `Hook` that copies the merged evaluation context (`species`, `country`, `dose`) onto the active span as `feature_flag.context.<key>` — registered alongside `TracesHook`/`MetricsHook`
 - **At least one trace** for service `fun-with-flags-java-spring` visible in Tempo
 - Spans tagged with **`feature_flag.context.dose=underdose`** searchable in Tempo and lining up with `feature_flag.variant=clouded` on the same span
@@ -137,7 +137,7 @@ The full implementation, including imports and a couple of subtle correctness no
 
 `fractional` is flagd's bucketing operation. Given a list of `[variant, percent]` pairs, it deterministically assigns each evaluation to one variant based on a hash of the **targeting key** on the evaluation context. Same key → same bucket → same variant, every request. Different keys spread across the percentages. **If no targeting key is set, every evaluation hashes the same way and the rollout collapses — every request lands in the same bucket and the percentages do nothing.**
 
-The piece that wires this up is the **`SpeciesInterceptor`** carried over from the Intermediate level. It runs on every inbound HTTP request, reads `?userId=...` from the query string, and constructs an `ImmutableContext(userId, attributes)` — by SDK convention, the first `String` argument to `ImmutableContext` **is** the OpenFeature `targetingKey`. That context is then set as the transaction context for the request, so every flag evaluation downstream of the interceptor sees a stable per-subject targeting key and `fractional` buckets correctly.
+You already wired this up in Intermediate. The **`SpeciesInterceptor`** you wrote there reads `?userId=...` from each request and constructs an `ImmutableContext(userId, attributes)` — by SDK convention the first `String` argument to `ImmutableContext` **is** the OpenFeature `targetingKey`. Expert ships the same interceptor byte-for-byte; the lab is already serving fractional rollouts correctly without you touching it. (Intermediate didn't have a flag that used the targetingKey; this is where it pays off.)
 
 The k6 loadgen demonstrates this end-to-end: it generates a fresh random `userId` per request, which means the interceptor produces a different targeting key per request, which means the fractional rollout spreads across the percentages exactly as configured. The dashboard's variant-distribution panel reflects that split directly.
 

@@ -39,15 +39,18 @@ The metrics half, however, is dead. Two reasons:
    recording flag evaluations as metrics.
 
 One thing that **is** already wired and matters for this level: the
-`SpeciesInterceptor` carried over from Intermediate. It runs on every
-inbound HTTP request, reads `?userId=…` from the query string, and
-constructs `new ImmutableContext(userId, attributes)` — by SDK convention,
-the first `String` argument **is** the OpenFeature `targetingKey`. That is
-what makes the `vision_amplifier_v2` fractional rollout actually bucket per
-subject; without it, every evaluation would hash the same way and the
-percentages would do nothing. You don't have to touch this file in Expert,
-but it's the reason the rollback in Step 6 takes effect immediately when
-the loadgen sends a fresh `userId` per request.
+`SpeciesInterceptor` you wrote in Intermediate. Expert ships it byte-for-byte
+unchanged. The relevant part for this level is the line you already wrote
+that reads `?userId=…` from the query string and constructs
+`new ImmutableContext(userId, attributes)` — by SDK convention, the first
+`String` argument **is** the OpenFeature `targetingKey`. That is what makes
+the `vision_amplifier_v2` fractional rollout actually bucket per subject;
+without it, every evaluation would hash the same way and the percentages
+would do nothing. (Intermediate didn't have a flag that used the
+targetingKey, so the wiring sat dormant; this is where it pays off.) You
+don't write any new code for this in Expert — the rollback in Step 6 takes
+effect immediately because the loadgen sends a fresh `userId` per request
+into the interceptor you already shipped.
 
 ## 🛠 Step 3: Wire the meter provider
 
@@ -131,10 +134,10 @@ public class OpenFeatureConfig implements WebMvcConfigurer {
         attributes.put("country", new Value(Optional.ofNullable(System.getenv("COUNTRY")).orElse("")));
         api.setEvaluationContext(new ImmutableContext(attributes));
 
-        api.addHooks(new AuditHook());
-        api.addHooks(new TracesHook());
-        api.addHooks(new MetricsHook(openTelemetry));
-        api.addHooks(new ContextSpanHook());
+        api.addHooks(new AuditHook());          // already wired in broken state
+        api.addHooks(new TracesHook());         // already wired in broken state
+        api.addHooks(new MetricsHook(openTelemetry));  // <-- you add this
+        api.addHooks(new ContextSpanHook());           // <-- you add this
     }
 
     // addInterceptors(...) unchanged

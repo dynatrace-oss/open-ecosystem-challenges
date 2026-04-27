@@ -37,12 +37,15 @@ public class SpeciesInterceptor implements HandlerInterceptor {
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
         String species = request.getParameter("species");
+        String userId = request.getParameter("userId");
+        HashMap<String, Value> attributes = new HashMap<>();
         if (species != null) {
-            HashMap<String, Value> attributes = new HashMap<>();
             attributes.put("species", new Value(species));
-            ImmutableContext evaluationContext = new ImmutableContext(attributes);
-            OpenFeatureAPI.getInstance().setTransactionContext(evaluationContext);
         }
+        ImmutableContext evaluationContext = userId != null
+                ? new ImmutableContext(userId, attributes)
+                : new ImmutableContext(attributes);
+        OpenFeatureAPI.getInstance().setTransactionContext(evaluationContext);
         return HandlerInterceptor.super.preHandle(request, response, handler);
     }
 
@@ -61,8 +64,9 @@ public class SpeciesInterceptor implements HandlerInterceptor {
 A few details worth calling out:
 
 - The static initialiser registers a `ThreadLocalTransactionContextPropagator` on the API. Without it the SDK has no way to carry per-request context across the call into the controller — the transaction context would silently be empty.
-- `afterCompletion` clears the context. Servlet container threads are pooled, so leaving the previous request's `species` on the thread would leak it into the *next* request unlucky enough to land on the same thread.
-- `preHandle` only sets the context if `species` is present. A `null` `species` query parameter must not poison the context — the country-targeting branch needs a clean slate when no per-request species is given.
+- `afterCompletion` clears the context. Servlet container threads are pooled, so leaving the previous request's species or `targetingKey` on the thread would leak it into the *next* request unlucky enough to land on the same thread.
+- The `ImmutableContext(targetingKey, attributes)` constructor is the explicit way to set the targetingKey alongside other attributes; the `ImmutableContext(attributes)` overload leaves it unset. We branch on whether `userId` is present so a missing `?userId=` doesn't poison the context with a `null` targetingKey.
+- No Intermediate flag uses the targetingKey yet — Intermediate's `vision_state` targets attributes, not a fractional bucket. The wiring is forward-looking: Expert's `vision_amplifier_v2` is a fractional rollout that buckets on `targetingKey`, so this interceptor is the same one Expert ships, byte for byte.
 
 ## 🧩 Step 3: The `AuditHook`
 
@@ -267,5 +271,6 @@ If everything passes, every cohort lands on the right reading and the audit log 
 - **Global evaluation context** is the right home for the trial's country because it's a property of the lab instance itself, not the subject. Setting it once at boot is correct, and reading it from `COUNTRY` in the environment lets the same image serve different trials without rebuilding.
 - **Invocation context** is the right home for the dose because it's known only at the moment the lab takes the reading — not on the request, not at startup. Passing it at the call site keeps the controller in charge of attributes whose value the controller is the only one to know.
 - **Hooks** are registered globally on the API, so every flag evaluation everywhere in the app picks them up — no need to thread the audit logger through every controller.
+- **`targetingKey`** lives on the transaction context too, set from `?userId=`. No Intermediate flag uses it, but it's the bucketing key for any fractional rollout further on — and it's the canonical PII identifier that the audit allowlist deliberately keeps out of `[AUDIT]` lines.
 
-That separation is the whole reason OpenFeature ships a vendor-neutral context model. The same code reads cleanly whether the provider is flagd in `Resolver.RPC` mode (this level), flagd in `Resolver.IN_PROCESS` mode (the sidebar), or anything else that implements the SDK's provider interface.
+That separation is the whole reason OpenFeature ships a vendor-neutral context model. The same code reads cleanly whether the provider is flagd in `Resolver.RPC` mode (this level) or `Resolver.IN_PROCESS` mode against the same flagd sibling — for the resolver-modes overview, see [solutions/beginner.md](./beginner.md).

@@ -16,10 +16,10 @@ Your shift: teach the lab to read each subject's species off the request, attach
 │                                                                      │
 │  HTTP ──► SpeciesInterceptor ──► Trial ──► OpenFeature client        │
 │           (transaction ctx:     (invocation ctx:   (global ctx:      │
-│            species ← ?species=)  dose ← computed   country ←         │
-│                                       at call site, $COUNTRY env)    │
-│                                       overridable                    │
-│                                       with ?dose=)                   │
+│            species ← ?species=   dose ← computed   country ←         │
+│            targetingKey          at call site,     $COUNTRY env)     │
+│              ← ?userId=)         overridable                         │
+│                                  with ?dose=)                        │
 │                                                            │         │
 │                                                            ▼         │
 │                                                       AuditHook      │
@@ -44,6 +44,7 @@ The lab and a flagd sidecar run as siblings in the devcontainer's compose stack.
 By the end of this level, you should have:
 
 - A Spring `HandlerInterceptor` that reads `?species=` from each incoming request, sets it on the OpenFeature **transaction context** for the duration of the request, and clears it on completion
+- The same interceptor reads `?userId=` and sets it as the OpenFeature **`targetingKey`** — no Intermediate flag uses it yet, but it's the bucketing key for any fractional rollout downstream (Expert's `vision_amplifier_v2` is the obvious one) and it's the canonical PII identifier the AuditHook deliberately won't log
 - A **global evaluation context** that carries `country` from the `COUNTRY` environment variable (`System.getenv("COUNTRY")`) the lab was started with
 - A `Trial` controller that, on each evaluation, passes the **`dose`** as **invocation context** — `"standard"` most of the time, `"underdose"` or `"overdose"` when the lab tech mis-measures (overridable with `?dose=`)
 - A custom `Hook` registered on the OpenFeature API that logs every flag evaluation with the flag key, variant, and reason
@@ -60,8 +61,9 @@ By the end of this level, you should have:
 
 - **Spring `HandlerInterceptor`** — per-request hook that runs `preHandle` before your controller and `afterCompletion` after the response. See [Spring's `HandlerInterceptor` Javadoc](https://docs.spring.io/spring-framework/docs/current/javadoc-api/org/springframework/web/servlet/HandlerInterceptor.html).
 - **Three OpenFeature context layers** — *global* (set once at startup, every request sees it), *transaction* (request-scoped, cleared at `afterCompletion`), *invocation* (passed at the call site). They merge before evaluation; **invocation > transaction > global** on conflict.
+  The transaction layer needs a **`ThreadLocalTransactionContextPropagator`** registered once on `OpenFeatureAPI` at startup — without it, the SDK has no way to carry per-request context across the call into the controller, and the transaction context silently stays empty.
+- **`targetingKey`** — a special slot on the eval context that flag implementations use as the bucketing key for fractional rollouts. The SDK exposes it via `ec.getTargetingKey()` rather than `ec.getValue("targetingKey")`; the `ImmutableContext(targetingKey, attributes)` constructor sets it explicitly. In real apps it's typically a stable user id — i.e. the canonical PII identifier you do **not** want flowing into audit logs.
 - **`Hook`** — interceptor for flag evaluations. `before`/`after`/`error`/`finallyAfter` fire around every `client.getXxxDetails(...)`. `HookContext.getCtx()` exposes the **merged** context — that's what makes an audit trail useful instead of a "got here" log line.
-- **`ThreadLocalTransactionContextPropagator`** — the propagator that makes transaction context survive across SDK calls in a thread-per-request servlet app. Register once on `OpenFeatureAPI` at startup.
 
 For an end-to-end summary of how the three layers fit together once the level is solved, see [solutions/intermediate.md → Why This Layout Works](./solutions/intermediate.md#-why-this-layout-works).
 
@@ -145,8 +147,8 @@ You need three pieces.
 
 Create `src/main/java/dev/openfeature/demo/java/demo/SpeciesInterceptor.java`. It implements Spring's `HandlerInterceptor` and does three things:
 
-- In `preHandle`, read the `species` query parameter. If it's non-null, build an `ImmutableContext` with one attribute (`species` → `Value`) and set it on the OpenFeature **transaction context** via `OpenFeatureAPI.getInstance().setTransactionContext(...)`.
-- In `afterCompletion`, clear the transaction context with an empty `ImmutableContext()` so the request's species doesn't leak into the next request that reuses this thread.
+- In `preHandle`, read both the `species` and the `userId` query parameters. Put `species` on an attributes map when present, then build an `ImmutableContext` with `userId` as the **targetingKey** if it's present (`new ImmutableContext(userId, attributes)`) — otherwise just the attributes (`new ImmutableContext(attributes)`). Call `OpenFeatureAPI.getInstance().setTransactionContext(...)` to install it.
+- In `afterCompletion`, clear the transaction context with an empty `ImmutableContext()` so neither the species nor the targetingKey leaks into the next request that reuses this thread.
 - In a static initialiser, register a `ThreadLocalTransactionContextPropagator` on the OpenFeature API. This is what makes the transaction context survive across the SDK call inside the controller.
 
 #### 3b. Wire the interceptor + global context + hook in `OpenFeatureConfig`
@@ -157,7 +159,7 @@ Update `OpenFeatureConfig` to:
 - After `setProviderAndWait`, read `System.getenv("COUNTRY")` (with a sensible fallback like `""` when unset), build an `ImmutableContext` containing `country` → `Value`, and call `api.setEvaluationContext(...)`. This is the **global** evaluation context — it's merged into every flag evaluation regardless of request.
 - Call `api.addHooks(new AuditHook())` to register your audit hook globally.
 
-#### 3c. A `AuditHook`
+#### 3c. An `AuditHook`
 
 Create `src/main/java/dev/openfeature/demo/java/demo/AuditHook.java`. It implements `dev.openfeature.sdk.Hook`. The lab director wants an **audit trail**, not a "got here" trace, so do something useful with the data the hook can see:
 
@@ -166,7 +168,7 @@ Create `src/main/java/dev/openfeature/demo/java/demo/AuditHook.java`. It impleme
 
 > ⚠️ **Audit-log PII note.** Use a **fixed allowlist** (`List.of("species", "country", "dose")`) — never iterate the whole eval context.
 >
-> The merged context typically also carries `targetingKey` (often a user id) and, in real apps, things like email or account identifiers. Audit logs are retained longer than app logs and shipped off-host to SIEMs, so leaking PII here is hard to redact after the fact. Same discipline the Expert OTel hook will need; see [OpenTelemetry's security guidance](https://opentelemetry.io/docs/security/).
+> You just wired `?userId=` as the **targetingKey** in step 3a. That's the canonical example of something that lives on the eval context but does **not** belong in an audit log: it's typically a stable user id, often joins to email and account data, and audit logs are retained longer than app logs and shipped off-host to SIEMs (where redacting after the fact is hard). The allowlist is what keeps the targetingKey out of `[AUDIT]` lines even though `HookContext.getCtx()` can see it. Same discipline the Expert OTel hook will need; see [OpenTelemetry's security guidance](https://opentelemetry.io/docs/security/).
 
 The order matters less than you'd think — Spring will pick up `OpenFeatureConfig` as a `@Configuration` class on boot, the `@PostConstruct` will run once, and from then on every evaluation the `Trial` performs will see both contexts and trigger your hook.
 
