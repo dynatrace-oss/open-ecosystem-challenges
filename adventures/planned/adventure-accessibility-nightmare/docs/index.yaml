@@ -21,6 +21,7 @@ tags:
   - Playwright
   - axe-core
   - Lighthouse
+  - Guidepup Virtual Screen Reader
 
 backstory:
   - >-
@@ -79,10 +80,12 @@ overview:
     turns to the accessibility gate, green for months without once loading the pages
     a customer pays on.
   - >-
-    What you leave with is a sense of what each layer of testing can settle. Linting
-    reads source and catches faults before anything renders. Scanning reads the
-    rendered DOM and catches faults in a snapshot. Driving the page with a keyboard
-    catches behavior, and behavior is where the remainder are.
+    What you leave with is a sense of how far each layer of testing reaches. Linting
+    reads your source and catches authoring mistakes before anything renders, but it
+    stops at code you wrote. Scanning reads the rendered DOM and catches faults in a
+    snapshot. Driving the page with a keyboard catches behavior, which a snapshot
+    never shows. Watching real sessions catches what changed after you shipped, which
+    is the only layer that reaches code you do not control.
   - >-
     The storefront is pre-provisioned in a Dev Container, so the work is the audit,
     the repairs and the test coverage.

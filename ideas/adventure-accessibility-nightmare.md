@@ -91,22 +91,26 @@ Repair the automated check that is meant to stop inaccessible code from shipping
 
 #### Story
 
-The components are repaired, and the legal team needs proof of continuous compliance for the EAA audit next week. Every merge already arrives with a green accessibility check attached, and the record says the storefront has been clean for months. But one item on the original legal notice was never reproduced. A customer reached the payment step, and once the keyboard was inside the card fields it never came out again, cycling between them however many times they pressed Tab. They never reached the button to place the order, and the check has never once reported anything there. Work out what that check is really looking at before the auditors arrive.
+The components are repaired, and the legal team needs proof of continuous compliance for the EAA audit next week. Every merge passes the accessibility check, and its run history has been green for months. But one item on the original legal notice was never reproduced. A customer reached the payment step and could not complete the order, and the check has never once reported anything there. Work out what that check is really looking at before the auditors arrive.
 
 #### The Problem
 
-The check runs on every build and always passes. The trouble is not the rules it applies but where it applies them. It never reaches the pages a customer moves through on the way to paying, and the barrier behind the lawsuit is a fault in how the page behaves rather than in how it is written, so no automated scanner would report it wherever it looked.
+The check runs on every build and always passes. The trouble is not the rules it applies but where it applies them. It never reaches the pages a customer moves through on the way to paying, and extending it there still finds nothing, because the barrier is a fault in how the page behaves rather than in how it is written. Even once the gate catches it, it has only ever checked the widget as it stood at the last build, and the vendor can ship a new one on a day when nobody pushes.
+
+Implementer note: the vendor widget must be a same-document script that mounts into a div, never an iframe. Focus and key events do not cross an iframe boundary, so a page-level beacon cannot observe the trap through one.
 
 #### Objective
 
-- Check the page as it appears in a browser, not the file the build produces
-- Catch the barrier on the payment step that no scan has ever reported
-- Prove the check works both ways: it fails a build that carries a known problem and passes one that does not
+- Have the gate audit every step a customer moves through, not only the homepage
+- Have the gate catch the payment barrier that no scan has ever reported
+- Keep reporting the barrier after the vendor replaces the widget with a version the gate has never tested
+- Produce a report recording what was audited, what was found, and what cannot be fixed
 
 #### What You'll Learn
 
 - Why a green accessibility check means nothing until you know which pages and states it actually looked at
-- How reading the source code, scanning the finished page, and driving the page with a keyboard each catch different faults, and why some faults only the last of them can find
+- How linting your source, scanning the finished page, and driving it with a keyboard each reach a different distance, and why only the last one finds a keyboard trap
+- Why a check that runs on your schedule cannot cover a component that changes on someone else's
 - How a third-party component you cannot change still becomes your own legal problem
 
 #### Tools & Infrastructure
