@@ -5,7 +5,7 @@ set -euo pipefail
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 cd "$SCRIPT_DIR"
 # shellcheck disable=SC1091
-source "$SCRIPT_DIR/../../../../lib/scripts/loader.sh"
+source "$SCRIPT_DIR/../../../lib/scripts/loader.sh"
 
 set_tracking_context "accessibility-nightmare" "beginner" "07" "09" "2026"
 
