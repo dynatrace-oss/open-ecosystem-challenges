@@ -19,9 +19,4 @@ npm ci
 echo "✨ Installing Playwright Chromium..."
 npx playwright install --with-deps chromium
 
-CHROME_PATH="$(node -e "const { chromium } = require('playwright'); console.log(chromium.executablePath())")"
-if [[ -x "$CHROME_PATH" ]] && ! grep -q '^export CHROME_PATH=' "$HOME/.bashrc"; then
-  echo "export CHROME_PATH=\"$CHROME_PATH\"" >> "$HOME/.bashrc"
-fi
-
 echo "✅ Post-create complete."
